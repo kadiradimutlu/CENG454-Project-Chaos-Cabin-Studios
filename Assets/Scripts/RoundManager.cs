@@ -1,48 +1,93 @@
+using FishNet;
 using FishNet.Object;
 using FishNet.Connection;
 using UnityEngine;
-using System.Collections.Generic;
 
 public class RoundManager : NetworkBehaviour
 {
     [Header("World Settings")]
-    public GameObject gameWorldObject; // The main object holding the entire arena
-    public Transform[] spawnPoints;    // Our 4 spawn points
+    [SerializeField] private GameObject gameWorldObject;
+    [SerializeField] private Transform[] spawnPoints;
 
     [Header("Prefab")]
-    public GameObject playerPrefab;    // The player prefab to spawn
+    [SerializeField] private NetworkObject playerPrefab;
 
-    // Only the Server (Host) runs this: Called when "Start Game" is pressed in the Lobby UI
-    [ServerRpc(RequireOwnership = false)]
+    private bool _roundStarted;
+
+    /// <summary>
+    /// Only call this from the server/host.
+    /// </summary>
     public void StartRoundServer()
     {
+        if (!IsServer)
+        {
+            Debug.LogWarning("StartRoundServer can only be called on the server.");
+            return;
+        }
+
+        if (_roundStarted)
+        {
+            Debug.LogWarning("Round already started.");
+            return;
+        }
+
+        if (playerPrefab == null)
+        {
+            Debug.LogError("Player prefab is not assigned.");
+            return;
+        }
+
+        if (spawnPoints == null || spawnPoints.Length == 0)
+        {
+            Debug.LogError("No spawn points assigned.");
+            return;
+        }
+
+        _roundStarted = true;
+
         Debug.Log("Server: Round is starting...");
 
-        // 1. Send a message to all clients to enable the game world
+        EnableWorldServer();
         EnableWorldClient();
 
-        // 2. Find all connected players (clients)
+        SpawnPlayersForConnectedClients();
+    }
+
+    private void SpawnPlayersForConnectedClients()
+    {
         int spawnIndex = 0;
-        foreach (NetworkConnection conn in ServerManager.Clients.Values)
+
+        foreach (NetworkConnection conn in InstanceFinder.ServerManager.Clients.Values)
         {
-            // Determine the spawn point (0, 1, 2, 3...)
+            if (conn == null || !conn.IsActive)
+                continue;
+
             Transform spawnPoint = spawnPoints[spawnIndex % spawnPoints.Length];
 
-            // Instantiate the player at the specified point
-            GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-            
-            // Tell Fish-Net to spawn this object on the network and give ownership to this connection
-            ServerManager.Spawn(player, conn);
+            NetworkObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+            InstanceFinder.ServerManager.Spawn(player, conn);
 
             spawnIndex++;
         }
     }
 
-    // The Server sends this to all clients (Observers): "Make the map visible!"
-    [ObserversRpc]
-    public void EnableWorldClient()
+    private void EnableWorldServer()
     {
-        gameWorldObject.SetActive(true);
+        if (gameWorldObject != null)
+            gameWorldObject.SetActive(true);
+    }
+
+    [ObserversRpc(BufferLast = true)]
+    private void EnableWorldClient()
+    {
+        if (gameWorldObject != null)
+            gameWorldObject.SetActive(true);
+
         Debug.Log("Client: GameWorld activated!");
+    }
+
+    public void ResetRoundState()
+    {
+        _roundStarted = false;
     }
 }
