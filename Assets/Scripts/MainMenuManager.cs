@@ -1,56 +1,60 @@
 using UnityEngine;
 using TMPro;
 using FishNet;
+using FishNet.Transporting.UTP;
+using Unity.Services.Core;
+using Unity.Services.Authentication;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
+using System.Threading.Tasks;
 
 public class MainMenuManager : MonoBehaviour
 {
+    [Header("Managers")]
+    public RoundManager roundManager;
+
     [Header("UI Panels")]
     public GameObject mainMenuPanel;
-    public GameObject settingsPanel; // Yeni eklenen Settings Paneli
+    public GameObject settingsPanel;
     public GameObject hostJoinPanel;
     public GameObject joinCodePanel;
     public GameObject lobbyRoomPanel;
 
-    [Header("Input Fields")]
+    [Header("Input & Output Fields")]
     public TMP_InputField codeInputField;
+    public TextMeshProUGUI roomCodeText;
 
-    private void Start()
+    private async void Start()
     {
-        // Show only the main menu when the game starts
+        // Initialize cloud services and show main menu when the game starts
+        await InitializeUnityServices();
         ShowMainMenu(); 
+    }
+
+    private async Task InitializeUnityServices()
+    {
+        try
+        {
+            await UnityServices.InitializeAsync();
+            if (!AuthenticationService.Instance.IsSignedIn)
+            {
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                Debug.Log("Connected to Unity Services. Player ID: " + AuthenticationService.Instance.PlayerId);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to initialize Unity Services: " + e.Message);
+        }
     }
 
     // --- PANEL NAVIGATION ---
     
-    public void ShowMainMenu()
-    {
-        CloseAllPanels();
-        mainMenuPanel.SetActive(true);
-    }
-
-    public void ShowSettingsPanel()
-    {
-        CloseAllPanels();
-        settingsPanel.SetActive(true);
-    }
-
-    public void ShowHostJoinPanel()
-    {
-        CloseAllPanels();
-        hostJoinPanel.SetActive(true);
-    }
-
-    public void ShowJoinCodePanel()
-    {
-        CloseAllPanels();
-        joinCodePanel.SetActive(true);
-    }
-
-    public void ShowLobbyRoom()
-    {
-        CloseAllPanels();
-        lobbyRoomPanel.SetActive(true);
-    }
+    public void ShowMainMenu() { CloseAllPanels(); mainMenuPanel.SetActive(true); }
+    public void ShowSettingsPanel() { CloseAllPanels(); settingsPanel.SetActive(true); }
+    public void ShowHostJoinPanel() { CloseAllPanels(); hostJoinPanel.SetActive(true); }
+    public void ShowJoinCodePanel() { CloseAllPanels(); joinCodePanel.SetActive(true); }
+    public void ShowLobbyRoom() { CloseAllPanels(); lobbyRoomPanel.SetActive(true); }
 
     private void CloseAllPanels()
     {
@@ -69,24 +73,80 @@ public class MainMenuManager : MonoBehaviour
         Application.Quit();
     }
 
-    public void ClickHost()
+    // --- RELAY (ROOM CODE) ACTIONS ---
+
+    public async void ClickHost()
     {
-        // Starts the Fish-Net server and client, then jumps to the Lobby Panel
-        InstanceFinder.ServerManager.StartConnection();
-        InstanceFinder.ClientManager.StartConnection();
-        
-        ShowLobbyRoom(); 
+        try
+        {
+            Debug.Log("Creating Relay Room...");
+            
+            // Create a room for 4 players (1 Host + 3 Clients)
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(3);
+            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            
+            if (roomCodeText != null) roomCodeText.text = "Room Code: " + joinCode;
+            Debug.Log("Generated Room Code: " + joinCode);
+
+            UnityTransport utp = InstanceFinder.TransportManager.GetTransport<UnityTransport>();
+            
+            // FIXED: Using FishNet's built-in raw data method instead of RelayServerData
+            utp.SetHostRelayData(
+                allocation.RelayServer.IpV4,
+                (ushort)allocation.RelayServer.Port,
+                allocation.AllocationIdBytes,
+                allocation.Key,
+                allocation.ConnectionData,
+                true // isSecure (DTLS)
+            );
+
+            // Start Server and Client for the Host
+            InstanceFinder.ServerManager.StartConnection();
+            InstanceFinder.ClientManager.StartConnection();
+            
+            ShowLobbyRoom(); 
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to create Relay room: " + e.Message);
+        }
     }
 
-    public void ClickJoinWithCode()
+    public async void ClickJoinWithCode()
     {
-        // Gets the input (IP or Code), connects via Fish-Net, and jumps to the Lobby Panel
-        string joinCodeOrIP = codeInputField.text;
-        InstanceFinder.ClientManager.StartConnection(joinCodeOrIP);
-        
-        ShowLobbyRoom(); 
+        try
+        {
+            string joinCode = codeInputField.text;
+            Debug.Log("Joining room with code: " + joinCode);
+
+            // Request to join the allocation using the code
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+
+            UnityTransport utp = InstanceFinder.TransportManager.GetTransport<UnityTransport>();
+            
+            // FIXED: Using FishNet's built-in raw data method instead of RelayServerData
+            utp.SetClientRelayData(
+                joinAllocation.RelayServer.IpV4,
+                (ushort)joinAllocation.RelayServer.Port,
+                joinAllocation.AllocationIdBytes,
+                joinAllocation.Key,
+                joinAllocation.ConnectionData,
+                joinAllocation.HostConnectionData,
+                true // isSecure (DTLS)
+            );
+
+            // Start Client connection
+            InstanceFinder.ClientManager.StartConnection();
+            ShowLobbyRoom(); 
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Failed to join room. Please check the code. Error: " + e.Message);
+        }
     }
 
+    // --- START MATCH ---
+    
     public void StartMatch()
     {
         // Only the Host (Server) can start the actual game
@@ -95,7 +155,14 @@ public class MainMenuManager : MonoBehaviour
             CloseAllPanels();
             Debug.Log("Game Starting! Spawning characters...");
             
-            // Future: Tell GameManager/RoundManager to start the timer and spawn players
+            if (roundManager != null)
+            {
+                roundManager.StartRoundServer();
+            }
+            else
+            {
+                Debug.LogWarning("RoundManager is not assigned in the Inspector!");
+            }
         }
         else
         {

@@ -926,11 +926,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 57516ba0-7cba-478a-9db6-97aa1e8232aa
+  cloudProjectId: ee3be1d1-4301-4129-8c45-5d3733d6f2a8
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: Project Chaos Cabin Studios
-  organizationId: kadiradimutlu
+  organizationId: emirevren521
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
