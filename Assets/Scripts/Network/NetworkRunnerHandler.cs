@@ -22,17 +22,21 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
     {
         _networkRunner.ProvideInput = true;
 
+        var sceneManager = gameObject.GetComponent<NetworkSceneManagerDefault>();
+        if (sceneManager == null) 
+        {
+            sceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
+        }
+
         await _networkRunner.StartGame(new StartGameArgs()
         {
             GameMode = mode,
             SessionName = roomName,
-            Scene = gameObject.AddComponent<NetworkSceneManagerDefault>(),
-            SceneManager = gameObject.GetComponent<NetworkSceneManagerDefault>()
+            SceneManager = sceneManager
         });
     }
 
     // --- INetworkRunnerCallbacks Implementations ---
-    // (Bunlar arayüzün zorunlu metotlarıdır, gerektiğinde içlerini dolduracağız)
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { Debug.Log($"Player {player} joined."); }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { Debug.Log($"Player {player} left."); }
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
