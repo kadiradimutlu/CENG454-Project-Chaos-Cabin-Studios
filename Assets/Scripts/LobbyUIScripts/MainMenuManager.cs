@@ -51,9 +51,10 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private Button leaveButton;
 
     [Header("Fusion")]
-    [SerializeField] private NetworkRunnerHandler runnerHandler;
+    [SerializeField] private NetworkRunnerHandler networkManagersPrefab;
     [SerializeField] private LobbyState lobbyStatePrefab;
 
+    private NetworkRunnerHandler runnerHandler;
     private NetworkRunner _runner;
     private LobbyState _lobbyState;
 
@@ -64,13 +65,15 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     private bool _localReady = false;
     private bool _gameWorldOpened = false;
 
+    private float _uiRefreshTimer = 0f;
+    private const float UiRefreshInterval = 0.10f;
+
+    private bool _isLeavingLobby = false;
+    private bool _isStartingFusion = false;
+
     private void Awake()
     {
-        if (runnerHandler == null)
-            runnerHandler = GetComponent<NetworkRunnerHandler>();
-
-        if (runnerHandler != null)
-            _runner = runnerHandler.GetRunner();
+        EnsureRunnerHandler();
 
         if (gameWorld != null)
             gameWorld.SetActive(false);
@@ -86,13 +89,126 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             HandleBack();
         }
 
-        if (_lobbyState != null && _lobbyState.Object != null)
+        if (!IsLobbyStateAlive())
+        {
+            _lobbyState = null;
+        }
+        else
         {
             if (_lobbyState.GameStarted && !_gameWorldOpened)
             {
                 EnterGameWorld();
             }
         }
+
+        if (_currentPanel == lobbyPanel && IsLobbyStateAlive())
+        {
+            _uiRefreshTimer += Time.deltaTime;
+            if (_uiRefreshTimer >= UiRefreshInterval)
+            {
+                _uiRefreshTimer = 0f;
+                RefreshLobbyUI();
+            }
+        }
+    }
+
+    // ==================================================
+    // HELPERS
+    // ==================================================
+
+    private bool EnsureRunnerHandler()
+    {
+        // 1) Mevcut runtime referansı canlıysa onu kullan
+        if (IsSceneObject(runnerHandler) && runnerHandler.IsReusable())
+        {
+            _runner = runnerHandler.GetRunner();
+            return true;
+        }
+
+        // 2) Singleton instance canlıysa onu kullan
+        if (NetworkRunnerHandler.Instance != null &&
+            IsSceneObject(NetworkRunnerHandler.Instance) &&
+            NetworkRunnerHandler.Instance.IsReusable())
+        {
+            runnerHandler = NetworkRunnerHandler.Instance;
+            _runner = runnerHandler.GetRunner();
+            return true;
+        }
+
+        // 3) Sahnedeki handler'ı bul
+        NetworkRunnerHandler found = FindObjectOfType<NetworkRunnerHandler>();
+        if (found != null && IsSceneObject(found) && found.IsReusable())
+        {
+            runnerHandler = found;
+            _runner = runnerHandler.GetRunner();
+            return true;
+        }
+
+        // 4) Var olan ama kullanılamayan scene instance varsa temizle
+        DestroyLiveRunnerHandlerObject();
+
+        // 5) Prefabdan yeni network manager üret
+        if (networkManagersPrefab != null)
+        {
+            runnerHandler = Instantiate(networkManagersPrefab);
+            _runner = runnerHandler != null ? runnerHandler.GetRunner() : null;
+            return runnerHandler != null;
+        }
+
+        Debug.LogError("NetworkRunnerHandler bulunamadı ve networkManagersPrefab atanmadı.");
+        return false;
+    }
+
+    private bool IsSceneObject(UnityEngine.Object obj)
+    {
+        if (obj == null)
+            return false;
+
+        if (obj is Component component)
+            return component.gameObject.scene.IsValid();
+
+        if (obj is GameObject gameObject)
+            return gameObject.scene.IsValid();
+
+        return false;
+    }
+
+    private void DestroyLiveRunnerHandlerObject()
+    {
+        GameObject sceneObjectToDestroy = null;
+
+        if (runnerHandler != null && IsSceneObject(runnerHandler))
+        {
+            sceneObjectToDestroy = runnerHandler.gameObject;
+        }
+        else if (NetworkRunnerHandler.Instance != null && IsSceneObject(NetworkRunnerHandler.Instance))
+        {
+            sceneObjectToDestroy = NetworkRunnerHandler.Instance.gameObject;
+        }
+        else
+        {
+            NetworkRunnerHandler found = FindObjectOfType<NetworkRunnerHandler>();
+            if (found != null && IsSceneObject(found))
+                sceneObjectToDestroy = found.gameObject;
+        }
+
+        runnerHandler = null;
+        _runner = null;
+
+        if (sceneObjectToDestroy != null)
+        {
+            Destroy(sceneObjectToDestroy);
+        }
+    }
+
+    private bool IsLobbyStateAlive()
+    {
+        return _lobbyState != null;
+    }
+
+    private void SafeClearLobbyState()
+    {
+        _lobbyState = null;
     }
 
     // ==================================================
@@ -101,11 +217,17 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void ClickPlay()
     {
+        if (_isLeavingLobby || _isStartingFusion)
+            return;
+
         OpenPanel(hostJoinPanel);
     }
 
     public void ClickSettings()
     {
+        if (_isLeavingLobby || _isStartingFusion)
+            return;
+
         _previousPanelBeforeSettings = _currentPanel;
         OpenPanel(settingsPanel);
     }
@@ -125,18 +247,33 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public async void ClickHost()
     {
-        _currentRoomCode = GenerateRandomCode(6);
+        if (_isLeavingLobby || _isStartingFusion)
+            return;
 
-        if (roomCodeText != null)
-            roomCodeText.text = $"Room Code: {_currentRoomCode}";
+        _isStartingFusion = true;
 
-        await StartFusion(GameMode.Host, _currentRoomCode);
+        try
+        {
+            _currentRoomCode = GenerateRandomCode(6);
+
+            if (roomCodeText != null)
+                roomCodeText.text = $"Room Code: {_currentRoomCode}";
+
+            await StartFusion(GameMode.Host, _currentRoomCode);
+        }
+        finally
+        {
+            _isStartingFusion = false;
+        }
     }
 
     public void ClickJoin()
     {
+        if (_isLeavingLobby || _isStartingFusion)
+            return;
+
         if (codeInputField != null)
-            codeInputField.text = "";
+            codeInputField.text = string.Empty;
 
         if (joinCodeInfoText != null)
             joinCodeInfoText.text = "Join code gir";
@@ -146,7 +283,12 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public async void ClickJoinYes()
     {
-        string joinCode = codeInputField != null ? codeInputField.text.Trim().ToUpper() : string.Empty;
+        if (_isLeavingLobby || _isStartingFusion)
+            return;
+
+        string joinCode = codeInputField != null
+            ? codeInputField.text.Trim().ToUpper()
+            : string.Empty;
 
         if (joinCode.Contains(":"))
         {
@@ -162,16 +304,28 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        _currentRoomCode = joinCode;
+        _isStartingFusion = true;
 
-        if (roomCodeText != null)
-            roomCodeText.text = $"Room Code: {_currentRoomCode}";
+        try
+        {
+            _currentRoomCode = joinCode;
 
-        await StartFusion(GameMode.Client, _currentRoomCode);
+            if (roomCodeText != null)
+                roomCodeText.text = $"Room Code: {_currentRoomCode}";
+
+            await StartFusion(GameMode.Client, _currentRoomCode);
+        }
+        finally
+        {
+            _isStartingFusion = false;
+        }
     }
 
     public void ClickJoinNo()
     {
+        if (_isLeavingLobby || _isStartingFusion)
+            return;
+
         OpenPanel(hostJoinPanel);
     }
 
@@ -181,20 +335,24 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void ClickReady()
     {
-        if (_runner == null || _lobbyState == null)
+        if (_isLeavingLobby || _isStartingFusion)
+            return;
+
+        if (_runner == null || !IsLobbyStateAlive())
             return;
 
         if (_lobbyState.IsHostPlayer(_runner.LocalPlayer))
             return;
 
-        _localReady = !_localReady;
-        _lobbyState.RPC_SetReady(_localReady);
-        RefreshLobbyUI();
+        _lobbyState.RPC_ToggleReady();
     }
 
     public void ClickStartGame()
     {
-        if (_runner == null || _lobbyState == null)
+        if (_isLeavingLobby || _isStartingFusion)
+            return;
+
+        if (_runner == null || !IsLobbyStateAlive())
             return;
 
         if (!_lobbyState.IsHostPlayer(_runner.LocalPlayer))
@@ -205,20 +363,58 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public async void LeaveLobby()
     {
-        _localReady = false;
-        _gameWorldOpened = false;
-        _lobbyState = null;
+        if (_isLeavingLobby)
+            return;
 
-        if (gameWorld != null)
-            gameWorld.SetActive(false);
+        _isLeavingLobby = true;
 
-        if (runnerHandler != null)
-            await runnerHandler.ShutdownRunner();
+        try
+        {
+            _localReady = false;
+            _gameWorldOpened = false;
+            _uiRefreshTimer = 0f;
+            _currentRoomCode = "";
 
-        _runner = runnerHandler != null ? runnerHandler.GetRunner() : null;
+            if (gameWorld != null)
+                gameWorld.SetActive(false);
 
-        OpenPanel(hostJoinPanel);
-        RefreshLobbyUI();
+            SafeClearLobbyState();
+
+            if (runnerHandler != null)
+            {
+                await runnerHandler.ShutdownRunner();
+            }
+
+            DestroyLiveRunnerHandlerObject();
+
+            _lobbyState = null;
+
+            OpenPanel(mainMenuPanel);
+            RefreshLobbyUI();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"LeaveLobby hata verdi: {ex.Message}");
+
+            SafeClearLobbyState();
+            DestroyLiveRunnerHandlerObject();
+
+            _localReady = false;
+            _gameWorldOpened = false;
+            _currentRoomCode = "";
+            _uiRefreshTimer = 0f;
+
+            if (gameWorld != null)
+                gameWorld.SetActive(false);
+
+            OpenPanel(mainMenuPanel);
+            RefreshLobbyUI();
+        }
+        finally
+        {
+            _isLeavingLobby = false;
+            _isStartingFusion = false;
+        }
     }
 
     // ==================================================
@@ -227,6 +423,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void HandleBack()
     {
+        if (_isLeavingLobby || _isStartingFusion)
+            return;
+
         if (_currentPanel == settingsPanel)
         {
             OpenPanel(_previousPanelBeforeSettings != null ? _previousPanelBeforeSettings : mainMenuPanel);
@@ -263,26 +462,46 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private async Task StartFusion(GameMode mode, string sessionName)
     {
-        if (runnerHandler == null)
+        if (_isLeavingLobby)
         {
-            Debug.LogError("NetworkRunnerHandler atanmadı.");
+            Debug.LogWarning("Lobby çıkışı sürerken yeni bağlantı başlatılamaz.");
             return;
         }
+
+        if (!EnsureRunnerHandler())
+            return;
 
         StartGameResult result = await runnerHandler.StartGame(mode, sessionName);
 
         if (!result.Ok)
         {
             Debug.LogError($"Fusion StartGame başarısız: {result.ShutdownReason}");
+            DestroyLiveRunnerHandlerObject();
             return;
         }
 
         _runner = runnerHandler.GetRunner();
 
+        if (_runner == null)
+        {
+            Debug.LogError("NetworkRunner alınamadı.");
+            DestroyLiveRunnerHandlerObject();
+            return;
+        }
+
         OpenPanel(lobbyPanel);
 
         if (mode == GameMode.Host)
+        {
             SpawnLobbyStateIfNeeded();
+
+            if (_lobbyState != null &&
+                _runner.LocalPlayer != default &&
+                !_lobbyState.ContainsPlayer(_runner.LocalPlayer))
+            {
+                _lobbyState.AssignPlayer(_runner.LocalPlayer);
+            }
+        }
 
         TryFindLobbyState();
         RefreshLobbyUI();
@@ -293,20 +512,30 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (_runner == null || !_runner.IsServer || lobbyStatePrefab == null)
             return;
 
-        if (_lobbyState != null)
+        if (IsLobbyStateAlive())
             return;
 
         _lobbyState = _runner.Spawn(lobbyStatePrefab, Vector3.zero, Quaternion.identity, null);
+
+        if (_lobbyState != null && _runner.LocalPlayer != default)
+        {
+            _lobbyState.AssignPlayer(_runner.LocalPlayer);
+        }
     }
 
     private void TryFindLobbyState()
     {
-        if (_lobbyState == null)
-            _lobbyState = FindObjectOfType<LobbyState>();
+        if (IsLobbyStateAlive())
+            return;
+
+        _lobbyState = FindObjectOfType<LobbyState>();
     }
 
     public void RegisterLobbyState(LobbyState state)
     {
+        if (state == null)
+            return;
+
         _lobbyState = state;
         RefreshLobbyUI();
     }
@@ -348,73 +577,102 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void RefreshLobbyUI()
     {
-        if (player1NameText) player1NameText.text = "Player 1: Empty";
-        if (player2NameText) player2NameText.text = "Player 2: Empty";
-        if (player3NameText) player3NameText.text = "Player 3: Empty";
-        if (player4NameText) player4NameText.text = "Player 4: Empty";
+        if (player1NameText) player1NameText.text = "Player 1: Bekleniyor...";
+        if (player2NameText) player2NameText.text = "Player 2: Bekleniyor...";
+        if (player3NameText) player3NameText.text = "Player 3: Bekleniyor...";
+        if (player4NameText) player4NameText.text = "Player 4: Bekleniyor...";
 
-        if (player1StatusText) player1StatusText.text = "";
-        if (player2StatusText) player2StatusText.text = "";
-        if (player3StatusText) player3StatusText.text = "";
-        if (player4StatusText) player4StatusText.text = "";
+        if (player1StatusText) player1StatusText.text = "Bekleniyor...";
+        if (player2StatusText) player2StatusText.text = "Bekleniyor...";
+        if (player3StatusText) player3StatusText.text = "Bekleniyor...";
+        if (player4StatusText) player4StatusText.text = "Bekleniyor...";
 
         if (player2ReadyButton) player2ReadyButton.gameObject.SetActive(false);
         if (player3ReadyButton) player3ReadyButton.gameObject.SetActive(false);
         if (player4ReadyButton) player4ReadyButton.gameObject.SetActive(false);
 
-        if (startButton) startButton.gameObject.SetActive(false);
+        if (player2ReadyButtonText) player2ReadyButtonText.text = "Hazır";
+        if (player3ReadyButtonText) player3ReadyButtonText.text = "Hazır";
+        if (player4ReadyButtonText) player4ReadyButtonText.text = "Hazır";
 
-        if (roomCodeText != null && !string.IsNullOrEmpty(_currentRoomCode))
-            roomCodeText.text = $"Room Code: {_currentRoomCode}";
+        if (startButton != null)
+        {
+            startButton.gameObject.SetActive(false);
+            startButton.interactable = false;
+        }
 
-        if (_runner == null || _lobbyState == null)
+        if (roomCodeText != null)
+        {
+            roomCodeText.text = string.IsNullOrEmpty(_currentRoomCode)
+                ? "Room Code: ------"
+                : $"Room Code: {_currentRoomCode}";
+        }
+
+        if (_runner == null || !IsLobbyStateAlive())
             return;
 
         LobbyState.LobbySlotData[] slots = _lobbyState.GetSlots();
 
-        if (slots[0].HasPlayer)
+        if (_runner.IsServer && _runner.LocalPlayer != default)
         {
-            if (player1NameText) player1NameText.text = "Player 1 (Host)";
-            if (player1StatusText) player1StatusText.text = "HOST";
+            if (!slots[0].HasPlayer)
+            {
+                _lobbyState.AssignPlayer(_runner.LocalPlayer);
+                slots = _lobbyState.GetSlots();
+            }
         }
 
-        if (slots[1].HasPlayer)
+        if (slots.Length > 0)
         {
-            if (player2NameText) player2NameText.text = "Player 2";
-            if (player2StatusText) player2StatusText.text = slots[1].IsReady ? "READY" : "NOT READY";
+            if (player1NameText) player1NameText.text = slots[0].DisplayName;
+            if (player1StatusText) player1StatusText.text = slots[0].StatusText;
         }
 
-        if (slots[2].HasPlayer)
+        if (slots.Length > 1)
         {
-            if (player3NameText) player3NameText.text = "Player 3";
-            if (player3StatusText) player3StatusText.text = slots[2].IsReady ? "READY" : "NOT READY";
+            if (player2NameText) player2NameText.text = slots[1].DisplayName;
+            if (player2StatusText) player2StatusText.text = slots[1].StatusText;
         }
 
-        if (slots[3].HasPlayer)
+        if (slots.Length > 2)
         {
-            if (player4NameText) player4NameText.text = "Player 4";
-            if (player4StatusText) player4StatusText.text = slots[3].IsReady ? "READY" : "NOT READY";
+            if (player3NameText) player3NameText.text = slots[2].DisplayName;
+            if (player3StatusText) player3StatusText.text = slots[2].StatusText;
+        }
+
+        if (slots.Length > 3)
+        {
+            if (player4NameText) player4NameText.text = slots[3].DisplayName;
+            if (player4StatusText) player4StatusText.text = slots[3].StatusText;
         }
 
         bool isHost = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
         int localSlotIndex = _lobbyState.GetPlayerSlotIndex(_runner.LocalPlayer);
+
+        _localReady = _lobbyState.GetPlayerReady(_runner.LocalPlayer);
 
         if (!isHost)
         {
             if (localSlotIndex == 1 && player2ReadyButton != null)
             {
                 player2ReadyButton.gameObject.SetActive(true);
-                if (player2ReadyButtonText) player2ReadyButtonText.text = _localReady ? "Unready" : "Ready";
+                player2ReadyButton.interactable = true;
+                if (player2ReadyButtonText)
+                    player2ReadyButtonText.text = _localReady ? "Hazır İptal" : "Hazır";
             }
             else if (localSlotIndex == 2 && player3ReadyButton != null)
             {
                 player3ReadyButton.gameObject.SetActive(true);
-                if (player3ReadyButtonText) player3ReadyButtonText.text = _localReady ? "Unready" : "Ready";
+                player3ReadyButton.interactable = true;
+                if (player3ReadyButtonText)
+                    player3ReadyButtonText.text = _localReady ? "Hazır İptal" : "Hazır";
             }
             else if (localSlotIndex == 3 && player4ReadyButton != null)
             {
                 player4ReadyButton.gameObject.SetActive(true);
-                if (player4ReadyButtonText) player4ReadyButtonText.text = _localReady ? "Unready" : "Ready";
+                player4ReadyButton.interactable = true;
+                if (player4ReadyButtonText)
+                    player4ReadyButtonText.text = _localReady ? "Hazır İptal" : "Hazır";
             }
         }
 
@@ -451,10 +709,16 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             SpawnLobbyStateIfNeeded();
 
             if (_lobbyState != null)
-                _lobbyState.AssignPlayer(player);
+            {
+                bool assigned = _lobbyState.AssignPlayer(player);
+                if (!assigned)
+                {
+                    Debug.LogWarning($"Player atanamadı: {player.PlayerId}");
+                }
+            }
         }
 
-        Invoke(nameof(DelayedRefresh), 0.2f);
+        RefreshLobbyUI();
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -463,17 +727,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log($"Player left: {player.PlayerId}");
 
         if (runner.IsServer && _lobbyState != null)
+        {
             _lobbyState.RemovePlayer(player);
-
-        Invoke(nameof(DelayedRefresh), 0.2f);
-    }
-
-    private void DelayedRefresh()
-    {
-        TryFindLobbyState();
-
-        if (_lobbyState != null && _runner != null)
-            _localReady = _lobbyState.GetPlayerReady(_runner.LocalPlayer);
+        }
 
         RefreshLobbyUI();
     }
@@ -482,36 +738,44 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         _runner = runner;
         Debug.Log("Server'a bağlandı.");
+        RefreshLobbyUI();
     }
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
-        _runner = runner;
-        Debug.LogWarning($"Server bağlantısı kesildi: {reason}");
-
-        _lobbyState = null;
+        _runner = null;
+        SafeClearLobbyState();
         _localReady = false;
         _gameWorldOpened = false;
+        _currentRoomCode = "";
+        _uiRefreshTimer = 0f;
+        _isLeavingLobby = false;
+        _isStartingFusion = false;
 
         if (gameWorld != null)
             gameWorld.SetActive(false);
 
+        DestroyLiveRunnerHandlerObject();
         OpenPanel(mainMenuPanel);
         RefreshLobbyUI();
     }
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
-        _runner = runner;
-        Debug.Log($"Shutdown: {shutdownReason}");
-
-        _lobbyState = null;
+        _runner = null;
+        SafeClearLobbyState();
         _localReady = false;
         _gameWorldOpened = false;
+        _currentRoomCode = "";
+        _uiRefreshTimer = 0f;
+        _isLeavingLobby = false;
+        _isStartingFusion = false;
 
         if (gameWorld != null)
             gameWorld.SetActive(false);
 
+        DestroyLiveRunnerHandlerObject();
+        OpenPanel(mainMenuPanel);
         RefreshLobbyUI();
     }
 
