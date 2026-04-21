@@ -24,6 +24,10 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private TextMeshProUGUI joinCodeInfoText;
     [SerializeField] private TextMeshProUGUI roomCodeText;
 
+    [Header("Lobby Code Copy UI")]
+    [SerializeField] private Button copyRoomCodeButton;
+    [SerializeField] private TextMeshProUGUI copyRoomCodeButtonText;
+
     [Header("Lobby - Player Names")]
     [SerializeField] private TextMeshProUGUI player1NameText;
     [SerializeField] private TextMeshProUGUI player2NameText;
@@ -78,6 +82,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (gameWorld != null)
             gameWorld.SetActive(false);
 
+        ResetCopyRoomCodeButtonText();
         OpenPanel(mainMenuPanel);
         RefreshLobbyUI();
     }
@@ -118,14 +123,12 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private bool EnsureRunnerHandler()
     {
-        // 1) Mevcut runtime referansı canlıysa onu kullan
-        if (IsSceneObject(runnerHandler) && runnerHandler.IsReusable())
+        if (runnerHandler != null && runnerHandler.IsReusable())
         {
             _runner = runnerHandler.GetRunner();
             return true;
         }
 
-        // 2) Singleton instance canlıysa onu kullan
         if (NetworkRunnerHandler.Instance != null &&
             IsSceneObject(NetworkRunnerHandler.Instance) &&
             NetworkRunnerHandler.Instance.IsReusable())
@@ -135,7 +138,6 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             return true;
         }
 
-        // 3) Sahnedeki handler'ı bul
         NetworkRunnerHandler found = FindObjectOfType<NetworkRunnerHandler>();
         if (found != null && IsSceneObject(found) && found.IsReusable())
         {
@@ -144,10 +146,8 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             return true;
         }
 
-        // 4) Var olan ama kullanılamayan scene instance varsa temizle
         DestroyLiveRunnerHandlerObject();
 
-        // 5) Prefabdan yeni network manager üret
         if (networkManagersPrefab != null)
         {
             runnerHandler = Instantiate(networkManagersPrefab);
@@ -211,6 +211,12 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         _lobbyState = null;
     }
 
+    private void ResetCopyRoomCodeButtonText()
+    {
+        if (copyRoomCodeButtonText != null)
+            copyRoomCodeButtonText.text = "Copy";
+    }
+
     // ==================================================
     // MAIN MENU
     // ==================================================
@@ -255,6 +261,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         try
         {
             _currentRoomCode = GenerateRandomCode(6);
+            ResetCopyRoomCodeButtonText();
 
             if (roomCodeText != null)
                 roomCodeText.text = $"Room Code: {_currentRoomCode}";
@@ -309,6 +316,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         try
         {
             _currentRoomCode = joinCode;
+            ResetCopyRoomCodeButtonText();
 
             if (roomCodeText != null)
                 roomCodeText.text = $"Room Code: {_currentRoomCode}";
@@ -361,6 +369,84 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         _lobbyState.RPC_RequestStartGame();
     }
 
+    public void ClickCopyRoomCode()
+    {
+        string codeToCopy = _currentRoomCode;
+
+        // Eğer current boşsa ekrandaki textten çek
+        if (string.IsNullOrWhiteSpace(codeToCopy) && roomCodeText != null)
+        {
+            codeToCopy = roomCodeText.text;
+        }
+
+        if (string.IsNullOrWhiteSpace(codeToCopy))
+        {
+            Debug.LogWarning("Kopyalanacak oda kodu bulunamadı.");
+            if (copyRoomCodeButtonText != null)
+                copyRoomCodeButtonText.text = "No Code";
+            return;
+        }
+
+        // "Room Code: ABC123" gibi gelirse temizle
+        codeToCopy = codeToCopy.Replace("Room Code:", "").Trim();
+
+        if (string.IsNullOrWhiteSpace(codeToCopy) || codeToCopy == "------")
+        {
+            Debug.LogWarning("Geçerli oda kodu yok.");
+            if (copyRoomCodeButtonText != null)
+                copyRoomCodeButtonText.text = "No Code";
+            return;
+        }
+
+        bool copied = false;
+
+        // Yöntem 1
+        try
+        {
+            GUIUtility.systemCopyBuffer = codeToCopy;
+            copied = !string.IsNullOrEmpty(GUIUtility.systemCopyBuffer);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("GUIUtility copy failed: " + e.Message);
+        }
+
+        // Yöntem 2 fallback
+        if (!copied)
+        {
+            try
+            {
+                TextEditor te = new TextEditor();
+                te.text = codeToCopy;
+                te.SelectAll();
+                te.Copy();
+                copied = true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("TextEditor copy failed: " + e.Message);
+            }
+        }
+
+        if (copied)
+        {
+            Debug.Log("Copied Room Code: " + codeToCopy);
+
+            if (copyRoomCodeButtonText != null)
+                copyRoomCodeButtonText.text = "Copied!";
+        }
+        else
+        {
+            Debug.LogWarning("Oda kodu kopyalanamadı.");
+
+            if (copyRoomCodeButtonText != null)
+                copyRoomCodeButtonText.text = "Failed";
+        }
+
+        CancelInvoke(nameof(ResetCopyRoomCodeButtonText));
+        Invoke(nameof(ResetCopyRoomCodeButtonText), 1.5f);
+    }
+
     public async void LeaveLobby()
     {
         if (_isLeavingLobby)
@@ -374,6 +460,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             _gameWorldOpened = false;
             _uiRefreshTimer = 0f;
             _currentRoomCode = "";
+            ResetCopyRoomCodeButtonText();
 
             if (gameWorld != null)
                 gameWorld.SetActive(false);
@@ -403,6 +490,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             _gameWorldOpened = false;
             _currentRoomCode = "";
             _uiRefreshTimer = 0f;
+            ResetCopyRoomCodeButtonText();
 
             if (gameWorld != null)
                 gameWorld.SetActive(false);
@@ -608,6 +696,13 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
                 : $"Room Code: {_currentRoomCode}";
         }
 
+        if (copyRoomCodeButton != null)
+        {
+            bool hasRoomCode = !string.IsNullOrWhiteSpace(_currentRoomCode);
+            copyRoomCodeButton.gameObject.SetActive(hasRoomCode);
+            copyRoomCodeButton.interactable = hasRoomCode;
+        }
+
         if (_runner == null || !IsLobbyStateAlive())
             return;
 
@@ -751,6 +846,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         _uiRefreshTimer = 0f;
         _isLeavingLobby = false;
         _isStartingFusion = false;
+        ResetCopyRoomCodeButtonText();
 
         if (gameWorld != null)
             gameWorld.SetActive(false);
@@ -770,6 +866,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         _uiRefreshTimer = 0f;
         _isLeavingLobby = false;
         _isStartingFusion = false;
+        ResetCopyRoomCodeButtonText();
 
         if (gameWorld != null)
             gameWorld.SetActive(false);
