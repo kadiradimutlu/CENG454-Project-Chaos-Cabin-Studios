@@ -167,7 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ab6dd37b22c27d4ba07d16b18f4bd58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalPlayerCameraBinder
-  cameraTarget: {fileID: 0}
+  cameraTarget: {fileID: 9183895688399179690}
 --- !u!1 &8779444187828829011
 GameObject:
   m_ObjectHideFlags: 0
