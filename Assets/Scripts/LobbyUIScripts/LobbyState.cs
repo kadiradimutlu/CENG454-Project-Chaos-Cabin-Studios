@@ -475,14 +475,45 @@ public class LobbyState : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestStartGame(RpcInfo info = default)
     {
+        if (!HasStateAuthority)
+        {
+            Debug.LogWarning("RPC_RequestStartGame ignored: no state authority.");
+            return;
+        }
+
         PlayerRef sender = info.Source;
 
-        if (!IsHostPlayer(sender))
+        if (sender == default && Runner != null)
+        {
+            sender = Runner.LocalPlayer;
+            Debug.Log($"RPC_RequestStartGame fallback sender applied. Sender={sender}");
+        }
+
+        Debug.Log(
+            $"RPC_RequestStartGame received | Sender={sender} | " +
+            $"IsHost={IsHostPlayer(sender)} | CanStart={CanHostStartGame()} | " +
+            $"HasStateAuthority={HasStateAuthority}"
+        );
+
+        if (sender == default)
+        {
+            Debug.LogWarning("RPC_RequestStartGame ignored: sender is default.");
             return;
+        }
+
+        if (!IsHostPlayer(sender))
+        {
+            Debug.LogWarning("RPC_RequestStartGame ignored: sender is not the host.");
+            return;
+        }
 
         if (!CanHostStartGame())
+        {
+            Debug.LogWarning("RPC_RequestStartGame ignored: CanHostStartGame returned false.");
             return;
+        }
 
         GameStarted = true;
+        Debug.Log("GameStarted has been set to TRUE.");
     }
 }

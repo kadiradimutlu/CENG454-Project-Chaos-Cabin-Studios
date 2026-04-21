@@ -103,6 +103,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             if (_lobbyState.GameStarted && !_gameWorldOpened)
             {
+                Debug.Log("GameStarted detected in MainMenuManager. Entering GameWorld.");
                 EnterGameWorld();
             }
         }
@@ -585,11 +586,6 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             LeaveLobby();
             return;
         }
-
-        if (_currentPanel == mainMenuPanel)
-        {
-            return;
-        }
     }
 
     // ==================================================
@@ -739,12 +735,6 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (player3ReadyButtonText) player3ReadyButtonText.text = "Hazır";
         if (player4ReadyButtonText) player4ReadyButtonText.text = "Hazır";
 
-        if (startButton != null)
-        {
-            startButton.gameObject.SetActive(false);
-            startButton.interactable = false;
-        }
-
         if (roomCodeText != null)
         {
             roomCodeText.text = string.IsNullOrEmpty(_currentRoomCode)
@@ -760,7 +750,14 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         if (_runner == null || !IsLobbyStateAlive())
+        {
+            if (startButton != null)
+            {
+                startButton.gameObject.SetActive(false);
+                startButton.interactable = false;
+            }
             return;
+        }
 
         LobbyState.LobbySlotData[] slots = _lobbyState.GetSlots();
 
@@ -829,8 +826,11 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (startButton != null)
         {
-            startButton.gameObject.SetActive(isHost);
-            startButton.interactable = isHost && _lobbyState.CanHostStartGame();
+            bool isHostForStart = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
+            bool canStartGame = _lobbyState.CanHostStartGame();
+
+            startButton.gameObject.SetActive(isHostForStart);
+            startButton.interactable = isHostForStart && canStartGame;
         }
     }
 
