@@ -18,6 +18,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     [Header("Game World")]
     [SerializeField] private GameObject gameWorld;
+    [SerializeField] private GameObject menuCameraObject;
+    [SerializeField] private GameObject gameplayCameraObject;
+    [SerializeField] private GameObject playerSpawnManagerObject;
 
     [Header("Join Code UI")]
     [SerializeField] private TMP_InputField codeInputField;
@@ -79,9 +82,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         EnsureRunnerHandler();
 
-        if (gameWorld != null)
-            gameWorld.SetActive(false);
-
+        SetGameplayView(false);
         ResetCopyRoomCodeButtonText();
         OpenPanel(mainMenuPanel);
         RefreshLobbyUI();
@@ -102,6 +103,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             if (_lobbyState.GameStarted && !_gameWorldOpened)
             {
+                Debug.Log("GameStarted detected in MainMenuManager. Entering GameWorld.");
                 EnterGameWorld();
             }
         }
@@ -155,7 +157,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             return runnerHandler != null;
         }
 
-        Debug.LogError("NetworkRunnerHandler bulunamadı ve networkManagersPrefab atanmadı.");
+        Debug.LogError("NetworkRunnerHandler could not be found and networkManagersPrefab is not assigned.");
         return false;
     }
 
@@ -215,6 +217,29 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (copyRoomCodeButtonText != null)
             copyRoomCodeButtonText.text = "Copy";
+    }
+
+    private void SetGameplayView(bool gameplayActive)
+    {
+        if (gameWorld != null)
+            gameWorld.SetActive(gameplayActive);
+
+        if (menuCameraObject != null)
+            menuCameraObject.SetActive(!gameplayActive);
+
+        if (gameplayCameraObject != null)
+            gameplayCameraObject.SetActive(gameplayActive);
+    }
+
+    private void CloseAllPanels()
+    {
+        if (mainMenuPanel) mainMenuPanel.SetActive(false);
+        if (settingsPanel) settingsPanel.SetActive(false);
+        if (hostJoinPanel) hostJoinPanel.SetActive(false);
+        if (joinCodePanel) joinCodePanel.SetActive(false);
+        if (lobbyPanel) lobbyPanel.SetActive(false);
+
+        _currentPanel = null;
     }
 
     // ==================================================
@@ -305,7 +330,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (string.IsNullOrWhiteSpace(joinCode))
         {
-            Debug.LogWarning("Join code boş olamaz.");
+            Debug.LogWarning("Join code cannot be empty.");
             if (joinCodeInfoText != null)
                 joinCodeInfoText.text = "Kod boş olamaz";
             return;
@@ -357,23 +382,52 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void ClickStartGame()
     {
+        Debug.Log("Start button clicked.");
+
         if (_isLeavingLobby || _isStartingFusion)
+        {
+            Debug.LogWarning("Start blocked: leave/start process is still running.");
             return;
+        }
 
-        if (_runner == null || !IsLobbyStateAlive())
+        if (_runner == null)
+        {
+            Debug.LogWarning("Start blocked: runner is null.");
             return;
+        }
 
-        if (!_lobbyState.IsHostPlayer(_runner.LocalPlayer))
+        if (!IsLobbyStateAlive())
+        {
+            Debug.LogWarning("Start blocked: LobbyState is missing.");
             return;
+        }
+
+        bool isHost = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
+        bool canStart = _lobbyState.CanHostStartGame();
+        int playerCount = _lobbyState.GetPlayerCount();
+
+        Debug.Log($"Start validation -> IsHost: {isHost}, CanStart: {canStart}, PlayerCount: {playerCount}");
+
+        if (!isHost)
+        {
+            Debug.LogWarning("Start blocked: local player is not the host.");
+            return;
+        }
+
+        if (!canStart)
+        {
+            Debug.LogWarning("Start blocked: CanHostStartGame returned false.");
+            return;
+        }
 
         _lobbyState.RPC_RequestStartGame();
+        Debug.Log("Start game RPC sent.");
     }
 
     public void ClickCopyRoomCode()
     {
         string codeToCopy = _currentRoomCode;
 
-        // Eğer current boşsa ekrandaki textten çek
         if (string.IsNullOrWhiteSpace(codeToCopy) && roomCodeText != null)
         {
             codeToCopy = roomCodeText.text;
@@ -381,18 +435,17 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (string.IsNullOrWhiteSpace(codeToCopy))
         {
-            Debug.LogWarning("Kopyalanacak oda kodu bulunamadı.");
+            Debug.LogWarning("No room code found to copy.");
             if (copyRoomCodeButtonText != null)
                 copyRoomCodeButtonText.text = "No Code";
             return;
         }
 
-        // "Room Code: ABC123" gibi gelirse temizle
         codeToCopy = codeToCopy.Replace("Room Code:", "").Trim();
 
         if (string.IsNullOrWhiteSpace(codeToCopy) || codeToCopy == "------")
         {
-            Debug.LogWarning("Geçerli oda kodu yok.");
+            Debug.LogWarning("There is no valid room code to copy.");
             if (copyRoomCodeButtonText != null)
                 copyRoomCodeButtonText.text = "No Code";
             return;
@@ -400,7 +453,6 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         bool copied = false;
 
-        // Yöntem 1
         try
         {
             GUIUtility.systemCopyBuffer = codeToCopy;
@@ -411,7 +463,6 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             Debug.LogWarning("GUIUtility copy failed: " + e.Message);
         }
 
-        // Yöntem 2 fallback
         if (!copied)
         {
             try
@@ -430,14 +481,14 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (copied)
         {
-            Debug.Log("Copied Room Code: " + codeToCopy);
+            Debug.Log("Room code copied: " + codeToCopy);
 
             if (copyRoomCodeButtonText != null)
                 copyRoomCodeButtonText.text = "Copied!";
         }
         else
         {
-            Debug.LogWarning("Oda kodu kopyalanamadı.");
+            Debug.LogWarning("Room code could not be copied.");
 
             if (copyRoomCodeButtonText != null)
                 copyRoomCodeButtonText.text = "Failed";
@@ -462,8 +513,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             _currentRoomCode = "";
             ResetCopyRoomCodeButtonText();
 
-            if (gameWorld != null)
-                gameWorld.SetActive(false);
+            SetGameplayView(false);
 
             SafeClearLobbyState();
 
@@ -481,7 +531,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         }
         catch (Exception ex)
         {
-            Debug.LogError($"LeaveLobby hata verdi: {ex.Message}");
+            Debug.LogError($"LeaveLobby failed: {ex.Message}");
 
             SafeClearLobbyState();
             DestroyLiveRunnerHandlerObject();
@@ -492,8 +542,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             _uiRefreshTimer = 0f;
             ResetCopyRoomCodeButtonText();
 
-            if (gameWorld != null)
-                gameWorld.SetActive(false);
+            SetGameplayView(false);
 
             OpenPanel(mainMenuPanel);
             RefreshLobbyUI();
@@ -537,11 +586,6 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             LeaveLobby();
             return;
         }
-
-        if (_currentPanel == mainMenuPanel)
-        {
-            return;
-        }
     }
 
     // ==================================================
@@ -552,7 +596,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (_isLeavingLobby)
         {
-            Debug.LogWarning("Lobby çıkışı sürerken yeni bağlantı başlatılamaz.");
+            Debug.LogWarning("A new connection cannot be started while leaving the lobby.");
             return;
         }
 
@@ -563,7 +607,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (!result.Ok)
         {
-            Debug.LogError($"Fusion StartGame başarısız: {result.ShutdownReason}");
+            Debug.LogError($"Fusion StartGame failed: {result.ShutdownReason}");
             DestroyLiveRunnerHandlerObject();
             return;
         }
@@ -572,11 +616,12 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (_runner == null)
         {
-            Debug.LogError("NetworkRunner alınamadı.");
+            Debug.LogError("NetworkRunner could not be retrieved.");
             DestroyLiveRunnerHandlerObject();
             return;
         }
 
+        SetGameplayView(false);
         OpenPanel(lobbyPanel);
 
         if (mode == GameMode.Host)
@@ -593,6 +638,8 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         TryFindLobbyState();
         RefreshLobbyUI();
+
+        Debug.Log($"Lobby opened successfully. Mode: {mode}, Room: {sessionName}");
     }
 
     private void SpawnLobbyStateIfNeeded()
@@ -634,15 +681,20 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void EnterGameWorld()
     {
+        if (_gameWorldOpened)
+            return;
+
         _gameWorldOpened = true;
 
-        if (lobbyPanel != null)
-            lobbyPanel.SetActive(false);
+        CloseAllPanels();
+        SetGameplayView(true);
 
-        if (gameWorld != null)
-            gameWorld.SetActive(true);
+        if (playerSpawnManagerObject != null)
+        {
+            playerSpawnManagerObject.SendMessage("TryStartGameplaySpawn", SendMessageOptions.DontRequireReceiver);
+        }
 
-        Debug.Log("GameWorld açıldı.");
+        Debug.Log("GameWorld opened. Gameplay has started.");
     }
 
     // ==================================================
@@ -683,12 +735,6 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (player3ReadyButtonText) player3ReadyButtonText.text = "Hazır";
         if (player4ReadyButtonText) player4ReadyButtonText.text = "Hazır";
 
-        if (startButton != null)
-        {
-            startButton.gameObject.SetActive(false);
-            startButton.interactable = false;
-        }
-
         if (roomCodeText != null)
         {
             roomCodeText.text = string.IsNullOrEmpty(_currentRoomCode)
@@ -704,7 +750,14 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         if (_runner == null || !IsLobbyStateAlive())
+        {
+            if (startButton != null)
+            {
+                startButton.gameObject.SetActive(false);
+                startButton.interactable = false;
+            }
             return;
+        }
 
         LobbyState.LobbySlotData[] slots = _lobbyState.GetSlots();
 
@@ -773,8 +826,11 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (startButton != null)
         {
-            startButton.gameObject.SetActive(isHost);
-            startButton.interactable = isHost && _lobbyState.CanHostStartGame();
+            bool isHostForStart = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
+            bool canStartGame = _lobbyState.CanHostStartGame();
+
+            startButton.gameObject.SetActive(isHostForStart);
+            startButton.interactable = isHostForStart && canStartGame;
         }
     }
 
@@ -808,7 +864,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
                 bool assigned = _lobbyState.AssignPlayer(player);
                 if (!assigned)
                 {
-                    Debug.LogWarning($"Player atanamadı: {player.PlayerId}");
+                    Debug.LogWarning($"Player could not be assigned: {player.PlayerId}");
                 }
             }
         }
@@ -832,7 +888,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnConnectedToServer(NetworkRunner runner)
     {
         _runner = runner;
-        Debug.Log("Server'a bağlandı.");
+        Debug.Log("Connected to server.");
         RefreshLobbyUI();
     }
 
@@ -848,12 +904,13 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         _isStartingFusion = false;
         ResetCopyRoomCodeButtonText();
 
-        if (gameWorld != null)
-            gameWorld.SetActive(false);
+        SetGameplayView(false);
 
         DestroyLiveRunnerHandlerObject();
         OpenPanel(mainMenuPanel);
         RefreshLobbyUI();
+
+        Debug.LogWarning($"Disconnected from server. Reason: {reason}");
     }
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
@@ -868,12 +925,13 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         _isStartingFusion = false;
         ResetCopyRoomCodeButtonText();
 
-        if (gameWorld != null)
-            gameWorld.SetActive(false);
+        SetGameplayView(false);
 
         DestroyLiveRunnerHandlerObject();
         OpenPanel(mainMenuPanel);
         RefreshLobbyUI();
+
+        Debug.LogWarning($"Runner shutdown. Reason: {shutdownReason}");
     }
 
     public void OnSceneLoadDone(NetworkRunner runner)
@@ -881,19 +939,58 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         _runner = runner;
         TryFindLobbyState();
         RefreshLobbyUI();
+
+        Debug.Log("Scene load completed.");
     }
 
-    public void OnSceneLoadStart(NetworkRunner runner) { }
+    public void OnSceneLoadStart(NetworkRunner runner)
+    {
+        Debug.Log("Scene load started.");
+    }
+
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
-    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
+
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
+    {
+        Debug.LogWarning($"Connection failed. Address: {remoteAddress}, Reason: {reason}");
+    }
+
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
-    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
-    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
-    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+    {
+        Debug.Log($"Session list updated. Session count: {sessionList.Count}");
+    }
+
+    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
+    {
+        Debug.Log("Custom authentication response received.");
+    }
+
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+    {
+        Debug.LogWarning("Host migration started.");
+    }
+
+    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
+    {
+        Debug.Log($"Reliable data received from player {player.PlayerId}.");
+    }
+
+    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
+    {
+        Debug.Log($"Reliable data progress from player {player.PlayerId}: {progress}");
+    }
+
+    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+    {
+        Debug.Log($"Object entered AOI for player {player.PlayerId}.");
+    }
+
+    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+    {
+        Debug.Log($"Object exited AOI for player {player.PlayerId}.");
+    }
 }
