@@ -4032,6 +4032,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   maxHealth: 100
   currentHealth: 0
+  healthBar: {fileID: 942199964}
 --- !u!1 &1036868565
 GameObject:
   m_ObjectHideFlags: 0
