@@ -19,7 +19,6 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     [Header("Game World")]
     [SerializeField] private GameObject gameWorld;
     [SerializeField] private GameObject menuCameraObject;
-    [SerializeField] private GameObject gameplayCameraObject;
     [SerializeField] private GameObject playerSpawnManagerObject;
 
     [Header("Join Code UI")]
@@ -224,11 +223,11 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (gameWorld != null)
             gameWorld.SetActive(gameplayActive);
 
-        if (menuCameraObject != null)
-            menuCameraObject.SetActive(!gameplayActive);
-
-        if (gameplayCameraObject != null)
-            gameplayCameraObject.SetActive(gameplayActive);
+        // Keep the menu camera alive until the local player camera is fully ready.
+        if (!gameplayActive)
+        {
+            EnableMenuCameraForMenu();
+        }
     }
 
     private void CloseAllPanels()
@@ -833,7 +832,23 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             startButton.interactable = isHostForStart && canStartGame;
         }
     }
+    public void DisableMenuCameraForGameplay()
+    {
+        if (menuCameraObject != null && menuCameraObject.activeSelf)
+        {
+            menuCameraObject.SetActive(false);
+            Debug.Log("MainMenuManager: Menu camera disabled for gameplay.");
+        }
+    }
 
+    public void EnableMenuCameraForMenu()
+    {
+        if (menuCameraObject != null && !menuCameraObject.activeSelf)
+        {
+            menuCameraObject.SetActive(true);
+            Debug.Log("MainMenuManager: Menu camera enabled for menu.");
+        }
+    }
     private string GenerateRandomCode(int length)
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
