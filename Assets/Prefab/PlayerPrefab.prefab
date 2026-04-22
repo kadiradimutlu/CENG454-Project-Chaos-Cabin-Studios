@@ -14,14 +14,14 @@ GameObject:
   - component: {fileID: 7138108064382286998}
   - component: {fileID: 3971168689283820697}
   - component: {fileID: 2796955079069592424}
-  - component: {fileID: 139542099881762211}
+  - component: {fileID: 2306145414830265327}
   m_Layer: 0
   m_Name: PlayerPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &91400695956637829
 Transform:
   m_ObjectHideFlags: 0
@@ -36,6 +36,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9183895688399179690}
+  - {fileID: 6302583243454890659}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &5920977665164419433
@@ -136,7 +137,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 2796955079069592424}
-  - {fileID: 139542099881762211}
+  - {fileID: 2306145414830265327}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2796955079069592424
 MonoBehaviour:
@@ -155,7 +156,7 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
---- !u!114 &139542099881762211
+--- !u!114 &2306145414830265327
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -164,11 +165,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 3600554267242463573}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ab6dd37b22c27d4ba07d16b18f4bd58, type: 3}
+  m_Script: {fileID: 11500000, guid: d46a8d2c6af9b274ba5029c06fd7ab07, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LocalPlayerCameraBinder
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCameraSetup
+  playerCameraObject: {fileID: 8655580079025213408}
+  cameraFollowRig: {fileID: 5835897299797775121}
   cameraTarget: {fileID: 9183895688399179690}
---- !u!1 &8779444187828829011
+--- !u!1 &8655580079025213408
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -176,24 +179,25 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 9183895688399179690}
-  - component: {fileID: 3319235845071589592}
-  - component: {fileID: 6786123399635994679}
-  - component: {fileID: 2423598430309148562}
+  - component: {fileID: 6302583243454890659}
+  - component: {fileID: 4429516403500304493}
+  - component: {fileID: 3700414507231301114}
+  - component: {fileID: 3196678949031664196}
+  - component: {fileID: 5835897299797775121}
   m_Layer: 0
-  m_Name: CameraTarget
+  m_Name: PlayerCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &9183895688399179690
+  m_IsActive: 0
+--- !u!4 &6302583243454890659
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8779444187828829011}
+  m_GameObject: {fileID: 8655580079025213408}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.6, z: 0}
@@ -202,13 +206,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 91400695956637829}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!20 &3319235845071589592
+--- !u!20 &4429516403500304493
 Camera:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8779444187828829011}
+  m_GameObject: {fileID: 8655580079025213408}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
@@ -253,21 +257,13 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &6786123399635994679
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8779444187828829011}
-  m_Enabled: 1
---- !u!114 &2423598430309148562
+--- !u!114 &3700414507231301114
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8779444187828829011}
+  m_GameObject: {fileID: 8655580079025213408}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
@@ -305,3 +301,59 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!81 &3196678949031664196
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8655580079025213408}
+  m_Enabled: 1
+--- !u!114 &5835897299797775121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8655580079025213408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6074757af38aaad44b6c88840e647d7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraFollowRig
+  target: {fileID: 0}
+  offset: {x: 0, y: 4, z: -6}
+  followSpeed: 8
+  lookSpeed: 8
+  lookAtTarget: 1
+--- !u!1 &8779444187828829011
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9183895688399179690}
+  m_Layer: 0
+  m_Name: CameraTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9183895688399179690
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8779444187828829011}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.6, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 91400695956637829}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
