@@ -1,7 +1,9 @@
 using UnityEngine;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     private Rigidbody rb;
 
@@ -36,7 +38,13 @@ public class PlayerController : MonoBehaviour
 
     [Header("Can Ayarları")]
     public int maxHealth = 100;
+    
+    [SyncVar(OnChange = nameof(OnHealthChanged))]
     public int currentHealth;
+    
+    [SyncVar(OnChange = nameof(OnRoleChanged))]
+    public string currentRole;
+
     public HealthBar healthBar;
 
     private float horizontalInput;
@@ -56,8 +64,6 @@ public class PlayerController : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
-        currentHealth = maxHealth;
-
         if (healthBar != null)
         {
             healthBar.SetMaxHealth(maxHealth);
@@ -69,8 +75,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        // Server tarafinda cani fulluyoruz.
+        currentHealth = maxHealth;
+    }
+
     void Update()
     {
+        if (!base.IsOwner) return;
+
         ReadInput();
         GroundCheck();
         HandleJump();
@@ -78,15 +93,17 @@ public class PlayerController : MonoBehaviour
         HandleBetterGravity();
         HandleAnimation();
 
-        // Geçici test
+        // Geçici test (Sadece server'da can dusurulebilir, o yuzden serverRpc cagirilmali ama simdilik local test)
         if (Input.GetKeyDown(KeyCode.P))
         {
-            TakeDamage(20);
+            CmdTakeDamage(20);
         }
     }
 
     void FixedUpdate()
     {
+        if (!base.IsOwner) return;
+
         HandleMovement();
     }
 
@@ -114,7 +131,7 @@ public class PlayerController : MonoBehaviour
         }
 
         Vector3 targetVelocity = moveDirection * targetSpeed;
-        Vector3 currentHorizontalVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        Vector3 currentHorizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
         float controlMultiplier = isGrounded ? 1f : airControlMultiplier;
 
@@ -135,9 +152,9 @@ public class PlayerController : MonoBehaviour
             speedChangeRate * Time.fixedDeltaTime
         );
 
-        rb.velocity = new Vector3(
+        rb.linearVelocity = new Vector3(
             smoothVelocity.x,
-            rb.velocity.y,
+            rb.linearVelocity.y,
             smoothVelocity.z
         );
     }
@@ -146,18 +163,18 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetButtonDown("Jump") && isGrounded && !isCrouching)
         {
-            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
     }
 
     void HandleBetterGravity()
     {
-        if (rb.velocity.y < 0)
+        if (rb.linearVelocity.y < 0)
         {
             rb.AddForce(Vector3.up * Physics.gravity.y * (fallMultiplier - 1f), ForceMode.Acceleration);
         }
-        else if (rb.velocity.y > 0 && !Input.GetButton("Jump"))
+        else if (rb.linearVelocity.y > 0 && !Input.GetButton("Jump"))
         {
             rb.AddForce(Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1f), ForceMode.Acceleration);
         }
@@ -209,31 +226,48 @@ public class PlayerController : MonoBehaviour
         if (animator == null)
             return;
 
-        Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float speedValue = horizontalVelocity.magnitude;
 
         animator.SetFloat("Speed", speedValue);
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    public void CmdTakeDamage(int damage)
+    {
+        TakeDamage(damage);
+    }
+
     public void TakeDamage(int damage)
     {
+        if (!base.IsServer) return; // Sadece serverda applies_damage_and_syncs
+
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
-        if (healthBar != null)
-        {
-            healthBar.SetHealth(currentHealth);
-        }
-
-        if (damageAudio != null && hurtClip != null)
-        {
-            damageAudio.PlayOneShot(hurtClip);
-        }
 
         if (currentHealth <= 0)
         {
             Die();
         }
+    }
+
+    private void OnHealthChanged(int oldHealth, int newHealth, bool asServer)
+    {
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(newHealth);
+        }
+
+        // Damage sesi calmak icin: eger azaliyorsa damage alinmis demektir.
+        if (newHealth < oldHealth && damageAudio != null && hurtClip != null)
+        {
+            damageAudio.PlayOneShot(hurtClip);
+        }
+    }
+
+    private void OnRoleChanged(string oldRole, string newRole, bool asServer)
+    {
+        // Rol degisimi burda dinlenebilir
     }
 
     void Die()
