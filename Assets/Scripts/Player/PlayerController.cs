@@ -1,90 +1,243 @@
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
-    private CharacterController controller;
+    private Rigidbody rb;
 
     [Header("Animasyon Ayarları")]
-    public Animator animator;          // YENİ: Modelin üzerindeki Animator'u kodumuza tanıtıyoruz
+    public Animator animator;
 
     [Header("Hareket Ayarları")]
-    public float walkSpeed = 4f;       // Yürüme hızı
-    public float runSpeed = 8f;        // Koşma hızı (Shift'e basınca)
-    public float jumpHeight = 2f;      // Zıplama yüksekliği
-    public float gravity = -19.62f;    // Yerçekimi kuvveti 
+    public float walkSpeed = 4f;
+    public float runSpeed = 8f;
+    public float acceleration = 18f;
+    public float deceleration = 22f;
+    public float airControlMultiplier = 0.45f;
+
+    [Header("Zıplama Ayarları")]
+    public float jumpForce = 7f;
+    public float fallMultiplier = 2.5f;
+    public float lowJumpMultiplier = 2f;
 
     [Header("Eğilme Ayarları")]
-    public float crouchHeight = 1f;    // Eğildiğinde karakterin boyu
-    private float originalHeight;      // Karakterin normal boyunu hafızada tutacağız
+    public Transform playerModel;
+    public float crouchScaleY = 0.5f;
+    public float crouchSpeedMultiplier = 0.5f;
 
-    // Fizik hesaplamaları için
-    private Vector3 velocity;          // Karakterin düşüş/zıplama hızı
-    private bool isGrounded;           // Karakter yerde mi?
+    private Vector3 originalScale;
+
+    [Header("Zemin Kontrol")]
+    public Transform groundCheckPoint;
+    public LayerMask groundLayer;
+    public float groundCheckRadius = 0.25f;
+
+    private bool isGrounded;
+
+    [Header("Can Ayarları")]
+    public int maxHealth = 100;
+    public int currentHealth;
+    public HealthBar healthBar;
+
+    private float horizontalInput;
+    private float verticalInput;
+    private Vector3 moveDirection;
+    private bool isCrouching;
+
+    [Header("Damage sesi Ayarları")]
+    public AudioSource damageAudio;
+    public AudioClip hurtClip;
 
     void Start()
     {
-        controller = GetComponent<CharacterController>();
-        // Karakterin başlangıç boyunu kaydediyoruz ki eğilme bitince eski haline dönebilsin
-        originalHeight = controller.height; 
+        rb = GetComponent<Rigidbody>();
+
+        rb.freezeRotation = true;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+        currentHealth = maxHealth;
+
+        if (healthBar != null)
+        {
+            healthBar.SetMaxHealth(maxHealth);
+        }
+
+        if (playerModel != null)
+        {
+            originalScale = playerModel.localScale;
+        }
     }
 
     void Update()
     {
-        // --- 1. YERE BASMA KONTROLÜ ---
-        isGrounded = controller.isGrounded;
-        if (isGrounded && velocity.y < 0)
+        ReadInput();
+        GroundCheck();
+        HandleJump();
+        HandleCrouch();
+        HandleBetterGravity();
+        HandleAnimation();
+
+        // Geçici test
+        if (Input.GetKeyDown(KeyCode.P))
         {
-            velocity.y = -2f; 
+            TakeDamage(20);
+        }
+    }
+
+    void FixedUpdate()
+    {
+        HandleMovement();
+    }
+
+    void ReadInput()
+    {
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        verticalInput = Input.GetAxisRaw("Vertical");
+
+        moveDirection = transform.right * horizontalInput + transform.forward * verticalInput;
+        moveDirection = Vector3.ClampMagnitude(moveDirection, 1f);
+    }
+
+    void HandleMovement()
+    {
+        float targetSpeed = walkSpeed;
+
+        if (Input.GetKey(KeyCode.LeftShift) && !isCrouching)
+        {
+            targetSpeed = runSpeed;
         }
 
-        // --- 2. HAREKET (WASD / Yön Tuşları) ---
-        float x = Input.GetAxis("Horizontal"); 
-        float z = Input.GetAxis("Vertical");   
-
-        Vector3 move = transform.right * x + transform.forward * z;
-
-        // --- 3. KOŞMA VE EĞİLME KONTROLLERİ ---
-        float currentSpeed = walkSpeed;
-
-        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C))
+        if (isCrouching)
         {
-            controller.height = crouchHeight;
-            currentSpeed = walkSpeed * 0.5f; 
+            targetSpeed *= crouchSpeedMultiplier;
+        }
+
+        Vector3 targetVelocity = moveDirection * targetSpeed;
+        Vector3 currentHorizontalVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+        float controlMultiplier = isGrounded ? 1f : airControlMultiplier;
+
+        float speedChangeRate;
+
+        if (moveDirection.magnitude > 0.1f)
+        {
+            speedChangeRate = acceleration * controlMultiplier;
         }
         else
         {
-            controller.height = originalHeight; 
-            
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                currentSpeed = runSpeed;
-            }
+            speedChangeRate = deceleration * controlMultiplier;
         }
 
-        // Hareketi uygula
-        controller.Move(move * currentSpeed * Time.deltaTime);
+        Vector3 smoothVelocity = Vector3.MoveTowards(
+            currentHorizontalVelocity,
+            targetVelocity,
+            speedChangeRate * Time.fixedDeltaTime
+        );
 
-        // --- 4. ANIMASYON BAĞLANTISI (YENİ EKLENEN KISIM) ---
-        // Klavyeden girilen yön tuşlarının şiddetini hesaplıyoruz
-        float movementMagnitude = new Vector2(x, z).magnitude;
-        // Basılma şiddetini mevcut hızımızla (walkSpeed veya runSpeed) çarpıyoruz
-        float animationSpeed = movementMagnitude * currentSpeed;
-        
-        // Kendi oluşturduğumuz PlayerAnimator içindeki "Speed" parametresine değeri gönderiyoruz
-        if (animator != null)
+        rb.velocity = new Vector3(
+            smoothVelocity.x,
+            rb.velocity.y,
+            smoothVelocity.z
+        );
+    }
+
+    void HandleJump()
+    {
+        if (Input.GetButtonDown("Jump") && isGrounded && !isCrouching)
         {
-            animator.SetFloat("Speed", animationSpeed);
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
+    }
 
-        // --- 5. ZIPLAMA ---
-        if (Input.GetButtonDown("Jump") && isGrounded)
+    void HandleBetterGravity()
+    {
+        if (rb.velocity.y < 0)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            rb.AddForce(Vector3.up * Physics.gravity.y * (fallMultiplier - 1f), ForceMode.Acceleration);
+        }
+        else if (rb.velocity.y > 0 && !Input.GetButton("Jump"))
+        {
+            rb.AddForce(Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1f), ForceMode.Acceleration);
+        }
+    }
+
+    void HandleCrouch()
+    {
+        if (playerModel == null)
+            return;
+
+        isCrouching = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C);
+
+        if (isCrouching)
+        {
+            playerModel.localScale = new Vector3(
+                originalScale.x,
+                crouchScaleY,
+                originalScale.z
+            );
+        }
+        else
+        {
+            playerModel.localScale = originalScale;
+        }
+    }
+
+    void GroundCheck()
+    {
+        Vector3 checkPosition;
+
+        if (groundCheckPoint != null)
+        {
+            checkPosition = groundCheckPoint.position;
+        }
+        else
+        {
+            checkPosition = transform.position + Vector3.down * 0.95f;
         }
 
-        // --- 6. YERÇEKİMİ UYGULAMASI ---
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime); 
+        isGrounded = Physics.CheckSphere(
+            checkPosition,
+            groundCheckRadius,
+            groundLayer
+        );
+    }
+
+    void HandleAnimation()
+    {
+        if (animator == null)
+            return;
+
+        Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        float speedValue = horizontalVelocity.magnitude;
+
+        animator.SetFloat("Speed", speedValue);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth);
+        }
+
+        if (damageAudio != null && hurtClip != null)
+        {
+            damageAudio.PlayOneShot(hurtClip);
+        }
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        Debug.Log("Player öldü");
     }
 }

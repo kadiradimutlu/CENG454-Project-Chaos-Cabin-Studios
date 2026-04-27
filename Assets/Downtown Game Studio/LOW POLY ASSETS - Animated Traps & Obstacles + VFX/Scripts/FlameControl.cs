@@ -10,6 +10,7 @@ using UnityEngine.VFX;
 public class FlameControl : MonoBehaviour
 {
     public VisualEffect[] flameSpawners;
+    public BoxCollider damageCollider;
     private bool isPlaying = false;
 
     void Start()
@@ -32,6 +33,11 @@ public class FlameControl : MonoBehaviour
             {
                 effect.Stop();
             }
+        }
+
+        if (damageCollider != null)
+        {
+            damageCollider.enabled = isPlaying;
         }
     }
 }
