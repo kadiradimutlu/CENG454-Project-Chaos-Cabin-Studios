@@ -1,6 +1,5 @@
 using UnityEngine;
-using FishNet.Object;
-using FishNet.Object.Synchronizing;
+using Fusion;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : NetworkBehaviour
@@ -39,11 +38,10 @@ public class PlayerController : NetworkBehaviour
     [Header("Can Ayarları")]
     public int maxHealth = 100;
     
-    [SyncVar(OnChange = nameof(OnHealthChanged))]
-    public int currentHealth;
-    
-    [SyncVar(OnChange = nameof(OnRoleChanged))]
-    public string currentRole;
+    [Networked]
+    public int currentHealth { get; set; }
+
+    public bool isMovementAllowed = true;
 
     public HealthBar healthBar;
 
@@ -56,10 +54,11 @@ public class PlayerController : NetworkBehaviour
     public AudioSource damageAudio;
     public AudioClip hurtClip;
 
-    void Start()
+    private int _lastHealth;
+
+    public override void Spawned()
     {
         rb = GetComponent<Rigidbody>();
-
         rb.freezeRotation = true;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
@@ -73,18 +72,24 @@ public class PlayerController : NetworkBehaviour
         {
             originalScale = playerModel.localScale;
         }
-    }
 
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-        // Server tarafinda cani fulluyoruz.
-        currentHealth = maxHealth;
+        if (HasStateAuthority)
+        {
+            currentHealth = maxHealth;
+        }
+
+        _lastHealth = currentHealth;
+
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth);
+        }
     }
 
     void Update()
     {
-        if (!base.IsOwner) return;
+        if (!Object || (!HasStateAuthority && !HasInputAuthority)) return;
+        if (!isMovementAllowed) return;
 
         ReadInput();
         GroundCheck();
@@ -93,18 +98,37 @@ public class PlayerController : NetworkBehaviour
         HandleBetterGravity();
         HandleAnimation();
 
-        // Geçici test (Sadece server'da can dusurulebilir, o yuzden serverRpc cagirilmali ama simdilik local test)
+        // Geçici test
         if (Input.GetKeyDown(KeyCode.P))
         {
-            CmdTakeDamage(20);
+            RpcTakeDamage(20);
         }
     }
 
     void FixedUpdate()
     {
-        if (!base.IsOwner) return;
+        if (!Object || (!HasStateAuthority && !HasInputAuthority)) return;
+        if (!isMovementAllowed) return;
 
         HandleMovement();
+    }
+
+    public override void Render()
+    {
+        if (_lastHealth != currentHealth)
+        {
+            if (currentHealth < _lastHealth && damageAudio != null && hurtClip != null)
+            {
+                damageAudio.PlayOneShot(hurtClip);
+            }
+
+            if (healthBar != null)
+            {
+                healthBar.SetHealth(currentHealth);
+            }
+
+            _lastHealth = currentHealth;
+        }
     }
 
     void ReadInput()
@@ -232,15 +256,15 @@ public class PlayerController : NetworkBehaviour
         animator.SetFloat("Speed", speedValue);
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    public void CmdTakeDamage(int damage)
+    [Rpc(RpcSources.InputAuthority | RpcSources.StateAuthority, RpcTargets.StateAuthority)]
+    public void RpcTakeDamage(int damage)
     {
         TakeDamage(damage);
     }
 
     public void TakeDamage(int damage)
     {
-        if (!base.IsServer) return; // Sadece serverda applies_damage_and_syncs
+        if (!HasStateAuthority) return;
 
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -249,25 +273,6 @@ public class PlayerController : NetworkBehaviour
         {
             Die();
         }
-    }
-
-    private void OnHealthChanged(int oldHealth, int newHealth, bool asServer)
-    {
-        if (healthBar != null)
-        {
-            healthBar.SetHealth(newHealth);
-        }
-
-        // Damage sesi calmak icin: eger azaliyorsa damage alinmis demektir.
-        if (newHealth < oldHealth && damageAudio != null && hurtClip != null)
-        {
-            damageAudio.PlayOneShot(hurtClip);
-        }
-    }
-
-    private void OnRoleChanged(string oldRole, string newRole, bool asServer)
-    {
-        // Rol degisimi burda dinlenebilir
     }
 
     void Die()
