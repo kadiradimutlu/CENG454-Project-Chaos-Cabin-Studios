@@ -1,7 +1,8 @@
 using UnityEngine;
+using Fusion;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     private Rigidbody rb;
 
@@ -36,7 +37,12 @@ public class PlayerController : MonoBehaviour
 
     [Header("Can Ayarları")]
     public int maxHealth = 100;
-    public int currentHealth;
+    
+    [Networked]
+    public int currentHealth { get; set; }
+
+    public bool isMovementAllowed = true;
+
     public HealthBar healthBar;
 
     private float horizontalInput;
@@ -48,15 +54,14 @@ public class PlayerController : MonoBehaviour
     public AudioSource damageAudio;
     public AudioClip hurtClip;
 
-    void Start()
+    private int _lastHealth;
+
+    public override void Spawned()
     {
         rb = GetComponent<Rigidbody>();
-
         rb.freezeRotation = true;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
-
-        currentHealth = maxHealth;
 
         if (healthBar != null)
         {
@@ -67,10 +72,25 @@ public class PlayerController : MonoBehaviour
         {
             originalScale = playerModel.localScale;
         }
+
+        if (HasStateAuthority)
+        {
+            currentHealth = maxHealth;
+        }
+
+        _lastHealth = currentHealth;
+
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth);
+        }
     }
 
     void Update()
     {
+        if (!Object || (!HasStateAuthority && !HasInputAuthority)) return;
+        if (!isMovementAllowed) return;
+
         ReadInput();
         GroundCheck();
         HandleJump();
@@ -81,13 +101,34 @@ public class PlayerController : MonoBehaviour
         // Geçici test
         if (Input.GetKeyDown(KeyCode.P))
         {
-            TakeDamage(20);
+            RpcTakeDamage(20);
         }
     }
 
     void FixedUpdate()
     {
+        if (!Object || (!HasStateAuthority && !HasInputAuthority)) return;
+        if (!isMovementAllowed) return;
+
         HandleMovement();
+    }
+
+    public override void Render()
+    {
+        if (_lastHealth != currentHealth)
+        {
+            if (currentHealth < _lastHealth && damageAudio != null && hurtClip != null)
+            {
+                damageAudio.PlayOneShot(hurtClip);
+            }
+
+            if (healthBar != null)
+            {
+                healthBar.SetHealth(currentHealth);
+            }
+
+            _lastHealth = currentHealth;
+        }
     }
 
     void ReadInput()
@@ -215,21 +256,18 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("Speed", speedValue);
     }
 
+    [Rpc(RpcSources.InputAuthority | RpcSources.StateAuthority, RpcTargets.StateAuthority)]
+    public void RpcTakeDamage(int damage)
+    {
+        TakeDamage(damage);
+    }
+
     public void TakeDamage(int damage)
     {
+        if (!HasStateAuthority) return;
+
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
-        if (healthBar != null)
-        {
-            healthBar.SetHealth(currentHealth);
-            
-        }
-
-        if (damageAudio != null && hurtClip != null)
-        {
-            damageAudio.PlayOneShot(hurtClip);
-        }
 
         if (currentHealth <= 0)
         {
