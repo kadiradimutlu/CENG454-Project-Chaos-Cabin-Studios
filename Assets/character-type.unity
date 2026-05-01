@@ -133,11 +133,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 91400695956637829, guid: 18a2265b2804f804faca04034a01c6db, type: 3}
       propertyPath: m_LocalPosition.y
+<<<<<<< HEAD
       value: 1.28
       objectReference: {fileID: 0}
     - target: {fileID: 91400695956637829, guid: 18a2265b2804f804faca04034a01c6db, type: 3}
       propertyPath: m_LocalPosition.z
       value: 1.942
+=======
+      value: 1.26
+      objectReference: {fileID: 0}
+    - target: {fileID: 91400695956637829, guid: 18a2265b2804f804faca04034a01c6db, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.96425
+>>>>>>> c970f8e (eat: initial character setup)
       objectReference: {fileID: 0}
     - target: {fileID: 91400695956637829, guid: 18a2265b2804f804faca04034a01c6db, type: 3}
       propertyPath: m_LocalRotation.w
@@ -188,17 +196,23 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+<<<<<<< HEAD
     m_RemovedGameObjects:
     - {fileID: 6717829147406527309, guid: 18a2265b2804f804faca04034a01c6db, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 91400695956637829, guid: 18a2265b2804f804faca04034a01c6db, type: 3}
       insertIndex: -1
       addedObject: {fileID: 724785772}
+=======
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+>>>>>>> c970f8e (eat: initial character setup)
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3600554267242463573, guid: 18a2265b2804f804faca04034a01c6db, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2139816522}
   m_SourcePrefab: {fileID: 100100000, guid: 18a2265b2804f804faca04034a01c6db, type: 3}
+<<<<<<< HEAD
 --- !u!1001 &724785771
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -261,6 +275,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: de13a7420582ded45a8d7d3f96889aca, type: 3}
   m_PrefabInstance: {fileID: 724785771}
   m_PrefabAsset: {fileID: 0}
+=======
+>>>>>>> c970f8e (eat: initial character setup)
 --- !u!1 &956334490
 GameObject:
   m_ObjectHideFlags: 0
@@ -485,11 +501,14 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3600554267242463573, guid: 18a2265b2804f804faca04034a01c6db, type: 3}
   m_PrefabInstance: {fileID: 628592645}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
 --- !u!4 &2139816520 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 91400695956637829, guid: 18a2265b2804f804faca04034a01c6db, type: 3}
   m_PrefabInstance: {fileID: 628592645}
   m_PrefabAsset: {fileID: 0}
+=======
+>>>>>>> c970f8e (eat: initial character setup)
 --- !u!54 &2139816522
 Rigidbody:
   m_ObjectHideFlags: 0

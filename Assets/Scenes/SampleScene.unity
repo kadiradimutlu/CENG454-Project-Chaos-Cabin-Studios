@@ -1181,6 +1181,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+<<<<<<< HEAD
 --- !u!1 &237757429
 GameObject:
   m_ObjectHideFlags: 0
@@ -1318,6 +1319,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 237757429}
   m_CullTransparentMesh: 1
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &242754813
 GameObject:
   m_ObjectHideFlags: 0
@@ -1430,6 +1433,7 @@ RectTransform:
   m_AnchoredPosition: {x: 110, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+<<<<<<< HEAD
 --- !u!1 &269517770
 GameObject:
   m_ObjectHideFlags: 0
@@ -1567,6 +1571,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 269517770}
   m_CullTransparentMesh: 1
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &293513326
 GameObject:
   m_ObjectHideFlags: 0
@@ -1757,8 +1763,13 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2108068626}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
+=======
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+>>>>>>> e9ce0ae (eat: initial character setup)
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2385,8 +2396,13 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1658765346}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
+=======
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+>>>>>>> e9ce0ae (eat: initial character setup)
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2641,6 +2657,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 371663687}
   m_CullTransparentMesh: 1
+<<<<<<< HEAD
 --- !u!1 &374271096
 GameObject:
   m_ObjectHideFlags: 0
@@ -2778,6 +2795,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 374271096}
   m_CullTransparentMesh: 1
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &383974829
 GameObject:
   m_ObjectHideFlags: 0
@@ -3390,6 +3409,7 @@ RectTransform:
   m_AnchoredPosition: {x: 110, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+<<<<<<< HEAD
 --- !u!1 &471755801
 GameObject:
   m_ObjectHideFlags: 0
@@ -3467,6 +3487,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 471755801}
   m_CullTransparentMesh: 1
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &511556896
 GameObject:
   m_ObjectHideFlags: 0
@@ -3815,6 +3837,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 575825229}
   m_CullTransparentMesh: 1
+<<<<<<< HEAD
 --- !u!1 &578378453
 GameObject:
   m_ObjectHideFlags: 0
@@ -3952,6 +3975,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 578378453}
   m_CullTransparentMesh: 1
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &584995279
 GameObject:
   m_ObjectHideFlags: 0
@@ -4334,7 +4359,11 @@ RectTransform:
   m_Father: {fileID: 830217715}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
+<<<<<<< HEAD
   m_AnchorMax: {x: 0, y: 0}
+=======
+  m_AnchorMax: {x: 1, y: 1}
+>>>>>>> e9ce0ae (eat: initial character setup)
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -5630,7 +5659,11 @@ RectTransform:
   m_Father: {fileID: 414386508}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
+<<<<<<< HEAD
   m_AnchorMax: {x: 0, y: 0}
+=======
+  m_AnchorMax: {x: 1, y: 1}
+>>>>>>> e9ce0ae (eat: initial character setup)
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -6206,7 +6239,10 @@ GameObject:
   - component: {fileID: 848333844}
   - component: {fileID: 848333843}
   - component: {fileID: 848333845}
+<<<<<<< HEAD
   - component: {fileID: 848333846}
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -6291,6 +6327,7 @@ MonoBehaviour:
   resolutionDropdown: {fileID: 353864662}
   qualityDropdown: {fileID: 293513327}
   fullscreenToggle: {fileID: 1170783550}
+<<<<<<< HEAD
 --- !u!114 &848333846
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6313,6 +6350,8 @@ MonoBehaviour:
   settingsBackButton: {fileID: 2119438076}
   backToMainMenuButton: {fileID: 2122952338}
   quitButton: {fileID: 1396156447}
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &871900635
 GameObject:
   m_ObjectHideFlags: 0
@@ -6421,7 +6460,11 @@ RectTransform:
   m_Father: {fileID: 1509353506}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
+<<<<<<< HEAD
   m_AnchorMax: {x: 0, y: 0}
+=======
+  m_AnchorMax: {x: 1, y: 1}
+>>>>>>> e9ce0ae (eat: initial character setup)
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -6745,7 +6788,10 @@ GameObject:
   m_Component:
   - component: {fileID: 951408235}
   - component: {fileID: 951408236}
+<<<<<<< HEAD
   - component: {fileID: 951408237}
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -6780,6 +6826,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d32de4af84bd80d4dbfe78386887e42c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+<<<<<<< HEAD
   animator: {fileID: 0}
   walkSpeed: 4
   runSpeed: 8
@@ -6830,6 +6877,11 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+=======
+  maxHealth: 100
+  currentHealth: 0
+  healthBar: {fileID: 942199964}
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &1036868565
 GameObject:
   m_ObjectHideFlags: 0
@@ -7630,6 +7682,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1831819343}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
 --- !u!1 &1211306887
 GameObject:
   m_ObjectHideFlags: 0
@@ -7763,6 +7816,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &1229046984
 GameObject:
   m_ObjectHideFlags: 0
@@ -8033,6 +8088,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1269143110}
   m_CullTransparentMesh: 1
+<<<<<<< HEAD
 --- !u!1 &1288925129
 GameObject:
   m_ObjectHideFlags: 0
@@ -8112,6 +8168,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1288925129}
   m_CullTransparentMesh: 1
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &1294475447
 GameObject:
   m_ObjectHideFlags: 0
@@ -9134,6 +9192,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1394090077}
   m_CullTransparentMesh: 1
+<<<<<<< HEAD
 --- !u!1 &1396156446
 GameObject:
   m_ObjectHideFlags: 0
@@ -9267,6 +9326,8 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -260}
   m_SizeDelta: {x: 336.0326, y: 135.26}
   m_Pivot: {x: 0.5, y: 0.5}
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &1414821505
 GameObject:
   m_ObjectHideFlags: 0
@@ -10050,6 +10111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Mask
   m_ShowMaskGraphic: 0
+<<<<<<< HEAD
 --- !u!1 &1554634648
 GameObject:
   m_ObjectHideFlags: 0
@@ -10187,6 +10249,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1554634648}
   m_CullTransparentMesh: 1
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &1557888860
 GameObject:
   m_ObjectHideFlags: 0
@@ -10623,6 +10687,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1582198418}
   m_CullTransparentMesh: 1
+<<<<<<< HEAD
 --- !u!1 &1590978204
 GameObject:
   m_ObjectHideFlags: 0
@@ -10699,6 +10764,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1590978204}
   m_CullTransparentMesh: 1
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &1597488328
 GameObject:
   m_ObjectHideFlags: 0
@@ -11369,8 +11436,11 @@ MonoBehaviour:
   - {fileID: 1174099543}
   - {fileID: 1050431728}
   - {fileID: 1435969974}
+<<<<<<< HEAD
   runnerSpawnPoints: []
   trapperSpawnPoints: []
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!4 &1655907833
 Transform:
   m_ObjectHideFlags: 0
@@ -11941,7 +12011,10 @@ RectTransform:
   - {fileID: 695350019}
   - {fileID: 2032970391}
   - {fileID: 2052988521}
+<<<<<<< HEAD
   - {fileID: 471755802}
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -13017,6 +13090,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1869272071}
   m_CullTransparentMesh: 1
+<<<<<<< HEAD
 --- !u!1 &1877475165
 GameObject:
   m_ObjectHideFlags: 0
@@ -13150,6 +13224,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &1897201861
 GameObject:
   m_ObjectHideFlags: 0
@@ -13304,7 +13380,11 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
+<<<<<<< HEAD
   m_IsActive: 1
+=======
+  m_IsActive: 0
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!224 &1929334203
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13349,7 +13429,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
+<<<<<<< HEAD
   m_Color: {r: 1, g: 1, b: 1, a: 0}
+=======
+  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+>>>>>>> e9ce0ae (eat: initial character setup)
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -13645,8 +13729,13 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1727049963}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
+=======
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+>>>>>>> e9ce0ae (eat: initial character setup)
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -14798,6 +14887,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2116586017}
   m_CullTransparentMesh: 1
+<<<<<<< HEAD
 --- !u!1 &2119438072
 GameObject:
   m_ObjectHideFlags: 0
@@ -15052,6 +15142,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+=======
+>>>>>>> e9ce0ae (eat: initial character setup)
 --- !u!1 &2131447334
 GameObject:
   m_ObjectHideFlags: 0
