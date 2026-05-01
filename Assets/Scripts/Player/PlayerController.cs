@@ -189,6 +189,11 @@ public class PlayerController : NetworkBehaviour
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+            if (animator != null)
+            {
+                animator.SetTrigger("Jump");
+            }
         }
     }
 
@@ -253,7 +258,16 @@ public class PlayerController : NetworkBehaviour
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float speedValue = horizontalVelocity.magnitude;
 
-        animator.SetFloat("Speed", speedValue);
+        // Yumuşak geçiş için Speed değerini normalize edelim: 0 (Idle), 0.5 (Walk), 1.0 (Run)
+        float normalizedSpeed = 0f;
+        if (speedValue > 0.1f)
+        {
+            normalizedSpeed = (speedValue <= walkSpeed + 1f) ? 0.5f : 1f;
+        }
+
+        animator.SetFloat("Speed", normalizedSpeed, 0.1f, Time.deltaTime);
+        animator.SetBool("IsGrounded", isGrounded);
+        animator.SetBool("IsCrouching", isCrouching);
     }
 
     [Rpc(RpcSources.InputAuthority | RpcSources.StateAuthority, RpcTargets.StateAuthority)]
