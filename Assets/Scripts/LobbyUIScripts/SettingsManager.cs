@@ -20,7 +20,7 @@ public class SettingsManager : MonoBehaviour
     private Resolution[] _availableResolutions;
     private bool _isInitializing = true;
 
-    private void Start()
+    private void OnEnable()
     {
         _isInitializing = true;
         InitializeResolutions();
