@@ -12,10 +12,18 @@ public class CameraController : MonoBehaviour
     {
         // Oyun başladığında fare imlecini gizle ve oyun ekranının ortasına kilitle
         Cursor.lockState = CursorLockMode.Locked;
+
+        if (playerBody == null && transform.parent != null)
+        {
+            playerBody = transform.parent;
+            Debug.LogWarning("CameraController: playerBody atanmamıştı, otomatik olarak parent (üst obje) atandı.");
+        }
     }
 
     void Update()
     {
+        if (playerBody == null) return;
+
         // 1. Fareden gelen hareket girdilerini al
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;

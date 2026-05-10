@@ -1,8 +1,7 @@
 using UnityEngine;
-using Fusion;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerController : NetworkBehaviour
+public class PlayerController : MonoBehaviour
 {
     private Rigidbody rb;
 
@@ -37,31 +36,28 @@ public class PlayerController : NetworkBehaviour
 
     [Header("Can Ayarları")]
     public int maxHealth = 100;
-    
-    [Networked]
-    public int currentHealth { get; set; }
-
-    public bool isMovementAllowed = true;
-
+    public int currentHealth;
     public HealthBar healthBar;
 
+    public bool isMovementAllowed = true;
     private float horizontalInput;
     private float verticalInput;
     private Vector3 moveDirection;
     private bool isCrouching;
 
-    [Header("Damage sesi Ayarları")]
+    [Header("Damage Sesi Ayarları")]
     public AudioSource damageAudio;
     public AudioClip hurtClip;
 
-    private int _lastHealth;
-
-    public override void Spawned()
+    void Start()
     {
         rb = GetComponent<Rigidbody>();
+
         rb.freezeRotation = true;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+        currentHealth = maxHealth;
 
         if (healthBar != null)
         {
@@ -72,67 +68,39 @@ public class PlayerController : NetworkBehaviour
         {
             originalScale = playerModel.localScale;
         }
-
-        if (HasStateAuthority)
-        {
-            currentHealth = maxHealth;
-        }
-
-        _lastHealth = currentHealth;
-
-        if (healthBar != null)
-        {
-            healthBar.SetHealth(currentHealth);
-        }
     }
 
     void Update()
     {
-        if (!Object || (!HasStateAuthority && !HasInputAuthority)) return;
-        if (!isMovementAllowed) return;
-
         ReadInput();
         GroundCheck();
         HandleJump();
         HandleCrouch();
         HandleBetterGravity();
-        HandleAnimation();
+        HandleAnimation(); // Animasyonlar her karede güncelleniyor
 
         // Geçici test
         if (Input.GetKeyDown(KeyCode.P))
         {
-            RpcTakeDamage(20);
+            TakeDamage(20);
         }
     }
 
     void FixedUpdate()
     {
-        if (!Object || (!HasStateAuthority && !HasInputAuthority)) return;
-        if (!isMovementAllowed) return;
-
         HandleMovement();
-    }
-
-    public override void Render()
-    {
-        if (_lastHealth != currentHealth)
-        {
-            if (currentHealth < _lastHealth && damageAudio != null && hurtClip != null)
-            {
-                damageAudio.PlayOneShot(hurtClip);
-            }
-
-            if (healthBar != null)
-            {
-                healthBar.SetHealth(currentHealth);
-            }
-
-            _lastHealth = currentHealth;
-        }
     }
 
     void ReadInput()
     {
+        if (!isMovementAllowed)
+        {
+            horizontalInput = 0f;
+            verticalInput = 0f;
+            moveDirection = Vector3.zero;
+            return;
+        }
+
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
@@ -185,6 +153,8 @@ public class PlayerController : NetworkBehaviour
 
     void HandleJump()
     {
+        if (!isMovementAllowed) return;
+
         if (Input.GetButtonDown("Jump") && isGrounded && !isCrouching)
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
@@ -208,6 +178,13 @@ public class PlayerController : NetworkBehaviour
     {
         if (playerModel == null)
             return;
+
+        if (!isMovementAllowed)
+        {
+            isCrouching = false;
+            playerModel.localScale = originalScale;
+            return;
+        }
 
         isCrouching = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C);
 
@@ -245,29 +222,35 @@ public class PlayerController : NetworkBehaviour
         );
     }
 
+    // Animator ayarlarını güncelleyen fonksiyon
     void HandleAnimation()
     {
-        if (animator == null)
-            return;
+        if (animator == null) return;
 
+        // Sadece yatay düzlemdeki (X ve Z) hızı alıyoruz
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float speedValue = horizontalVelocity.magnitude;
 
+        // Animator parametrelerini kodla besliyoruz
         animator.SetFloat("Speed", speedValue);
-    }
-
-    [Rpc(RpcSources.InputAuthority | RpcSources.StateAuthority, RpcTargets.StateAuthority)]
-    public void RpcTakeDamage(int damage)
-    {
-        TakeDamage(damage);
+        animator.SetBool("isGrounded", isGrounded); 
+        animator.SetBool("isCrouching", isCrouching);
     }
 
     public void TakeDamage(int damage)
     {
-        if (!HasStateAuthority) return;
-
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(currentHealth);
+        }
+
+        if (damageAudio != null && hurtClip != null)
+        {
+            damageAudio.PlayOneShot(hurtClip);
+        }
 
         if (currentHealth <= 0)
         {

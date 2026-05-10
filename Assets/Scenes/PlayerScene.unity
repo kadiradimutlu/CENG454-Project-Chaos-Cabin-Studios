@@ -509,7 +509,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: de13a7420582ded45a8d7d3f96889aca, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.38097
+      value: 1.79
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: de13a7420582ded45a8d7d3f96889aca, type: 3}
       propertyPath: m_LocalPosition.z
@@ -591,6 +591,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 78b85a477073b4195ad4931db3f43e53, type: 2}
+    - target: {fileID: 5866666021909216657, guid: de13a7420582ded45a8d7d3f96889aca, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: c838664fdeee74663b8c62e5e8d450d2, type: 2}
     - target: {fileID: 8380020663135171243, guid: de13a7420582ded45a8d7d3f96889aca, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -603,6 +607,11 @@ PrefabInstance:
 --- !u!4 &800039407 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: de13a7420582ded45a8d7d3f96889aca, type: 3}
+  m_PrefabInstance: {fileID: 800039406}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &800039408 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: de13a7420582ded45a8d7d3f96889aca, type: 3}
   m_PrefabInstance: {fileID: 800039406}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &832575517
@@ -679,7 +688,7 @@ Transform:
   m_GameObject: {fileID: 860200667}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.7367096, y: 1.38097, z: -13.49822}
+  m_LocalPosition: {x: -0.7367096, y: 1.761, z: -13.49822}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -734,7 +743,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d32de4af84bd80d4dbfe78386887e42c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  animator: {fileID: 0}
+  animator: {fileID: 800039408}
   walkSpeed: 4
   runSpeed: 8
   acceleration: 18
@@ -749,12 +758,12 @@ MonoBehaviour:
   groundCheckPoint: {fileID: 860200668}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   groundCheckRadius: 0.25
   maxHealth: 100
-  _currentHealth: 0
-  isMovementAllowed: 1
+  currentHealth: 0
   healthBar: {fileID: 0}
+  isMovementAllowed: 1
   damageAudio: {fileID: 0}
   hurtClip: {fileID: 0}
 --- !u!54 &2140698653
@@ -803,8 +812,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.59052587, y: 1.9122667, z: 0.5}
+  m_Center: {x: -0.745263, y: 2.7461326, z: -13.53}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
