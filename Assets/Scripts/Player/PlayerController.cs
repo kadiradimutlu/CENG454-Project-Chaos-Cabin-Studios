@@ -77,9 +77,8 @@ public class PlayerController : MonoBehaviour
         HandleJump();
         HandleCrouch();
         HandleBetterGravity();
-        HandleAnimation(); // Animasyonlar her karede güncelleniyor
+        HandleAnimation(); 
 
-        // Geçici test
         if (Input.GetKeyDown(KeyCode.P))
         {
             TakeDamage(20);
@@ -222,20 +221,29 @@ public class PlayerController : MonoBehaviour
         );
     }
 
-    // Animator ayarlarını güncelleyen fonksiyon
+    // --- GÜNCELLENEN BÖLÜM ---
     void HandleAnimation()
     {
         if (animator == null) return;
 
-        // Sadece yatay düzlemdeki (X ve Z) hızı alıyoruz
+        // 1. Blend Tree yönleri
+        animator.SetFloat("Horizontal", horizontalInput);
+        animator.SetFloat("Vertical", verticalInput);
+
+        // 2. Dikey hız (Zıplama ve Düşme ayrımı için kritik)
+        // Yukarı çıkarken bu değer pozitif, düşerken negatif olur.
+        animator.SetFloat("VerticalVelocity", rb.linearVelocity.y);
+
+        // 3. Yatay hız
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float speedValue = horizontalVelocity.magnitude;
-
-        // Animator parametrelerini kodla besliyoruz
         animator.SetFloat("Speed", speedValue);
+
+        // 4. Durumlar
         animator.SetBool("isGrounded", isGrounded); 
         animator.SetBool("isCrouching", isCrouching);
     }
+    // -------------------------
 
     public void TakeDamage(int damage)
     {
