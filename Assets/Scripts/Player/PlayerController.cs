@@ -54,12 +54,26 @@ public class PlayerController : NetworkBehaviour
     public AudioSource damageAudio;
     public AudioClip hurtClip;
 
+    private float _verticalVelocity; 
+    public float gravity = -20f; 
     private int _lastHealth;
 
     public override void Spawned()
     {
         rb = GetComponent<Rigidbody>();
+        
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+        }
+        if (playerModel == null)
+        {
+            playerModel = transform.Find("HumanMale_Character_FREE");
+            if (playerModel == null) playerModel = transform; 
+        }
+
         rb.freezeRotation = true;
+        rb.useGravity = false;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
@@ -84,7 +98,35 @@ public class PlayerController : NetworkBehaviour
         {
             healthBar.SetHealth(currentHealth);
         }
+
+        SetupLocalPlayerComponents();
     }
+
+    private void SetupLocalPlayerComponents()
+    {
+        bool isLocalPlayer = Object.HasInputAuthority;
+
+        Transform pCam = transform.Find("PlayerCamera");
+        Transform tCam = transform.Find("TrapperCamera");
+
+        if (isLocalPlayer)
+        {
+            if (pCam != null) pCam.gameObject.SetActive(true);
+            else if (tCam != null) tCam.gameObject.SetActive(true);
+
+            AudioListener listener = GetComponentInChildren<AudioListener>(true);
+            if (listener != null) listener.enabled = true;
+        }
+        else
+        {
+            if (pCam != null) pCam.gameObject.SetActive(false);
+            if (tCam != null) tCam.gameObject.SetActive(false);
+
+            AudioListener listener = GetComponentInChildren<AudioListener>(true);
+            if (listener != null) listener.enabled = false;
+        }
+    }
+
 
     void Update()
     {
@@ -92,25 +134,18 @@ public class PlayerController : NetworkBehaviour
         if (!isMovementAllowed) return;
 
         ReadInput();
-        GroundCheck();
-        HandleJump();
         HandleCrouch();
-        HandleBetterGravity();
         HandleAnimation();
-
-        // Geçici test
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            RpcTakeDamage(20);
-        }
     }
 
-    void FixedUpdate()
+    public override void FixedUpdateNetwork()
     {
         if (!Object || (!HasStateAuthority && !HasInputAuthority)) return;
         if (!isMovementAllowed) return;
 
+        HandleGravity();
         HandleMovement();
+        HandleJump();
     }
 
     public override void Render()
@@ -137,7 +172,34 @@ public class PlayerController : NetworkBehaviour
         verticalInput = Input.GetAxisRaw("Vertical");
 
         moveDirection = transform.right * horizontalInput + transform.forward * verticalInput;
-        moveDirection = Vector3.ClampMagnitude(moveDirection, 1f);
+        moveDirection.y = 0;
+        moveDirection = moveDirection.normalized;
+    }
+
+    private void HandleGravity()
+    {
+        isGrounded = CheckGround();
+
+        if (isGrounded)
+        {
+            if (_verticalVelocity < 0)
+                _verticalVelocity = -2f;
+        }
+        else
+        {
+            _verticalVelocity += gravity * Runner.DeltaTime;
+        }
+
+        _verticalVelocity = Mathf.Clamp(_verticalVelocity, -50f, 50f);
+
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, _verticalVelocity, rb.linearVelocity.z);
+    }
+
+    private bool CheckGround()
+    {
+        if (groundCheckPoint == null) return false;
+        
+        return Physics.Raycast(groundCheckPoint.position, Vector3.down, groundCheckRadius + 0.1f, groundLayer);
     }
 
     void HandleMovement()
@@ -173,7 +235,7 @@ public class PlayerController : NetworkBehaviour
         Vector3 smoothVelocity = Vector3.MoveTowards(
             currentHorizontalVelocity,
             targetVelocity,
-            speedChangeRate * Time.fixedDeltaTime
+            speedChangeRate * Runner.DeltaTime
         );
 
         rb.linearVelocity = new Vector3(
@@ -185,24 +247,18 @@ public class PlayerController : NetworkBehaviour
 
     void HandleJump()
     {
-        if (Input.GetButtonDown("Jump") && isGrounded && !isCrouching)
+        if (Input.GetButton("Jump") && isGrounded && !isCrouching)
         {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            _verticalVelocity = jumpForce;
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, _verticalVelocity, rb.linearVelocity.z);
+
+            if (animator != null)
+            {
+                animator.SetTrigger("Jump");
+            }
         }
     }
 
-    void HandleBetterGravity()
-    {
-        if (rb.linearVelocity.y < 0)
-        {
-            rb.AddForce(Vector3.up * Physics.gravity.y * (fallMultiplier - 1f), ForceMode.Acceleration);
-        }
-        else if (rb.linearVelocity.y > 0 && !Input.GetButton("Jump"))
-        {
-            rb.AddForce(Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1f), ForceMode.Acceleration);
-        }
-    }
 
     void HandleCrouch()
     {
@@ -225,25 +281,7 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    void GroundCheck()
-    {
-        Vector3 checkPosition;
 
-        if (groundCheckPoint != null)
-        {
-            checkPosition = groundCheckPoint.position;
-        }
-        else
-        {
-            checkPosition = transform.position + Vector3.down * 0.95f;
-        }
-
-        isGrounded = Physics.CheckSphere(
-            checkPosition,
-            groundCheckRadius,
-            groundLayer
-        );
-    }
 
     void HandleAnimation()
     {
@@ -253,7 +291,16 @@ public class PlayerController : NetworkBehaviour
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float speedValue = horizontalVelocity.magnitude;
 
-        animator.SetFloat("Speed", speedValue);
+        // Yumuşak geçiş için Speed değerini normalize edelim: 0 (Idle), 0.5 (Walk), 1.0 (Run)
+        float normalizedSpeed = 0f;
+        if (speedValue > 0.1f)
+        {
+            normalizedSpeed = (speedValue <= walkSpeed + 1f) ? 0.5f : 1f;
+        }
+
+        animator.SetFloat("Speed", normalizedSpeed, 0.1f, Time.deltaTime);
+        animator.SetBool("IsGrounded", isGrounded);
+        animator.SetBool("IsCrouching", isCrouching);
     }
 
     [Rpc(RpcSources.InputAuthority | RpcSources.StateAuthority, RpcTargets.StateAuthority)]

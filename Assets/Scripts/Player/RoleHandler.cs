@@ -1,78 +1,45 @@
-using UnityEngine;
 using Fusion;
+using UnityEngine;
 
 public class RoleHandler : NetworkBehaviour
 {
-    [Header("Components")]
-    public PlayerController playerController;
+    [Networked] public PlayerRole CurrentRole { get; set; }
 
-    [Header("Kameralar")]
-    public GameObject runnerCameraObj;
-    public GameObject trapperCameraObj;
+    [SerializeField] private RoleApplierBehaviour[] roleAppliers;
 
-    public enum PlayerRole
-    {
-        None,
-        Runner,
-        Trapper
-    }
-
-    [Networked]
-    public PlayerRole currentRole { get; set; }
-
-    private PlayerRole _lastRole;
+    private PlayerRole lastRenderedRole = PlayerRole.None;
 
     public override void Spawned()
     {
-        if (playerController == null)
-            playerController = GetComponent<PlayerController>();
+        if (roleAppliers == null || roleAppliers.Length == 0)
+        {
+            roleAppliers = GetComponents<RoleApplierBehaviour>();
+        }
 
-        _lastRole = PlayerRole.None;
-
-        // HasStateAuthority ise ve server yeni basladiysa rol onceden atanmis olabilir,
-        // Bu yuzden spawn oldugunda hemen ayarlari uyguluyoruz.
-        ApplyRoleSettings(currentRole);
+        ApplyRoleSettings(CurrentRole);
+        lastRenderedRole = CurrentRole;
     }
 
     public override void Render()
     {
-        if (_lastRole != currentRole)
+        if (lastRenderedRole == CurrentRole)
         {
-            ApplyRoleSettings(currentRole);
-            _lastRole = currentRole;
+            return;
         }
+
+        ApplyRoleSettings(CurrentRole);
+        lastRenderedRole = CurrentRole;
     }
 
     private void ApplyRoleSettings(PlayerRole role)
     {
-        if (role == PlayerRole.None) return;
+        bool isLocalPlayer = Object != null && Object.HasInputAuthority;
 
-        bool isLocalPlayer = Object.HasInputAuthority;
-
-        if (role == PlayerRole.Trapper)
+        foreach (RoleApplierBehaviour roleApplier in roleAppliers)
         {
-            if (playerController != null)
+            if (roleApplier != null)
             {
-                playerController.isMovementAllowed = false;
-            }
-
-            if (isLocalPlayer)
-            {
-                if (runnerCameraObj != null) runnerCameraObj.SetActive(false);
-                if (trapperCameraObj != null) trapperCameraObj.SetActive(true);
-            }
-        }
-        else if (role == PlayerRole.Runner)
-        {
-            if (playerController != null)
-            {
-                playerController.isMovementAllowed = true;
-            }
-
-            if (isLocalPlayer)
-            {
-                if (trapperCameraObj != null) trapperCameraObj.SetActive(false);
-                if (runnerCameraObj != null) runnerCameraObj.SetActive(true);
+                roleApplier.ApplyRole(role, isLocalPlayer);
             }
         }
     }
