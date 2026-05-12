@@ -154,10 +154,17 @@ public class PlayerController : MonoBehaviour
     {
         if (!isMovementAllowed) return;
 
+        // Karakter yerdeyken ve eğilmiyorken zıplama tuşuna basarsa
         if (Input.GetButtonDown("Jump") && isGrounded && !isCrouching)
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+            // Animator'a zıplama tetikleyicisini gönderiyoruz
+            if (animator != null)
+            {
+                animator.SetTrigger("JumpTrigger");
+            }
         }
     }
 
@@ -221,29 +228,26 @@ public class PlayerController : MonoBehaviour
         );
     }
 
-    // --- GÜNCELLENEN BÖLÜM ---
     void HandleAnimation()
     {
         if (animator == null) return;
 
-        // 1. Blend Tree yönleri
+        // 1. Blend Tree için klavyeden gelen ham yön değerleri
         animator.SetFloat("Horizontal", horizontalInput);
         animator.SetFloat("Vertical", verticalInput);
 
-        // 2. Dikey hız (Zıplama ve Düşme ayrımı için kritik)
-        // Yukarı çıkarken bu değer pozitif, düşerken negatif olur.
+        // 2. Dikey hız (Zıplamadan düşmeye geçiş kontrolü için)
         animator.SetFloat("VerticalVelocity", rb.linearVelocity.y);
 
-        // 3. Yatay hız
+        // 3. Genel hareket hızı
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float speedValue = horizontalVelocity.magnitude;
         animator.SetFloat("Speed", speedValue);
 
-        // 4. Durumlar
+        // 4. Durum Boole'ları
         animator.SetBool("isGrounded", isGrounded); 
         animator.SetBool("isCrouching", isCrouching);
     }
-    // -------------------------
 
     public void TakeDamage(int damage)
     {
