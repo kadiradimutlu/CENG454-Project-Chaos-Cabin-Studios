@@ -99,7 +99,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         for (int i = 0; i < activePlayers.Count; i++)
         {
-            RoleHandler.PlayerRole assignedRole = (i < 2) ? RoleHandler.PlayerRole.Runner : RoleHandler.PlayerRole.Trapper;
+            PlayerRole assignedRole = (i < 2) ? PlayerRole.Runner : PlayerRole.Trapper;
             SpawnPlayerIfNeeded(activePlayers[i], assignedRole, i);
         }
 
@@ -107,7 +107,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log("PlayerSpawner: Gameplay spawn tamamlandı.");
     }
 
-    private void SpawnPlayerIfNeeded(PlayerRef player, RoleHandler.PlayerRole assignedRole, int indexHint = -1)
+    private void SpawnPlayerIfNeeded(PlayerRef player, PlayerRole assignedRole, int indexHint = -1)
     {
         if (_runner == null || !_runner.IsServer)
             return;
@@ -142,7 +142,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             var roleHandler = spawnedObject.GetComponent<RoleHandler>();
             if (roleHandler != null)
             {
-                roleHandler.currentRole = assignedRole;
+                roleHandler.SetRole(assignedRole);
             }
 
             Debug.Log($"PlayerSpawner: Player {player.PlayerId} spawn edildi. Rol: {assignedRole}");
@@ -153,15 +153,24 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    private Transform GetSpawnPoint(RoleHandler.PlayerRole role, int indexHint)
+    private Transform GetSpawnPoint(PlayerRole role, int indexHint)
     {
-        Transform[] points = (role == RoleHandler.PlayerRole.Runner) ? runnerSpawnPoints : trapperSpawnPoints;
+        Transform[] points = (role == PlayerRole.Runner) ? runnerSpawnPoints : trapperSpawnPoints;
         
         if (points == null || points.Length == 0)
+        {
             points = spawnPoints;
+        }
 
+        if (points == null || points.Length == 0)
+        {
+            return null;
+        }
+            
         if (indexHint < 0)
+        {
             indexHint = 0;
+        }
 
         indexHint = Mathf.Clamp(indexHint, 0, points.Length - 1);
         return points[indexHint];
@@ -195,7 +204,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         if (_runner.IsServer && _gameplaySpawnStarted)
         {
             int index = _spawnedPlayers.Count;
-            RoleHandler.PlayerRole role = (index < 2) ? RoleHandler.PlayerRole.Runner : RoleHandler.PlayerRole.Trapper;
+            PlayerRole role = (index < 2) ? PlayerRole.Runner : PlayerRole.Trapper;
             SpawnPlayerIfNeeded(player, role, index);
         }
     }
