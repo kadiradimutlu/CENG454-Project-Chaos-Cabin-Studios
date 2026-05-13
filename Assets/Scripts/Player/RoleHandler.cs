@@ -4,11 +4,9 @@ using Fusion;
 public class RoleHandler : NetworkBehaviour
 {
     [Header("Components")]
-    public PlayerController playerController;
+    private PlayerMovement _playerMovement;
 
-    [Header("Kameralar")]
-    public GameObject runnerCameraObj;
-    public GameObject trapperCameraObj;
+   
 
     public enum PlayerRole
     {
@@ -24,13 +22,15 @@ public class RoleHandler : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (playerController == null)
-            playerController = GetComponent<PlayerController>();
+        if(_playerMovement == null )
+        {
+            _playerMovement = GetComponent<PlayerMovement>();
+        }    
+       
 
         _lastRole = PlayerRole.None;
 
-        // HasStateAuthority ise ve server yeni basladiysa rol onceden atanmis olabilir,
-        // Bu yuzden spawn oldugunda hemen ayarlari uyguluyoruz.
+        
         ApplyRoleSettings(currentRole);
     }
 
@@ -58,21 +58,17 @@ public class RoleHandler : NetworkBehaviour
 
             if (isLocalPlayer)
             {
-                if (runnerCameraObj != null) runnerCameraObj.SetActive(false);
-                if (trapperCameraObj != null) trapperCameraObj.SetActive(true);
+                
             }
         }
         else if (role == PlayerRole.Runner)
         {
-            if (playerController != null)
-            {
-                playerController.isMovementAllowed = true;
+            
             }
 
             if (isLocalPlayer)
             {
-                if (trapperCameraObj != null) trapperCameraObj.SetActive(false);
-                if (runnerCameraObj != null) runnerCameraObj.SetActive(true);
+                
             }
         }
     }
