@@ -31,6 +31,16 @@ public class RoleHandler : NetworkBehaviour
         lastRenderedRole = CurrentRole;
     }
 
+    public void SetRole(PlayerRole newRole)
+    {
+        if (!HasStateAuthority)
+        {
+            return;
+        }
+
+        CurrentRole = newRole;
+    }
+
     private void ApplyRoleSettings(PlayerRole role)
     {
         bool isLocalPlayer = Object != null && Object.HasInputAuthority;
