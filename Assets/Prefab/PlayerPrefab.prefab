@@ -18,6 +18,9 @@ GameObject:
   - component: {fileID: 1643129204841086932}
   - component: {fileID: 1230728563986974221}
   - component: {fileID: -6558359621573049810}
+  - component: {fileID: 265149033449573497}
+  - component: {fileID: 6574671038988352209}
+  - component: {fileID: 4745300973869823781}
   m_Layer: 0
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -146,6 +149,8 @@ MonoBehaviour:
   - {fileID: 1643129204841086932}
   - {fileID: 1230728563986974221}
   - {fileID: -6558359621573049810}
+  - {fileID: 6574671038988352209}
+  - {fileID: 4745300973869823781}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2796955079069592424
 MonoBehaviour:
@@ -191,9 +196,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1582c0f2d71c21646b9e268bf545051a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoleHandler
-  playerController: {fileID: 0}
-  runnerCameraObj: {fileID: 8655580079025213408}
-  trapperCameraObj: {fileID: 5535873060997195435}
   _currentRole: 1
 --- !u!114 &1230728563986974221
 MonoBehaviour:
@@ -221,6 +223,65 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 5
   rotationSpeed: 10
+  jumpForce: 5
+--- !u!54 &265149033449573497
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3600554267242463573}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 80
+  m_CollisionDetection: 0
+--- !u!114 &6574671038988352209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3600554267242463573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bda3eac9fd95a42f0bb673d2ff6d1311, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
+  animator: {fileID: 3638880797616173288}
+--- !u!114 &4745300973869823781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3600554267242463573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkMecanimAnimator
+  Animator: {fileID: 3638880797616173288}
+  ApplyTiming: 2
+  SyncSettings: 79
+  StateHashes: 00000000a1f7ab0dbb6691e7c76ba771622f40ce2320aa61a7037c8e28a981077af3fe2e249a8c8fcf590472fbcb4cdc7fe89a3371220edbf36d425e
+  TriggerHashes: 0000000087a0c60628a98107
+  TotalWords: 5
 --- !u!1 &5535873060997195435
 GameObject:
   m_ObjectHideFlags: 0
@@ -618,11 +679,20 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: c838664fdeee74663b8c62e5e8d450d2, type: 2}
+    - target: {fileID: 5866666021909216657, guid: de13a7420582ded45a8d7d3f96889aca, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de13a7420582ded45a8d7d3f96889aca, type: 3}
+--- !u!95 &3638880797616173288 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: de13a7420582ded45a8d7d3f96889aca, type: 3}
+  m_PrefabInstance: {fileID: 7139739673473469817}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7250736141540469394 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: de13a7420582ded45a8d7d3f96889aca, type: 3}
