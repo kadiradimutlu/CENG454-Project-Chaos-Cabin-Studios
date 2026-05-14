@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3971168689283820697}
   - component: {fileID: 2796955079069592424}
   - component: {fileID: 2306145414830265327}
+  - component: {fileID: 1643129204841086932}
   m_Layer: 0
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -139,6 +140,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 2796955079069592424}
   - {fileID: 2306145414830265327}
+  - {fileID: 1643129204841086932}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2796955079069592424
 MonoBehaviour:
@@ -172,6 +174,22 @@ MonoBehaviour:
   playerCameraObject: {fileID: 8655580079025213408}
   cameraFollowRig: {fileID: 5835897299797775121}
   cameraTarget: {fileID: 9183895688399179690}
+--- !u!114 &1643129204841086932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3600554267242463573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1582c0f2d71c21646b9e268bf545051a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoleHandler
+  playerController: {fileID: 0}
+  runnerCameraObj: {fileID: 8655580079025213408}
+  trapperCameraObj: {fileID: 5535873060997195435}
+  _currentRole: 1
 --- !u!1 &5535873060997195435
 GameObject:
   m_ObjectHideFlags: 0
