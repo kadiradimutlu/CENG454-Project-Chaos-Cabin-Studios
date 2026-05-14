@@ -1,14 +1,12 @@
 using UnityEngine;
 using Fusion;
 
-public class RoleHandler : NetworkBehaviour
+public partial class RoleHandler : NetworkBehaviour
 {
     [Header("Components")]
-    public PlayerController playerController;
-
-    [Header("Kameralar")]
-    public GameObject runnerCameraObj;
-    public GameObject trapperCameraObj;
+    private PlayerMovement _playerMovement;
+    
+    private PlayerMovement playerController; 
 
     public enum PlayerRole
     {
@@ -24,13 +22,13 @@ public class RoleHandler : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (playerController == null)
-            playerController = GetComponent<PlayerController>();
+        if (_playerMovement == null)
+        {
+            _playerMovement = GetComponent<PlayerMovement>();
+            playerController = _playerMovement; 
+        }
 
         _lastRole = PlayerRole.None;
-
-        // HasStateAuthority ise ve server yeni basladiysa rol onceden atanmis olabilir,
-        // Bu yuzden spawn oldugunda hemen ayarlari uyguluyoruz.
         ApplyRoleSettings(currentRole);
     }
 
@@ -44,36 +42,36 @@ public class RoleHandler : NetworkBehaviour
     }
 
     private void ApplyRoleSettings(PlayerRole role)
+
+{
+
+    if (role == PlayerRole.None) return;
+ 
+    bool isLocalPlayer = Object.HasInputAuthority;
+ 
+    if (role == PlayerRole.Trapper)
+
     {
-        if (role == PlayerRole.None) return;
 
-        bool isLocalPlayer = Object.HasInputAuthority;
-
-        if (role == PlayerRole.Trapper)
+        if (_playerMovement != null)
         {
-            if (playerController != null)
-            {
-                playerController.isMovementAllowed = false;
-            }
 
-            if (isLocalPlayer)
-            {
-                if (runnerCameraObj != null) runnerCameraObj.SetActive(false);
-                if (trapperCameraObj != null) trapperCameraObj.SetActive(true);
-            }
-        }
-        else if (role == PlayerRole.Runner)
-        {
-            if (playerController != null)
-            {
-                playerController.isMovementAllowed = true;
-            }
+            //_playerMovement.isMovementAllowed = false;
 
-            if (isLocalPlayer)
-            {
-                if (trapperCameraObj != null) trapperCameraObj.SetActive(false);
-                if (runnerCameraObj != null) runnerCameraObj.SetActive(true);
-            }
-        }
     }
+
+    else if (role == PlayerRole.Runner)
+
+    {
+
+        if (_playerMovement != null)
+        {
+
+            //_playerMovement.isMovementAllowed = true;
+
+    }
+
 }
+}
+}}
+ 
