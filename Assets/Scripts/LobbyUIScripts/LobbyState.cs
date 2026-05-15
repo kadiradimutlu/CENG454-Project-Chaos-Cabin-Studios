@@ -52,6 +52,7 @@ public class LobbyState : NetworkBehaviour
     public override void Spawned()
     {
         MainMenuManager menu = FindObjectOfType<MainMenuManager>();
+
         if (menu != null)
         {
             menu.RegisterLobbyState(this);
@@ -293,6 +294,7 @@ public class LobbyState : NetworkBehaviour
         if (Slot2Player == player) return 1;
         if (Slot3Player == player) return 2;
         if (Slot4Player == player) return 3;
+
         return -1;
     }
 
@@ -302,6 +304,7 @@ public class LobbyState : NetworkBehaviour
         if (Slot2Player == player) return Slot2Ready;
         if (Slot3Player == player) return Slot3Ready;
         if (Slot4Player == player) return Slot4Ready;
+
         return false;
     }
 
@@ -381,9 +384,14 @@ public class LobbyState : NetworkBehaviour
             IsReady = hasPlayer && !isHost && readyValue,
             CanUseReady = hasPlayer && !isHost,
             Player = player,
+
+            // Empty slots now only show Player 2 / Player 3 / Player 4.
+            // Host slot shows Player 1 (Host).
             DisplayName = hasPlayer
                 ? (isHost ? $"Player {slotIndex + 1} (Host)" : $"Player {slotIndex + 1}")
-                : $"Player {slotIndex + 1}: Bekleniyor...",
+                : $"Player {slotIndex + 1}",
+
+            // Empty slots show no waiting/status text.
             StatusText = GetStatusText(hasPlayer, isHost, readyValue)
         };
 
@@ -393,12 +401,12 @@ public class LobbyState : NetworkBehaviour
     private string GetStatusText(bool hasPlayer, bool isHost, bool readyValue)
     {
         if (!hasPlayer)
-            return "Bekleniyor...";
+            return string.Empty;
 
         if (isHost)
             return "Host";
 
-        return readyValue ? "Hazır!" : "Lobide";
+        return readyValue ? "Ready!" : "In Lobby";
     }
 
     // ==================================================

@@ -110,6 +110,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (_currentPanel == lobbyPanel && IsLobbyStateAlive())
         {
             _uiRefreshTimer += Time.deltaTime;
+
             if (_uiRefreshTimer >= UiRefreshInterval)
             {
                 _uiRefreshTimer = 0f;
@@ -140,6 +141,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         NetworkRunnerHandler found = FindObjectOfType<NetworkRunnerHandler>();
+
         if (found != null && IsSceneObject(found) && found.IsReusable())
         {
             runnerHandler = found;
@@ -189,6 +191,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         else
         {
             NetworkRunnerHandler found = FindObjectOfType<NetworkRunnerHandler>();
+
             if (found != null && IsSceneObject(found))
                 sceneObjectToDestroy = found.gameObject;
         }
@@ -223,7 +226,6 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (gameWorld != null)
             gameWorld.SetActive(gameplayActive);
 
-        // Keep the menu camera alive until the local player camera is fully ready.
         if (!gameplayActive)
         {
             EnableMenuCameraForMenu();
@@ -239,6 +241,17 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (lobbyPanel) lobbyPanel.SetActive(false);
 
         _currentPanel = null;
+    }
+
+    private void SetStatusText(TextMeshProUGUI textObject, string value)
+    {
+        if (textObject == null)
+            return;
+
+        textObject.text = value;
+
+        if (textObject.gameObject != null)
+            textObject.gameObject.SetActive(!string.IsNullOrWhiteSpace(value));
     }
 
     // ==================================================
@@ -307,7 +320,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             codeInputField.text = string.Empty;
 
         if (joinCodeInfoText != null)
-            joinCodeInfoText.text = "Join code gir";
+            joinCodeInfoText.text = "Enter Room Code";
 
         OpenPanel(joinCodePanel);
     }
@@ -329,9 +342,11 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (string.IsNullOrWhiteSpace(joinCode))
         {
-            Debug.LogWarning("Join code cannot be empty.");
+            Debug.LogWarning("Room code cannot be empty.");
+
             if (joinCodeInfoText != null)
-                joinCodeInfoText.text = "Kod boş olamaz";
+                joinCodeInfoText.text = "Room code cannot be empty.";
+
             return;
         }
 
@@ -435,8 +450,10 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (string.IsNullOrWhiteSpace(codeToCopy))
         {
             Debug.LogWarning("No room code found to copy.");
+
             if (copyRoomCodeButtonText != null)
                 copyRoomCodeButtonText.text = "No Code";
+
             return;
         }
 
@@ -445,8 +462,10 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (string.IsNullOrWhiteSpace(codeToCopy) || codeToCopy == "------")
         {
             Debug.LogWarning("There is no valid room code to copy.");
+
             if (copyRoomCodeButtonText != null)
                 copyRoomCodeButtonText.text = "No Code";
+
             return;
         }
 
@@ -513,7 +532,6 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             ResetCopyRoomCodeButtonText();
 
             SetGameplayView(false);
-
             SafeClearLobbyState();
 
             if (runnerHandler != null)
@@ -716,23 +734,23 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void RefreshLobbyUI()
     {
-        if (player1NameText) player1NameText.text = "Player 1: Bekleniyor...";
-        if (player2NameText) player2NameText.text = "Player 2: Bekleniyor...";
-        if (player3NameText) player3NameText.text = "Player 3: Bekleniyor...";
-        if (player4NameText) player4NameText.text = "Player 4: Bekleniyor...";
+        if (player1NameText) player1NameText.text = "Player 1";
+        if (player2NameText) player2NameText.text = "Player 2";
+        if (player3NameText) player3NameText.text = "Player 3";
+        if (player4NameText) player4NameText.text = "Player 4";
 
-        if (player1StatusText) player1StatusText.text = "Bekleniyor...";
-        if (player2StatusText) player2StatusText.text = "Bekleniyor...";
-        if (player3StatusText) player3StatusText.text = "Bekleniyor...";
-        if (player4StatusText) player4StatusText.text = "Bekleniyor...";
+        SetStatusText(player1StatusText, "");
+        SetStatusText(player2StatusText, "");
+        SetStatusText(player3StatusText, "");
+        SetStatusText(player4StatusText, "");
 
         if (player2ReadyButton) player2ReadyButton.gameObject.SetActive(false);
         if (player3ReadyButton) player3ReadyButton.gameObject.SetActive(false);
         if (player4ReadyButton) player4ReadyButton.gameObject.SetActive(false);
 
-        if (player2ReadyButtonText) player2ReadyButtonText.text = "Hazır";
-        if (player3ReadyButtonText) player3ReadyButtonText.text = "Hazır";
-        if (player4ReadyButtonText) player4ReadyButtonText.text = "Hazır";
+        if (player2ReadyButtonText) player2ReadyButtonText.text = "Ready";
+        if (player3ReadyButtonText) player3ReadyButtonText.text = "Ready";
+        if (player4ReadyButtonText) player4ReadyButtonText.text = "Ready";
 
         if (roomCodeText != null)
         {
@@ -755,6 +773,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
                 startButton.gameObject.SetActive(false);
                 startButton.interactable = false;
             }
+
             return;
         }
 
@@ -772,25 +791,25 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (slots.Length > 0)
         {
             if (player1NameText) player1NameText.text = slots[0].DisplayName;
-            if (player1StatusText) player1StatusText.text = slots[0].StatusText;
+            SetStatusText(player1StatusText, slots[0].StatusText);
         }
 
         if (slots.Length > 1)
         {
             if (player2NameText) player2NameText.text = slots[1].DisplayName;
-            if (player2StatusText) player2StatusText.text = slots[1].StatusText;
+            SetStatusText(player2StatusText, slots[1].StatusText);
         }
 
         if (slots.Length > 2)
         {
             if (player3NameText) player3NameText.text = slots[2].DisplayName;
-            if (player3StatusText) player3StatusText.text = slots[2].StatusText;
+            SetStatusText(player3StatusText, slots[2].StatusText);
         }
 
         if (slots.Length > 3)
         {
             if (player4NameText) player4NameText.text = slots[3].DisplayName;
-            if (player4StatusText) player4StatusText.text = slots[3].StatusText;
+            SetStatusText(player4StatusText, slots[3].StatusText);
         }
 
         bool isHost = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
@@ -804,22 +823,25 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             {
                 player2ReadyButton.gameObject.SetActive(true);
                 player2ReadyButton.interactable = true;
+
                 if (player2ReadyButtonText)
-                    player2ReadyButtonText.text = _localReady ? "Hazır İptal" : "Hazır";
+                    player2ReadyButtonText.text = _localReady ? "Cancel Ready" : "Ready";
             }
             else if (localSlotIndex == 2 && player3ReadyButton != null)
             {
                 player3ReadyButton.gameObject.SetActive(true);
                 player3ReadyButton.interactable = true;
+
                 if (player3ReadyButtonText)
-                    player3ReadyButtonText.text = _localReady ? "Hazır İptal" : "Hazır";
+                    player3ReadyButtonText.text = _localReady ? "Cancel Ready" : "Ready";
             }
             else if (localSlotIndex == 3 && player4ReadyButton != null)
             {
                 player4ReadyButton.gameObject.SetActive(true);
                 player4ReadyButton.interactable = true;
+
                 if (player4ReadyButtonText)
-                    player4ReadyButtonText.text = _localReady ? "Hazır İptal" : "Hazır";
+                    player4ReadyButtonText.text = _localReady ? "Cancel Ready" : "Ready";
             }
         }
 
@@ -832,6 +854,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             startButton.interactable = isHostForStart && canStartGame;
         }
     }
+
     public void DisableMenuCameraForGameplay()
     {
         if (menuCameraObject != null && menuCameraObject.activeSelf)
@@ -849,6 +872,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             Debug.Log("MainMenuManager: Menu camera enabled for menu.");
         }
     }
+
     private string GenerateRandomCode(int length)
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -877,6 +901,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             if (_lobbyState != null)
             {
                 bool assigned = _lobbyState.AssignPlayer(player);
+
                 if (!assigned)
                 {
                     Debug.LogWarning($"Player could not be assigned: {player.PlayerId}");
@@ -964,7 +989,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
+
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
 
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
