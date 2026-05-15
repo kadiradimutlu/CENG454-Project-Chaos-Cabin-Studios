@@ -1,9 +1,13 @@
+using System.Text;
 using Fusion;
 using UnityEngine;
 
 public class LobbyState : NetworkBehaviour
 {
     private const int MaxPlayers = 4;
+
+    private const int ChatMaxMessageLength = 120;
+    private const int ChatLineCapacity = 180;
 
     [Header("Lobby State")]
     [Networked] public PlayerRef Slot1Player { get; set; }
@@ -19,6 +23,20 @@ public class LobbyState : NetworkBehaviour
     [Networked] public NetworkBool Slot4Ready { get; set; }
 
     [Networked] public NetworkBool GameStarted { get; set; }
+
+    [Header("Lobby Chat")]
+    [Networked] public int ChatMessageVersion { get; set; }
+
+    [Networked, Capacity(ChatLineCapacity)] public string ChatLine1 { get; set; }
+    [Networked, Capacity(ChatLineCapacity)] public string ChatLine2 { get; set; }
+    [Networked, Capacity(ChatLineCapacity)] public string ChatLine3 { get; set; }
+    [Networked, Capacity(ChatLineCapacity)] public string ChatLine4 { get; set; }
+    [Networked, Capacity(ChatLineCapacity)] public string ChatLine5 { get; set; }
+    [Networked, Capacity(ChatLineCapacity)] public string ChatLine6 { get; set; }
+    [Networked, Capacity(ChatLineCapacity)] public string ChatLine7 { get; set; }
+    [Networked, Capacity(ChatLineCapacity)] public string ChatLine8 { get; set; }
+    [Networked, Capacity(ChatLineCapacity)] public string ChatLine9 { get; set; }
+    [Networked, Capacity(ChatLineCapacity)] public string ChatLine10 { get; set; }
 
     public struct LobbySlotData
     {
@@ -447,6 +465,76 @@ public class LobbyState : NetworkBehaviour
     }
 
     // ==================================================
+    // LOBBY CHAT
+    // ==================================================
+
+    public string GetChatLog()
+    {
+        StringBuilder builder = new StringBuilder();
+
+        AppendChatLine(builder, ChatLine1);
+        AppendChatLine(builder, ChatLine2);
+        AppendChatLine(builder, ChatLine3);
+        AppendChatLine(builder, ChatLine4);
+        AppendChatLine(builder, ChatLine5);
+        AppendChatLine(builder, ChatLine6);
+        AppendChatLine(builder, ChatLine7);
+        AppendChatLine(builder, ChatLine8);
+        AppendChatLine(builder, ChatLine9);
+        AppendChatLine(builder, ChatLine10);
+
+        return builder.ToString();
+    }
+
+    private void AppendChatLine(StringBuilder builder, string line)
+    {
+        if (string.IsNullOrWhiteSpace(line))
+            return;
+
+        if (builder.Length > 0)
+            builder.AppendLine();
+
+        builder.Append(line);
+    }
+
+    private void PushChatLine(string newLine)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        ChatLine1 = ChatLine2;
+        ChatLine2 = ChatLine3;
+        ChatLine3 = ChatLine4;
+        ChatLine4 = ChatLine5;
+        ChatLine5 = ChatLine6;
+        ChatLine6 = ChatLine7;
+        ChatLine7 = ChatLine8;
+        ChatLine8 = ChatLine9;
+        ChatLine9 = ChatLine10;
+        ChatLine10 = newLine;
+
+        ChatMessageVersion++;
+    }
+
+    private string SanitizeChatMessage(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+            return string.Empty;
+
+        message = message.Replace("\r", " ");
+        message = message.Replace("\n", " ");
+        message = message.Trim();
+
+        while (message.Contains("  "))
+            message = message.Replace("  ", " ");
+
+        if (message.Length > ChatMaxMessageLength)
+            message = message.Substring(0, ChatMaxMessageLength);
+
+        return message;
+    }
+
+    // ==================================================
     // RPC CALLS
     // ==================================================
 
@@ -470,6 +558,40 @@ public class LobbyState : NetworkBehaviour
             return;
 
         TogglePlayerReadyServer(sender);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_SendChatMessage(string rawMessage, RpcInfo info = default)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        PlayerRef sender = info.Source;
+
+        if (sender == default && Runner != null)
+            sender = Runner.LocalPlayer;
+
+        if (sender == default)
+            return;
+
+        if (!ContainsPlayer(sender))
+            return;
+
+        string cleanMessage = SanitizeChatMessage(rawMessage);
+
+        if (string.IsNullOrWhiteSpace(cleanMessage))
+            return;
+
+        int slotIndex = GetPlayerSlotIndex(sender);
+
+        if (slotIndex < 0)
+            return;
+
+        string line = $"Player {slotIndex + 1}: {cleanMessage}";
+
+        PushChatLine(line);
+
+        Debug.Log($"Lobby chat message: {line}");
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
