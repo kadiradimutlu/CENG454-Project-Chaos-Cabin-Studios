@@ -12,15 +12,19 @@ public class LobbyState : NetworkBehaviour
     [Header("Lobby State")]
     [Networked] public PlayerRef Slot1Player { get; set; }
     [Networked] public NetworkBool Slot1Ready { get; set; }
+    [Networked] public int Slot1SkinIndex { get; set; }
 
     [Networked] public PlayerRef Slot2Player { get; set; }
     [Networked] public NetworkBool Slot2Ready { get; set; }
+    [Networked] public int Slot2SkinIndex { get; set; }
 
     [Networked] public PlayerRef Slot3Player { get; set; }
     [Networked] public NetworkBool Slot3Ready { get; set; }
+    [Networked] public int Slot3SkinIndex { get; set; }
 
     [Networked] public PlayerRef Slot4Player { get; set; }
     [Networked] public NetworkBool Slot4Ready { get; set; }
+    [Networked] public int Slot4SkinIndex { get; set; }
 
     [Networked] public NetworkBool GameStarted { get; set; }
 
@@ -47,6 +51,8 @@ public class LobbyState : NetworkBehaviour
         public PlayerRef Player;
         public string DisplayName;
         public string StatusText;
+        public int SkinIndex;
+        public string SkinName;
     }
 
     public override void Spawned()
@@ -81,10 +87,29 @@ public class LobbyState : NetworkBehaviour
         if (!HasStateAuthority)
             return;
 
-        if (Slot1Player == default) Slot1Ready = false;
-        if (Slot2Player == default) Slot2Ready = false;
-        if (Slot3Player == default) Slot3Ready = false;
-        if (Slot4Player == default) Slot4Ready = false;
+        if (Slot1Player == default)
+        {
+            Slot1Ready = false;
+            Slot1SkinIndex = 0;
+        }
+
+        if (Slot2Player == default)
+        {
+            Slot2Ready = false;
+            Slot2SkinIndex = 0;
+        }
+
+        if (Slot3Player == default)
+        {
+            Slot3Ready = false;
+            Slot3SkinIndex = 0;
+        }
+
+        if (Slot4Player == default)
+        {
+            Slot4Ready = false;
+            Slot4SkinIndex = 0;
+        }
 
         if (Slot1Player == default && GameStarted)
             GameStarted = false;
@@ -98,6 +123,7 @@ public class LobbyState : NetworkBehaviour
         {
             Slot1Player = default;
             Slot1Ready = false;
+            Slot1SkinIndex = 0;
             changed = true;
         }
 
@@ -105,6 +131,7 @@ public class LobbyState : NetworkBehaviour
         {
             Slot2Player = default;
             Slot2Ready = false;
+            Slot2SkinIndex = 0;
             changed = true;
         }
 
@@ -112,6 +139,7 @@ public class LobbyState : NetworkBehaviour
         {
             Slot3Player = default;
             Slot3Ready = false;
+            Slot3SkinIndex = 0;
             changed = true;
         }
 
@@ -119,6 +147,7 @@ public class LobbyState : NetworkBehaviour
         {
             Slot4Player = default;
             Slot4Ready = false;
+            Slot4SkinIndex = 0;
             changed = true;
         }
 
@@ -154,6 +183,7 @@ public class LobbyState : NetworkBehaviour
         {
             Slot1Player = player;
             Slot1Ready = false;
+            Slot1SkinIndex = 0;
             return true;
         }
 
@@ -161,6 +191,7 @@ public class LobbyState : NetworkBehaviour
         {
             Slot2Player = player;
             Slot2Ready = false;
+            Slot2SkinIndex = 0;
             return true;
         }
 
@@ -168,6 +199,7 @@ public class LobbyState : NetworkBehaviour
         {
             Slot3Player = player;
             Slot3Ready = false;
+            Slot3SkinIndex = 0;
             return true;
         }
 
@@ -175,6 +207,7 @@ public class LobbyState : NetworkBehaviour
         {
             Slot4Player = player;
             Slot4Ready = false;
+            Slot4SkinIndex = 0;
             return true;
         }
 
@@ -193,24 +226,28 @@ public class LobbyState : NetworkBehaviour
         {
             Slot1Player = default;
             Slot1Ready = false;
+            Slot1SkinIndex = 0;
         }
 
         if (Slot2Player == player)
         {
             Slot2Player = default;
             Slot2Ready = false;
+            Slot2SkinIndex = 0;
         }
 
         if (Slot3Player == player)
         {
             Slot3Player = default;
             Slot3Ready = false;
+            Slot3SkinIndex = 0;
         }
 
         if (Slot4Player == player)
         {
             Slot4Player = default;
             Slot4Ready = false;
+            Slot4SkinIndex = 0;
         }
 
         CompactSlots();
@@ -243,8 +280,17 @@ public class LobbyState : NetworkBehaviour
             Slot4Ready
         };
 
+        int[] skinStates = new int[MaxPlayers]
+        {
+            Slot1SkinIndex,
+            Slot2SkinIndex,
+            Slot3SkinIndex,
+            Slot4SkinIndex
+        };
+
         PlayerRef[] compactPlayers = new PlayerRef[MaxPlayers];
         bool[] compactReady = new bool[MaxPlayers];
+        int[] compactSkins = new int[MaxPlayers];
 
         int writeIndex = 0;
 
@@ -254,21 +300,26 @@ public class LobbyState : NetworkBehaviour
             {
                 compactPlayers[writeIndex] = players[i];
                 compactReady[writeIndex] = writeIndex == 0 ? false : readyStates[i];
+                compactSkins[writeIndex] = NormalizeSkinIndex(skinStates[i]);
                 writeIndex++;
             }
         }
 
         Slot1Player = compactPlayers[0];
         Slot1Ready = false;
+        Slot1SkinIndex = compactSkins[0];
 
         Slot2Player = compactPlayers[1];
         Slot2Ready = compactReady[1];
+        Slot2SkinIndex = compactSkins[1];
 
         Slot3Player = compactPlayers[2];
         Slot3Ready = compactReady[2];
+        Slot3SkinIndex = compactSkins[2];
 
         Slot4Player = compactPlayers[3];
         Slot4Ready = compactReady[3];
+        Slot4SkinIndex = compactSkins[3];
     }
 
     // ==================================================
@@ -376,6 +427,7 @@ public class LobbyState : NetworkBehaviour
     private LobbySlotData BuildSlotData(int slotIndex, PlayerRef player, bool readyValue, bool isHost)
     {
         bool hasPlayer = player != default;
+        int skinIndex = hasPlayer ? GetSlotSkinIndex(slotIndex) : 0;
 
         LobbySlotData data = new LobbySlotData
         {
@@ -392,7 +444,10 @@ public class LobbyState : NetworkBehaviour
                 : $"Player {slotIndex + 1}",
 
             // Empty slots show no waiting/status text.
-            StatusText = GetStatusText(hasPlayer, isHost, readyValue)
+            StatusText = GetStatusText(hasPlayer, isHost, readyValue),
+
+            SkinIndex = skinIndex,
+            SkinName = hasPlayer ? GetSkinDisplayName(skinIndex) : string.Empty
         };
 
         return data;
@@ -407,6 +462,105 @@ public class LobbyState : NetworkBehaviour
             return "Host";
 
         return readyValue ? "Ready!" : "In Lobby";
+    }
+
+    // ==================================================
+    // SKIN SELECTION
+    // ==================================================
+
+    private int GetSkinCount()
+    {
+        CharacterSkinDatabase database = CharacterSkinDatabase.Instance;
+
+        if (database == null)
+            return 4;
+
+        return Mathf.Max(1, database.SkinCount);
+    }
+
+    private int NormalizeSkinIndex(int skinIndex)
+    {
+        int skinCount = GetSkinCount();
+
+        if (skinIndex < 0)
+            return skinCount - 1;
+
+        if (skinIndex >= skinCount)
+            return 0;
+
+        return skinIndex;
+    }
+
+    private int GetSlotSkinIndex(int slotIndex)
+    {
+        switch (slotIndex)
+        {
+            case 0: return NormalizeSkinIndex(Slot1SkinIndex);
+            case 1: return NormalizeSkinIndex(Slot2SkinIndex);
+            case 2: return NormalizeSkinIndex(Slot3SkinIndex);
+            case 3: return NormalizeSkinIndex(Slot4SkinIndex);
+            default: return 0;
+        }
+    }
+
+    private void SetSlotSkinIndex(int slotIndex, int skinIndex)
+    {
+        skinIndex = NormalizeSkinIndex(skinIndex);
+
+        switch (slotIndex)
+        {
+            case 0:
+                Slot1SkinIndex = skinIndex;
+                break;
+            case 1:
+                Slot2SkinIndex = skinIndex;
+                break;
+            case 2:
+                Slot3SkinIndex = skinIndex;
+                break;
+            case 3:
+                Slot4SkinIndex = skinIndex;
+                break;
+        }
+    }
+
+    private string GetSkinDisplayName(int skinIndex)
+    {
+        CharacterSkinDatabase database = CharacterSkinDatabase.Instance;
+
+        if (database == null)
+            return $"Skin {skinIndex + 1}";
+
+        return database.GetSkinName(skinIndex);
+    }
+
+    public int GetPlayerSkinIndex(PlayerRef player)
+    {
+        int slotIndex = GetPlayerSlotIndex(player);
+
+        if (slotIndex < 0)
+            return 0;
+
+        return GetSlotSkinIndex(slotIndex);
+    }
+
+    public void ChangePlayerSkinServer(PlayerRef player, int direction)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (player == default)
+            return;
+
+        int slotIndex = GetPlayerSlotIndex(player);
+
+        if (slotIndex < 0)
+            return;
+
+        int currentSkinIndex = GetSlotSkinIndex(slotIndex);
+        int nextSkinIndex = currentSkinIndex + direction;
+
+        SetSlotSkinIndex(slotIndex, nextSkinIndex);
     }
 
     // ==================================================
@@ -566,6 +720,28 @@ public class LobbyState : NetworkBehaviour
             return;
 
         TogglePlayerReadyServer(sender);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_ChangeSkin(int direction, RpcInfo info = default)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        PlayerRef sender = info.Source;
+
+        if (sender == default && Runner != null)
+            sender = Runner.LocalPlayer;
+
+        if (sender == default)
+            return;
+
+        if (!ContainsPlayer(sender))
+            return;
+
+        direction = direction < 0 ? -1 : 1;
+
+        ChangePlayerSkinServer(sender, direction);
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]

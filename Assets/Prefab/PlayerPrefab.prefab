@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 265149033449573497}
   - component: {fileID: 6574671038988352209}
   - component: {fileID: 4745300973869823781}
+  - component: {fileID: 4736110249863798448}
   m_Layer: 0
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -151,6 +152,7 @@ MonoBehaviour:
   - {fileID: -6558359621573049810}
   - {fileID: 6574671038988352209}
   - {fileID: 4745300973869823781}
+  - {fileID: 4736110249863798448}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2796955079069592424
 MonoBehaviour:
@@ -280,8 +282,22 @@ MonoBehaviour:
   ApplyTiming: 2
   SyncSettings: 79
   StateHashes: 00000000a1f7ab0dbb6691e7c76ba771622f40ce2320aa61a7037c8e28a981077af3fe2e249a8c8fcf590472fbcb4cdc7fe89a3371220edbf36d425e
-  TriggerHashes: 0000000087a0c60628a98107
+  TriggerHashes: 0000000087a0c606
   TotalWords: 5
+--- !u!114 &4736110249863798448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3600554267242463573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9f1b4f7e26869f489abff72ffa68fba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkinApplier
+  _SkinIndex: 0
+  targetRenderer: {fileID: 0}
 --- !u!1 &5535873060997195435
 GameObject:
   m_ObjectHideFlags: 0

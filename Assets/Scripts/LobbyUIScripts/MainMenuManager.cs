@@ -52,6 +52,12 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private TextMeshProUGUI player3ReadyButtonText;
     [SerializeField] private TextMeshProUGUI player4ReadyButtonText;
 
+    [Header("Lobby - Skin Selection")]
+    [SerializeField] private Button[] previousSkinButtons;
+    [SerializeField] private Button[] nextSkinButtons;
+    [SerializeField] private TextMeshProUGUI[] skinNameTexts;
+    [SerializeField] private Image[] skinPreviewImages;
+
     [Header("Lobby - Other Buttons")]
     [SerializeField] private Button startButton;
     [SerializeField] private Button leaveButton;
@@ -80,6 +86,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     private void Awake()
     {
         EnsureRunnerHandler();
+        SetupSkinSelectionButtons();
 
         SetGameplayView(false);
         ResetCopyRoomCodeButtonText();
@@ -392,6 +399,45 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             return;
 
         _lobbyState.RPC_ToggleReady();
+    }
+
+    private void SetupSkinSelectionButtons()
+    {
+        SetupSkinButtonArray(previousSkinButtons, -1);
+        SetupSkinButtonArray(nextSkinButtons, 1);
+    }
+
+    private void SetupSkinButtonArray(Button[] buttons, int direction)
+    {
+        if (buttons == null)
+            return;
+
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            int slotIndex = i;
+
+            if (buttons[i] == null)
+                continue;
+
+            buttons[i].onClick.RemoveAllListeners();
+            buttons[i].onClick.AddListener(() => ClickChangeSkin(slotIndex, direction));
+        }
+    }
+
+    private void ClickChangeSkin(int slotIndex, int direction)
+    {
+        if (_isLeavingLobby || _isStartingFusion)
+            return;
+
+        if (_runner == null || !IsLobbyStateAlive())
+            return;
+
+        int localSlotIndex = _lobbyState.GetPlayerSlotIndex(_runner.LocalPlayer);
+
+        if (localSlotIndex != slotIndex)
+            return;
+
+        _lobbyState.RPC_ChangeSkin(direction);
     }
 
     public void ClickStartGame()
@@ -752,6 +798,8 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (player3ReadyButtonText) player3ReadyButtonText.text = "Ready";
         if (player4ReadyButtonText) player4ReadyButtonText.text = "Ready";
 
+        ClearSkinSelectionUI();
+
         if (roomCodeText != null)
         {
             roomCodeText.text = string.IsNullOrEmpty(_currentRoomCode)
@@ -815,6 +863,8 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         bool isHost = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
         int localSlotIndex = _lobbyState.GetPlayerSlotIndex(_runner.LocalPlayer);
 
+        RefreshSkinSelectionUI(slots, localSlotIndex);
+
         _localReady = _lobbyState.GetPlayerReady(_runner.LocalPlayer);
 
         if (!isHost)
@@ -852,6 +902,81 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
             startButton.gameObject.SetActive(isHostForStart);
             startButton.interactable = isHostForStart && canStartGame;
+        }
+    }
+
+    private void RefreshSkinSelectionUI(LobbyState.LobbySlotData[] slots, int localSlotIndex)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            bool hasSlot = slots != null && i < slots.Length;
+            bool hasPlayer = hasSlot && slots[i].HasPlayer;
+            bool isLocalSlot = i == localSlotIndex;
+
+            string skinName = hasPlayer ? slots[i].SkinName : string.Empty;
+            int skinIndex = hasPlayer ? slots[i].SkinIndex : 0;
+
+            if (skinNameTexts != null && i < skinNameTexts.Length && skinNameTexts[i] != null)
+            {
+                skinNameTexts[i].text = hasPlayer ? skinName : string.Empty;
+                skinNameTexts[i].gameObject.SetActive(hasPlayer);
+            }
+
+            bool canChangeSkin = hasPlayer && isLocalSlot && !_lobbyState.GameStarted;
+
+            if (previousSkinButtons != null && i < previousSkinButtons.Length && previousSkinButtons[i] != null)
+            {
+                previousSkinButtons[i].gameObject.SetActive(canChangeSkin);
+                previousSkinButtons[i].interactable = canChangeSkin;
+            }
+
+            if (nextSkinButtons != null && i < nextSkinButtons.Length && nextSkinButtons[i] != null)
+            {
+                nextSkinButtons[i].gameObject.SetActive(canChangeSkin);
+                nextSkinButtons[i].interactable = canChangeSkin;
+            }
+
+            if (skinPreviewImages != null && i < skinPreviewImages.Length && skinPreviewImages[i] != null)
+            {
+                skinPreviewImages[i].gameObject.SetActive(hasPlayer);
+
+                if (hasPlayer)
+                {
+                    CharacterSkinDatabase database = CharacterSkinDatabase.Instance;
+
+                    if (database != null)
+                    {
+                        Color previewColor = database.GetPreviewColor(skinIndex);
+                        previewColor.a = 1f;
+
+                        skinPreviewImages[i].enabled = true;
+                        skinPreviewImages[i].color = previewColor;
+                        skinPreviewImages[i].canvasRenderer.SetAlpha(1f);
+                        skinPreviewImages[i].SetAllDirty();
+                    }
+                }
+            }
+        }
+    }
+
+    private void ClearSkinSelectionUI()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            if (skinNameTexts != null && i < skinNameTexts.Length && skinNameTexts[i] != null)
+            {
+                skinNameTexts[i].text = string.Empty;
+                skinNameTexts[i].gameObject.SetActive(false);
+            }
+
+            if (previousSkinButtons != null && i < previousSkinButtons.Length && previousSkinButtons[i] != null)
+                previousSkinButtons[i].gameObject.SetActive(false);
+
+            if (nextSkinButtons != null && i < nextSkinButtons.Length && nextSkinButtons[i] != null)
+                nextSkinButtons[i].gameObject.SetActive(false);
+
+            if (skinPreviewImages != null && i < skinPreviewImages.Length && skinPreviewImages[i] != null)
+                skinPreviewImages[i].gameObject.SetActive(false);
         }
     }
 
