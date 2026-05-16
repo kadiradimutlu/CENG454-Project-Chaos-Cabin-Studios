@@ -13,6 +13,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private Transform[] trapperSpawnPoints;
 
     private NetworkRunner _runner;
+    private LobbyState _lobbyState;
     private bool _callbacksRegistered = false;
     private bool _gameplaySpawnStarted = false;
 
@@ -21,11 +22,13 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     private void Awake()
     {
         TryCacheRunner();
+        TryCacheLobbyState();
     }
 
     private void OnEnable()
     {
         TryCacheRunner();
+        TryCacheLobbyState();
         TryRegisterCallbacks();
     }
 
@@ -45,6 +48,25 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         _runner = FindObjectOfType<NetworkRunner>();
         return _runner != null;
+    }
+
+    private bool TryCacheLobbyState()
+    {
+        if (_lobbyState != null)
+            return true;
+
+        _lobbyState = FindObjectOfType<LobbyState>();
+        return _lobbyState != null;
+    }
+
+    private int GetSkinIndexForPlayer(PlayerRef player)
+    {
+        TryCacheLobbyState();
+
+        if (_lobbyState == null)
+            return 0;
+
+        return _lobbyState.GetPlayerSkinIndex(player);
     }
 
     private void TryRegisterCallbacks()
@@ -68,6 +90,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         TryRegisterCallbacks();
+        TryCacheLobbyState();
 
         if (!_runner.IsServer)
         {
@@ -145,7 +168,13 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
                 roleHandler.currentRole = assignedRole;
             }
 
-            Debug.Log($"PlayerSpawner: Player {player.PlayerId} spawn edildi. Rol: {assignedRole}");
+            var skinApplier = spawnedObject.GetComponent<PlayerSkinApplier>();
+            if (skinApplier != null)
+            {
+                skinApplier.SkinIndex = GetSkinIndexForPlayer(player);
+            }
+
+            Debug.Log($"PlayerSpawner: Player {player.PlayerId} spawn edildi. Rol: {assignedRole}, SkinIndex: {GetSkinIndexForPlayer(player)}");
         }
         else
         {
@@ -217,6 +246,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         _runner = null;
+        _lobbyState = null;
         _callbacksRegistered = false;
         _gameplaySpawnStarted = false;
         _spawnedPlayers.Clear();
@@ -225,12 +255,14 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnConnectedToServer(NetworkRunner runner)
     {
         _runner = runner;
+        TryCacheLobbyState();
         TryRegisterCallbacks();
     }
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
         _runner = null;
+        _lobbyState = null;
         _callbacksRegistered = false;
         _gameplaySpawnStarted = false;
         _spawnedPlayers.Clear();
