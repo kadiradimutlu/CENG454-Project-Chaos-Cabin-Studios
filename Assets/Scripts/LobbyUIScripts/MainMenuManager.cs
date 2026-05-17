@@ -938,7 +938,8 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
             if (skinPreviewImages != null && i < skinPreviewImages.Length && skinPreviewImages[i] != null)
             {
-                skinPreviewImages[i].gameObject.SetActive(hasPlayer);
+                Image previewImage = skinPreviewImages[i];
+                previewImage.gameObject.SetActive(hasPlayer);
 
                 if (hasPlayer)
                 {
@@ -946,13 +947,15 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
                     if (database != null)
                     {
+                        Sprite previewSprite = database.GetPreviewSprite(skinIndex);
                         Color previewColor = database.GetPreviewColor(skinIndex);
                         previewColor.a = 1f;
 
-                        skinPreviewImages[i].enabled = true;
-                        skinPreviewImages[i].color = previewColor;
-                        skinPreviewImages[i].canvasRenderer.SetAlpha(1f);
-                        skinPreviewImages[i].SetAllDirty();
+                        previewImage.enabled = true;
+                        previewImage.sprite = previewSprite;
+                        previewImage.color = previewSprite != null ? Color.white : previewColor;
+                        previewImage.canvasRenderer.SetAlpha(1f);
+                        previewImage.SetAllDirty();
                     }
                 }
             }
