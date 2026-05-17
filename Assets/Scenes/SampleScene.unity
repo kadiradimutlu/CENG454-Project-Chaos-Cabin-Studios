@@ -6894,18 +6894,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkinDatabase
   skins:
-  - skinName: Red
-    material: {fileID: 2100000, guid: 9c57a234c75160c4293ab85cbaa56439, type: 2}
+  - skinName: Frank The Tall
+    previewSprite: {fileID: 0}
     previewColor: {r: 1, g: 0, b: 0, a: 0}
-  - skinName: Green
-    material: {fileID: 2100000, guid: d74f1ce30edcac24aa07b16e5b9a630a, type: 2}
+    visualPrefab: {fileID: 4422862805800552131, guid: 9cc406917c719f545a5295bf56d7d680, type: 3}
+    material: {fileID: 0}
+    visualLocalPosition: {x: 0, y: 0, z: 0}
+    visualLocalEulerAngles: {x: 0, y: 0, z: 0}
+    visualLocalScale: {x: 1, y: 1, z: 1}
+  - skinName: Man Eater
+    previewSprite: {fileID: 0}
     previewColor: {r: 0, g: 1, b: 0, a: 0}
-  - skinName: Yellow
-    material: {fileID: 2100000, guid: 294c67d41be3b39489770d0520bec5b6, type: 2}
+    visualPrefab: {fileID: 1884033747178790662, guid: 246bc6ae6112c1044bec6af49d3bed89, type: 3}
+    material: {fileID: 0}
+    visualLocalPosition: {x: 0, y: 0, z: 0}
+    visualLocalEulerAngles: {x: 0, y: 0, z: 0}
+    visualLocalScale: {x: 1, y: 1, z: 1}
+  - skinName: Spartan The Horn
+    previewSprite: {fileID: 0}
     previewColor: {r: 1, g: 1, b: 0, a: 0}
-  - skinName: Blue
-    material: {fileID: 2100000, guid: c527e107b2c5e1745a70d637c27f27be, type: 2}
+    visualPrefab: {fileID: 1045545673273708244, guid: 3d539cf970586cd489381d641d70037a, type: 3}
+    material: {fileID: 0}
+    visualLocalPosition: {x: 0, y: 0, z: 0}
+    visualLocalEulerAngles: {x: 0, y: 0, z: 0}
+    visualLocalScale: {x: 1, y: 1, z: 1}
+  - skinName: Wanderer Thomas
+    previewSprite: {fileID: 0}
     previewColor: {r: 0, g: 0, b: 1, a: 0}
+    visualPrefab: {fileID: 7787220039379789826, guid: 5f3228bb92cde8a40b8e4057d504bd92, type: 3}
+    material: {fileID: 0}
+    visualLocalPosition: {x: 0, y: 0, z: 0}
+    visualLocalEulerAngles: {x: 0, y: 0, z: 0}
+    visualLocalScale: {x: 1, y: 1, z: 1}
 --- !u!1 &922906319
 GameObject:
   m_ObjectHideFlags: 0
