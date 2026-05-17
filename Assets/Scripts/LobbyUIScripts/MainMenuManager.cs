@@ -58,6 +58,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private TextMeshProUGUI[] skinNameTexts;
     [SerializeField] private Image[] skinPreviewImages;
 
+    [Header("Lobby - 3D Character Preview")]
+    [SerializeField] private LobbyCharacterPreview[] characterPreviewDisplays;
+
     [Header("Lobby - Other Buttons")]
     [SerializeField] private Button startButton;
     [SerializeField] private Button leaveButton;
@@ -936,9 +939,37 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
                 nextSkinButtons[i].interactable = canChangeSkin;
             }
 
+            LobbyCharacterPreview previewDisplay = GetCharacterPreviewDisplay(i);
+
+            if (previewDisplay != null)
+            {
+                // Keep the preview GameObject active. Only hide/show its RawImage.
+                // Deactivating the object every UI refresh can stop the RenderTexture
+                // from displaying even though the runtime model and camera exist.
+                if (!previewDisplay.gameObject.activeSelf)
+                    previewDisplay.gameObject.SetActive(true);
+
+                if (hasPlayer)
+                {
+                    previewDisplay.ShowCharacter(skinIndex);
+                    previewDisplay.SetPreviewVisible(true);
+                }
+                else
+                {
+                    previewDisplay.ClearPreview();
+                    previewDisplay.SetPreviewVisible(false);
+                }
+
+                if (skinPreviewImages != null && i < skinPreviewImages.Length && skinPreviewImages[i] != null)
+                    skinPreviewImages[i].gameObject.SetActive(false);
+
+                continue;
+            }
+
             if (skinPreviewImages != null && i < skinPreviewImages.Length && skinPreviewImages[i] != null)
             {
-                skinPreviewImages[i].gameObject.SetActive(hasPlayer);
+                Image previewImage = skinPreviewImages[i];
+                previewImage.gameObject.SetActive(hasPlayer);
 
                 if (hasPlayer)
                 {
@@ -946,17 +977,30 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
                     if (database != null)
                     {
+                        Sprite previewSprite = database.GetPreviewSprite(skinIndex);
                         Color previewColor = database.GetPreviewColor(skinIndex);
                         previewColor.a = 1f;
 
-                        skinPreviewImages[i].enabled = true;
-                        skinPreviewImages[i].color = previewColor;
-                        skinPreviewImages[i].canvasRenderer.SetAlpha(1f);
-                        skinPreviewImages[i].SetAllDirty();
+                        previewImage.enabled = true;
+                        previewImage.sprite = previewSprite;
+                        previewImage.color = previewSprite != null ? Color.white : previewColor;
+                        previewImage.canvasRenderer.SetAlpha(1f);
+                        previewImage.SetAllDirty();
                     }
                 }
             }
         }
+    }
+
+    private LobbyCharacterPreview GetCharacterPreviewDisplay(int index)
+    {
+        if (characterPreviewDisplays == null)
+            return null;
+
+        if (index < 0 || index >= characterPreviewDisplays.Length)
+            return null;
+
+        return characterPreviewDisplays[index];
     }
 
     private void ClearSkinSelectionUI()
@@ -974,6 +1018,17 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
             if (nextSkinButtons != null && i < nextSkinButtons.Length && nextSkinButtons[i] != null)
                 nextSkinButtons[i].gameObject.SetActive(false);
+
+            LobbyCharacterPreview previewDisplay = GetCharacterPreviewDisplay(i);
+            if (previewDisplay != null)
+            {
+                // Keep the preview component alive; only hide the RawImage.
+                // RefreshSkinSelectionUI will decide whether to show/clear each slot.
+                if (!previewDisplay.gameObject.activeSelf)
+                    previewDisplay.gameObject.SetActive(true);
+
+                previewDisplay.SetPreviewVisible(false);
+            }
 
             if (skinPreviewImages != null && i < skinPreviewImages.Length && skinPreviewImages[i] != null)
                 skinPreviewImages[i].gameObject.SetActive(false);

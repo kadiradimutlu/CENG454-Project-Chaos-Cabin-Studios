@@ -583,6 +583,7 @@ RectTransform:
   - {fileID: 421934245}
   - {fileID: 334084045}
   - {fileID: 203223797}
+  - {fileID: 747707097}
   m_Father: {fileID: 2052988521}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -864,6 +865,119 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 40694251}
   m_CullTransparentMesh: 1
+--- !u!1 &66403726
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 66403727}
+  - component: {fileID: 66403729}
+  - component: {fileID: 66403728}
+  - component: {fileID: 66403730}
+  m_Layer: 5
+  m_Name: Player4CharacterPreview3D
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &66403727
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66403726}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 460149213}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 539, y: 190}
+  m_SizeDelta: {x: 170, y: 215}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &66403728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66403726}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &66403729
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66403726}
+  m_CullTransparentMesh: 1
+--- !u!114 &66403730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66403726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e37eb9f0cc40674dab8a7d4a1926a5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LobbyCharacterPreview
+  targetImage: {fileID: 66403728}
+  textureSize: 768
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0}
+  useOrthographicCamera: 1
+  orthographicPadding: 0.95
+  horizontalFitInfluence: 0.28
+  perspectiveFieldOfView: 28
+  perspectiveDistanceMultiplier: 1.35
+  cameraDirection: {x: 0, y: 0, z: 1}
+  lookAtOffset: {x: 0, y: 0.05, z: 0}
+  previewModelEulerAngles: {x: 0, y: 0, z: 0}
+  previewScaleMultiplier: 1.4
+  previewAnimatorController: {fileID: 9100000, guid: c838664fdeee74663b8c62e5e8d450d2, type: 2}
+  previewStateName: Movement
+  keepAnimatorEnabled: 1
+  forceIdleParameters: 1
+  applyFallbackPose: 1
+  leftUpperArmLocalEuler: {x: 0, y: 0, z: -58}
+  rightUpperArmLocalEuler: {x: 0, y: 0, z: 58}
+  leftForearmLocalEuler: {x: 0, y: 0, z: -18}
+  rightForearmLocalEuler: {x: 0, y: 0, z: 18}
+  createPreviewLight: 1
+  lightEulerAngles: {x: 45, y: -30, z: 0}
+  lightIntensity: 2
+  createFillLight: 1
+  fillLightIntensity: 0.85
+  isolateOnPreviewLayer: 1
+  previewLayer: 31
 --- !u!1 &83621307
 GameObject:
   m_ObjectHideFlags: 0
@@ -1637,6 +1751,119 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 207147540}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &215605786
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 215605787}
+  - component: {fileID: 215605789}
+  - component: {fileID: 215605788}
+  - component: {fileID: 215605790}
+  m_Layer: 5
+  m_Name: Player2CharacterPreview3D
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &215605787
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 215605786}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 515726660}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -295, y: 190}
+  m_SizeDelta: {x: 170, y: 215}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &215605788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 215605786}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &215605789
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 215605786}
+  m_CullTransparentMesh: 1
+--- !u!114 &215605790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 215605786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e37eb9f0cc40674dab8a7d4a1926a5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LobbyCharacterPreview
+  targetImage: {fileID: 215605788}
+  textureSize: 768
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0}
+  useOrthographicCamera: 1
+  orthographicPadding: 0.95
+  horizontalFitInfluence: 0.28
+  perspectiveFieldOfView: 28
+  perspectiveDistanceMultiplier: 1.35
+  cameraDirection: {x: 0, y: 0, z: 1}
+  lookAtOffset: {x: 0, y: 0.05, z: 0}
+  previewModelEulerAngles: {x: 0, y: 0, z: 0}
+  previewScaleMultiplier: 1.4
+  previewAnimatorController: {fileID: 9100000, guid: c838664fdeee74663b8c62e5e8d450d2, type: 2}
+  previewStateName: Movement
+  keepAnimatorEnabled: 1
+  forceIdleParameters: 1
+  applyFallbackPose: 1
+  leftUpperArmLocalEuler: {x: 0, y: 0, z: -58}
+  rightUpperArmLocalEuler: {x: 0, y: 0, z: 58}
+  leftForearmLocalEuler: {x: 0, y: 0, z: -18}
+  rightForearmLocalEuler: {x: 0, y: 0, z: 18}
+  createPreviewLight: 1
+  lightEulerAngles: {x: 45, y: -30, z: 0}
+  lightIntensity: 2
+  createFillLight: 1
+  fillLightIntensity: 0.85
+  isolateOnPreviewLayer: 1
+  previewLayer: 31
 --- !u!1 &237757429
 GameObject:
   m_ObjectHideFlags: 0
@@ -1810,6 +2037,7 @@ RectTransform:
   - {fileID: 2001001533}
   - {fileID: 1360856393}
   - {fileID: 1148953610}
+  - {fileID: 918303621}
   m_Father: {fileID: 2052988521}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -4328,6 +4556,7 @@ RectTransform:
   - {fileID: 1801356950}
   - {fileID: 450820579}
   - {fileID: 1167782925}
+  - {fileID: 66403727}
   m_Father: {fileID: 2052988521}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -4448,6 +4677,7 @@ RectTransform:
   - {fileID: 782723717}
   - {fileID: 1020170112}
   - {fileID: 350554708}
+  - {fileID: 215605787}
   m_Father: {fileID: 2052988521}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -5685,6 +5915,119 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 730921875}
   m_CullTransparentMesh: 1
+--- !u!1 &747707096
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 747707097}
+  - component: {fileID: 747707099}
+  - component: {fileID: 747707098}
+  - component: {fileID: 747707100}
+  m_Layer: 5
+  m_Name: Player3CharacterPreview3D
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &747707097
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747707096}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 25743310}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 107, y: 190}
+  m_SizeDelta: {x: 170, y: 215}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &747707098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747707096}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &747707099
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747707096}
+  m_CullTransparentMesh: 1
+--- !u!114 &747707100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747707096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e37eb9f0cc40674dab8a7d4a1926a5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LobbyCharacterPreview
+  targetImage: {fileID: 747707098}
+  textureSize: 768
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0}
+  useOrthographicCamera: 1
+  orthographicPadding: 0.95
+  horizontalFitInfluence: 0.28
+  perspectiveFieldOfView: 28
+  perspectiveDistanceMultiplier: 1.35
+  cameraDirection: {x: 0, y: 0, z: 1}
+  lookAtOffset: {x: 0, y: 0.05, z: 0}
+  previewModelEulerAngles: {x: 0, y: 0, z: 0}
+  previewScaleMultiplier: 1.4
+  previewAnimatorController: {fileID: 9100000, guid: c838664fdeee74663b8c62e5e8d450d2, type: 2}
+  previewStateName: Movement
+  keepAnimatorEnabled: 1
+  forceIdleParameters: 1
+  applyFallbackPose: 1
+  leftUpperArmLocalEuler: {x: 0, y: 0, z: -58}
+  rightUpperArmLocalEuler: {x: 0, y: 0, z: 58}
+  leftForearmLocalEuler: {x: 0, y: 0, z: -18}
+  rightForearmLocalEuler: {x: 0, y: 0, z: 18}
+  createPreviewLight: 1
+  lightEulerAngles: {x: 45, y: -30, z: 0}
+  lightIntensity: 2
+  createFillLight: 1
+  fillLightIntensity: 0.85
+  isolateOnPreviewLayer: 1
+  previewLayer: 31
 --- !u!1 &751792245
 GameObject:
   m_ObjectHideFlags: 0
@@ -6823,6 +7166,11 @@ MonoBehaviour:
   - {fileID: 1020170113}
   - {fileID: 334084046}
   - {fileID: 450820580}
+  characterPreviewDisplays:
+  - {fileID: 918303624}
+  - {fileID: 215605790}
+  - {fileID: 747707100}
+  - {fileID: 66403730}
   startButton: {fileID: 1080115319}
   leaveButton: {fileID: 342107360}
   networkManagersPrefab: {fileID: 7168327894542041993, guid: 685ce58cb7be6f947884cdac2fbe4a61, type: 3}
@@ -6894,18 +7242,151 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkinDatabase
   skins:
-  - skinName: Red
-    material: {fileID: 2100000, guid: 9c57a234c75160c4293ab85cbaa56439, type: 2}
+  - skinName: Frank The Tall
+    previewSprite: {fileID: 0}
     previewColor: {r: 1, g: 0, b: 0, a: 0}
-  - skinName: Green
-    material: {fileID: 2100000, guid: d74f1ce30edcac24aa07b16e5b9a630a, type: 2}
+    visualPrefab: {fileID: 4422862805800552131, guid: 9cc406917c719f545a5295bf56d7d680, type: 3}
+    material: {fileID: 0}
+    visualLocalPosition: {x: 0, y: 0, z: 0}
+    visualLocalEulerAngles: {x: 0, y: 0, z: 0}
+    visualLocalScale: {x: 1, y: 1, z: 1}
+  - skinName: Man Eater
+    previewSprite: {fileID: 0}
     previewColor: {r: 0, g: 1, b: 0, a: 0}
-  - skinName: Yellow
-    material: {fileID: 2100000, guid: 294c67d41be3b39489770d0520bec5b6, type: 2}
+    visualPrefab: {fileID: 1884033747178790662, guid: 246bc6ae6112c1044bec6af49d3bed89, type: 3}
+    material: {fileID: 0}
+    visualLocalPosition: {x: 0, y: 0, z: 0}
+    visualLocalEulerAngles: {x: 0, y: 0, z: 0}
+    visualLocalScale: {x: 1, y: 1, z: 1}
+  - skinName: Spartan The Horn
+    previewSprite: {fileID: 0}
     previewColor: {r: 1, g: 1, b: 0, a: 0}
-  - skinName: Blue
-    material: {fileID: 2100000, guid: c527e107b2c5e1745a70d637c27f27be, type: 2}
+    visualPrefab: {fileID: 1045545673273708244, guid: 3d539cf970586cd489381d641d70037a, type: 3}
+    material: {fileID: 0}
+    visualLocalPosition: {x: 0, y: 0, z: 0}
+    visualLocalEulerAngles: {x: 0, y: 0, z: 0}
+    visualLocalScale: {x: 1, y: 1, z: 1}
+  - skinName: Wanderer Thomas
+    previewSprite: {fileID: 0}
     previewColor: {r: 0, g: 0, b: 1, a: 0}
+    visualPrefab: {fileID: 7787220039379789826, guid: 5f3228bb92cde8a40b8e4057d504bd92, type: 3}
+    material: {fileID: 0}
+    visualLocalPosition: {x: 0, y: 0, z: 0}
+    visualLocalEulerAngles: {x: 0, y: 0, z: 0}
+    visualLocalScale: {x: 1, y: 1, z: 1}
+--- !u!1 &918303620
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 918303621}
+  - component: {fileID: 918303623}
+  - component: {fileID: 918303622}
+  - component: {fileID: 918303624}
+  m_Layer: 5
+  m_Name: Player1CharacterPreview3D
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &918303621
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918303620}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 249186354}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -674, y: 190}
+  m_SizeDelta: {x: 170, y: 215}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &918303622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918303620}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &918303623
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918303620}
+  m_CullTransparentMesh: 1
+--- !u!114 &918303624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918303620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e37eb9f0cc40674dab8a7d4a1926a5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LobbyCharacterPreview
+  targetImage: {fileID: 918303622}
+  textureSize: 768
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0}
+  useOrthographicCamera: 1
+  orthographicPadding: 0.95
+  horizontalFitInfluence: 0.28
+  perspectiveFieldOfView: 28
+  perspectiveDistanceMultiplier: 1.35
+  cameraDirection: {x: 0, y: 0, z: 1}
+  lookAtOffset: {x: 0, y: 0.05, z: 0}
+  previewModelEulerAngles: {x: 0, y: 0, z: 0}
+  previewScaleMultiplier: 1.4
+  previewAnimatorController: {fileID: 9100000, guid: c838664fdeee74663b8c62e5e8d450d2, type: 2}
+  previewStateName: Movement
+  keepAnimatorEnabled: 1
+  forceIdleParameters: 1
+  applyFallbackPose: 1
+  leftUpperArmLocalEuler: {x: 0, y: 0, z: -58}
+  rightUpperArmLocalEuler: {x: 0, y: 0, z: 58}
+  leftForearmLocalEuler: {x: 0, y: 0, z: -18}
+  rightForearmLocalEuler: {x: 0, y: 0, z: 18}
+  createPreviewLight: 1
+  lightEulerAngles: {x: 45, y: -30, z: 0}
+  lightIntensity: 2
+  createFillLight: 1
+  fillLightIntensity: 0.85
+  isolateOnPreviewLayer: 1
+  previewLayer: 31
 --- !u!1 &922906319
 GameObject:
   m_ObjectHideFlags: 0
