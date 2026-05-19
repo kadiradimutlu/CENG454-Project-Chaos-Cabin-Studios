@@ -4,70 +4,100 @@ using UnityEngine;
 
 public class PlayerCameraSetup : NetworkBehaviour
 {
+    [Header("Local Camera")]
     [SerializeField] private GameObject playerCameraObject;
     [SerializeField] private CameraFollowRig cameraFollowRig;
     [SerializeField] private Transform cameraTarget;
 
-    private Camera _playerCamera;
-    private AudioListener _audioListener;
+    private Camera playerCamera;
+    private AudioListener audioListener;
+    private bool detachedLocalCamera;
 
     private void Awake()
     {
-        if (playerCameraObject != null)
-        {
-            _playerCamera = playerCameraObject.GetComponentInChildren<Camera>(true);
-            _audioListener = playerCameraObject.GetComponentInChildren<AudioListener>(true);
-        }
+        CacheCameraReferences();
+        DisableLocalCamera();
     }
 
     public override void Spawned()
     {
-        Debug.Log(
-            $"PlayerCameraSetup Spawned | Object={name} | " +
-            $"HasInputAuthority={HasInputAuthority} | " +
-            $"InputAuthority={(Object != null ? Object.InputAuthority.ToString() : "NULL")}"
-        );
+        CacheCameraReferences();
 
         if (playerCameraObject == null)
         {
-            Debug.LogWarning("PlayerCameraSetup: playerCameraObject is not assigned.");
+            Debug.LogWarning("PlayerCameraSetup: Player Camera Object atanmadı.");
             return;
         }
 
         if (cameraFollowRig == null)
         {
-            Debug.LogWarning("PlayerCameraSetup: cameraFollowRig is not assigned.");
+            Debug.LogWarning("PlayerCameraSetup: Camera Follow Rig atanmadı.");
             return;
         }
 
         if (!HasInputAuthority)
         {
-            playerCameraObject.SetActive(false);
-            Debug.Log($"PlayerCameraSetup: Camera disabled for remote player {name}");
+            DisableLocalCamera();
             return;
         }
 
+        EnableLocalCamera();
+
+        if (playerCameraObject.transform.parent != null)
+        {
+            playerCameraObject.transform.SetParent(null, true);
+            detachedLocalCamera = true;
+        }
+
         Transform targetToUse = cameraTarget != null ? cameraTarget : transform;
-
-        playerCameraObject.SetActive(true);
-
-        if (_playerCamera == null)
-            _playerCamera = playerCameraObject.GetComponentInChildren<Camera>(true);
-
-        if (_audioListener == null)
-            _audioListener = playerCameraObject.GetComponentInChildren<AudioListener>(true);
-
-        if (_playerCamera != null)
-            _playerCamera.enabled = true;
-
-        if (_audioListener != null)
-            _audioListener.enabled = true;
-
         cameraFollowRig.SetTarget(targetToUse, true);
 
-        Debug.Log($"PlayerCameraSetup: Local player camera enabled for {name}");
-
         StartCoroutine(DisableMenuCameraNextFrame());
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        if (detachedLocalCamera && playerCameraObject != null)
+            Destroy(playerCameraObject);
+    }
+
+    private void CacheCameraReferences()
+    {
+        if (playerCameraObject == null)
+            return;
+
+        if (playerCamera == null)
+            playerCamera = playerCameraObject.GetComponentInChildren<Camera>(true);
+
+        if (audioListener == null)
+            audioListener = playerCameraObject.GetComponentInChildren<AudioListener>(true);
+    }
+
+    private void EnableLocalCamera()
+    {
+        if (playerCameraObject != null)
+            playerCameraObject.SetActive(true);
+
+        if (playerCamera != null)
+        {
+            playerCamera.enabled = true;
+            playerCamera.tag = "MainCamera";
+        }
+
+        if (audioListener != null)
+            audioListener.enabled = true;
+    }
+
+    private void DisableLocalCamera()
+    {
+        if (playerCamera != null)
+            playerCamera.enabled = false;
+
+        if (audioListener != null)
+            audioListener.enabled = false;
+
+        if (playerCameraObject != null)
+            playerCameraObject.SetActive(false);
     }
 
     private IEnumerator DisableMenuCameraNextFrame()
@@ -76,13 +106,10 @@ public class PlayerCameraSetup : NetworkBehaviour
         yield return new WaitForEndOfFrame();
 
         MainMenuManager menuManager = FindObjectOfType<MainMenuManager>();
+
         if (menuManager != null)
-        {
             menuManager.DisableMenuCameraForGameplay();
-        }
         else
-        {
-            Debug.LogWarning("PlayerCameraSetup: MainMenuManager not found, menu camera could not be disabled.");
-        }
+            Debug.LogWarning("PlayerCameraSetup: MainMenuManager bulunamadı, menu camera kapatılamadı.");
     }
 }

@@ -6,22 +6,21 @@ public class PlayerAnimation : NetworkBehaviour
     [Header("Components")]
     [SerializeField] private Animator animator;
 
-    private Rigidbody _rb;
+    private PlayerMovement movement;
 
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int IsGroundedHash = Animator.StringToHash("IsGrounded");
-    private static readonly int isCrouchingHash = Animator.StringToHash("isCrouching");
+    private static readonly int IsCrouchingHash = Animator.StringToHash("isCrouching");
     private static readonly int HorizontalHash = Animator.StringToHash("Horizontal");
     private static readonly int VerticalHash = Animator.StringToHash("Vertical");
     private static readonly int VerticalVelocityHash = Animator.StringToHash("VerticalVelocity");
-    private static readonly int JumpTriggerHash = Animator.StringToHash("JumpTrigger");
 
     private void Awake()
     {
         if (animator == null)
-            animator = GetComponentInChildren<Animator>();
+            animator = GetComponentInChildren<Animator>(true);
 
-        _rb = GetComponent<Rigidbody>();
+        movement = GetComponent<PlayerMovement>();
     }
 
     public void SetAnimator(Animator newAnimator)
@@ -32,44 +31,24 @@ public class PlayerAnimation : NetworkBehaviour
         animator = newAnimator;
     }
 
-    public override void FixedUpdateNetwork()
+    public override void Render()
     {
         if (animator == null)
             return;
 
-        if (GetInput(out GameplayInput input))
-        {
-            float h = input.MoveDirection.x;
-            float v = input.MoveDirection.y;
-            float speed = input.MoveDirection.magnitude;
+        if (movement == null)
+            movement = GetComponent<PlayerMovement>();
 
-            if (input.SprintButton && speed > 0)
-            {
-                h *= 2f;
-                v *= 2f;
-                speed *= 2f;
-            }
-            else if (input.CrouchButton)
-            {
-                h *= 0.5f;
-                v *= 0.5f;
-                speed *= 0.5f;
-            }
+        if (movement == null)
+            return;
 
-            animator.SetFloat(HorizontalHash, h);
-            animator.SetFloat(VerticalHash, v);
-            animator.SetFloat(SpeedHash, speed);
-            animator.SetBool(isCrouchingHash, input.CrouchButton);
+        Vector2 moveInput = movement.CurrentMoveInput;
 
-            if (input.JumpButton)
-                animator.SetTrigger(JumpTriggerHash);
-        }
-
-        if (_rb != null)
-        {
-            bool isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f);
-            animator.SetBool(IsGroundedHash, isGrounded);
-            animator.SetFloat(VerticalVelocityHash, _rb.linearVelocity.y);
-        }
+        animator.SetFloat(HorizontalHash, moveInput.x);
+        animator.SetFloat(VerticalHash, moveInput.y);
+        animator.SetFloat(SpeedHash, movement.CurrentSpeed01);
+        animator.SetBool(IsGroundedHash, movement.CurrentGrounded);
+        animator.SetBool(IsCrouchingHash, movement.CurrentCrouching);
+        animator.SetFloat(VerticalVelocityHash, movement.CurrentVerticalVelocity);
     }
 }

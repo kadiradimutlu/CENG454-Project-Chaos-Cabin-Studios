@@ -9,8 +9,12 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     [Header("Player Spawn")]
     [SerializeField] private NetworkObject playerPrefab;
     [SerializeField] private Transform[] spawnPoints;
-    [SerializeField] private Transform[] runnerSpawnPoints;
-    [SerializeField] private Transform[] trapperSpawnPoints;
+
+    [Header("Hierarchy Parent")]
+    [SerializeField] private Transform spawnedPlayersParent;
+
+    [Header("Spawn Safety")]
+    [SerializeField] private float spawnYOffset = 1.2f;
 
     private NetworkRunner _runner;
     private LobbyState _lobbyState;
@@ -59,16 +63,6 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         return _lobbyState != null;
     }
 
-    private int GetSkinIndexForPlayer(PlayerRef player)
-    {
-        TryCacheLobbyState();
-
-        if (_lobbyState == null)
-            return 0;
-
-        return _lobbyState.GetPlayerSkinIndex(player);
-    }
-
     private void TryRegisterCallbacks()
     {
         if (!TryCacheRunner())
@@ -89,14 +83,11 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        TryRegisterCallbacks();
         TryCacheLobbyState();
+        TryRegisterCallbacks();
 
         if (!_runner.IsServer)
-        {
-            // Sadece host/server spawn yapar
             return;
-        }
 
         if (_gameplaySpawnStarted)
         {
@@ -122,15 +113,18 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         for (int i = 0; i < activePlayers.Count; i++)
         {
-            RoleHandler.PlayerRole assignedRole = (i < 2) ? RoleHandler.PlayerRole.Runner : RoleHandler.PlayerRole.Trapper;
-            SpawnPlayerIfNeeded(activePlayers[i], assignedRole, i);
+            RoleHandler.PlayerRole role = i < 2
+                ? RoleHandler.PlayerRole.Runner
+                : RoleHandler.PlayerRole.Trapper;
+
+            SpawnPlayerIfNeeded(activePlayers[i], role, i);
         }
 
         _gameplaySpawnStarted = true;
         Debug.Log("PlayerSpawner: Gameplay spawn tamamlandı.");
     }
 
-    private void SpawnPlayerIfNeeded(PlayerRef player, RoleHandler.PlayerRole assignedRole, int indexHint = -1)
+    private void SpawnPlayerIfNeeded(PlayerRef player, RoleHandler.PlayerRole role, int indexHint = -1)
     {
         if (_runner == null || !_runner.IsServer)
             return;
@@ -147,34 +141,49 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        Transform spawnPoint = GetSpawnPoint(assignedRole, indexHint);
-        Vector3 spawnPosition = spawnPoint != null ? spawnPoint.position : Vector3.zero;
-        Quaternion spawnRotation = spawnPoint != null ? spawnPoint.rotation : Quaternion.identity;
+        Transform spawnPoint = GetSpawnPoint(indexHint);
+
+        Vector3 spawnPosition = spawnPoint != null
+            ? spawnPoint.position
+            : Vector3.zero;
+
+        spawnPosition.y += spawnYOffset;
+
+        Quaternion spawnRotation = spawnPoint != null
+            ? spawnPoint.rotation
+            : Quaternion.identity;
+
+        int skinIndex = GetSkinIndexForPlayer(player);
 
         NetworkObject spawnedObject = _runner.Spawn(
             playerPrefab,
             spawnPosition,
             spawnRotation,
-            player
+            player,
+            (runner, obj) =>
+            {
+                ForceSpawnTransform(obj, spawnPosition, spawnRotation);
+                ParentSpawnedObject(obj);
+                ApplyPlayerData(obj, role, skinIndex);
+            }
         );
 
         if (spawnedObject != null)
         {
+            ForceSpawnTransform(spawnedObject, spawnPosition, spawnRotation);
+            ParentSpawnedObject(spawnedObject);
+            ApplyPlayerData(spawnedObject, role, skinIndex);
+
+            _runner.SetPlayerObject(player, spawnedObject);
             _spawnedPlayers[player] = spawnedObject;
 
-            var roleHandler = spawnedObject.GetComponent<RoleHandler>();
-            if (roleHandler != null)
-            {
-                roleHandler.currentRole = assignedRole;
-            }
-
-            var skinApplier = spawnedObject.GetComponent<PlayerSkinApplier>();
-            if (skinApplier != null)
-            {
-                skinApplier.SkinIndex = GetSkinIndexForPlayer(player);
-            }
-
-            Debug.Log($"PlayerSpawner: Player {player.PlayerId} spawn edildi. Rol: {assignedRole}, SkinIndex: {GetSkinIndexForPlayer(player)}");
+            Debug.Log(
+                $"PlayerSpawner: Player {player.PlayerId} spawn edildi. " +
+                $"Role={role} | SkinIndex={skinIndex} | " +
+                $"SpawnPoint={(spawnPoint != null ? spawnPoint.name : "NULL")} | " +
+                $"Position={spawnPosition} | " +
+                $"Parent={(spawnedObject.transform.parent != null ? spawnedObject.transform.parent.name : "ROOT")}"
+            );
         }
         else
         {
@@ -182,18 +191,74 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    private Transform GetSpawnPoint(RoleHandler.PlayerRole role, int indexHint)
+    private void ApplyPlayerData(NetworkObject obj, RoleHandler.PlayerRole role, int skinIndex)
     {
-        Transform[] points = (role == RoleHandler.PlayerRole.Runner) ? runnerSpawnPoints : trapperSpawnPoints;
-        
-        if (points == null || points.Length == 0)
-            points = spawnPoints;
+        if (obj == null)
+            return;
+
+        RoleHandler roleHandler = obj.GetComponent<RoleHandler>();
+        if (roleHandler != null)
+            roleHandler.currentRole = role;
+
+        PlayerSkinApplier skinApplier = obj.GetComponent<PlayerSkinApplier>();
+        if (skinApplier != null)
+            skinApplier.SkinIndex = skinIndex;
+    }
+
+    private int GetSkinIndexForPlayer(PlayerRef player)
+    {
+        TryCacheLobbyState();
+
+        if (_lobbyState == null)
+            return 0;
+
+        return _lobbyState.GetPlayerSkinIndex(player);
+    }
+
+    private void ForceSpawnTransform(NetworkObject obj, Vector3 position, Quaternion rotation)
+    {
+        if (obj == null)
+            return;
+
+        obj.transform.SetPositionAndRotation(position, rotation);
+
+        Rigidbody rb = obj.GetComponent<Rigidbody>();
+
+        if (rb != null)
+        {
+            rb.position = position;
+            rb.rotation = rotation;
+            rb.angularVelocity = Vector3.zero;
+
+#if UNITY_6000_0_OR_NEWER
+            rb.linearVelocity = Vector3.zero;
+#else
+            rb.velocity = Vector3.zero;
+#endif
+        }
+    }
+
+    private void ParentSpawnedObject(NetworkObject obj)
+    {
+        if (obj == null)
+            return;
+
+        if (spawnedPlayersParent == null)
+            return;
+
+        obj.transform.SetParent(spawnedPlayersParent, true);
+    }
+
+    private Transform GetSpawnPoint(int indexHint)
+    {
+        if (spawnPoints == null || spawnPoints.Length == 0)
+            return null;
 
         if (indexHint < 0)
             indexHint = 0;
 
-        indexHint = Mathf.Clamp(indexHint, 0, points.Length - 1);
-        return points[indexHint];
+        indexHint = Mathf.Clamp(indexHint, 0, spawnPoints.Length - 1);
+        return spawnPoints[indexHint];
     }
 
     private void DespawnPlayer(PlayerRef player)
@@ -205,17 +270,11 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return;
 
         if (spawnedObject != null)
-        {
             _runner.Despawn(spawnedObject);
-        }
 
         _spawnedPlayers.Remove(player);
         Debug.Log($"PlayerSpawner: Player {player.PlayerId} despawn edildi.");
     }
-
-    // ==================================================
-    // FUSION CALLBACKS
-    // ==================================================
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
@@ -224,7 +283,11 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         if (_runner.IsServer && _gameplaySpawnStarted)
         {
             int index = _spawnedPlayers.Count;
-            RoleHandler.PlayerRole role = (index < 2) ? RoleHandler.PlayerRole.Runner : RoleHandler.PlayerRole.Trapper;
+
+            RoleHandler.PlayerRole role = index < 2
+                ? RoleHandler.PlayerRole.Runner
+                : RoleHandler.PlayerRole.Trapper;
+
             SpawnPlayerIfNeeded(player, role, index);
         }
     }
@@ -234,9 +297,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         _runner = runner;
 
         if (_runner.IsServer)
-        {
             DespawnPlayer(player);
-        }
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
@@ -269,26 +330,15 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
-
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
-
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
-
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
-
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
-
     public void OnSceneLoadDone(NetworkRunner runner) { }
-
     public void OnSceneLoadStart(NetworkRunner runner) { }
-
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
 }

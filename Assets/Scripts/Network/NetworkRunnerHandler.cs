@@ -36,14 +36,23 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
 
     private void OnDestroy()
     {
+        if (_networkRunner != null && _selfCallbacksAdded)
+        {
+            _networkRunner.RemoveCallbacks(this);
+            _selfCallbacksAdded = false;
+        }
+
         if (Instance == this)
             Instance = null;
     }
 
     private void CacheReferences()
     {
-        _networkRunner = GetComponent<NetworkRunner>();
-        _sceneManager = GetComponent<NetworkSceneManagerDefault>();
+        if (_networkRunner == null)
+            _networkRunner = GetComponent<NetworkRunner>();
+
+        if (_sceneManager == null)
+            _sceneManager = GetComponent<NetworkSceneManagerDefault>();
 
         if (_mainMenuManager == null)
             _mainMenuManager = FindObjectOfType<MainMenuManager>();
@@ -92,11 +101,8 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
 
     public NetworkRunner GetRunner()
     {
-        if (_networkRunner == null)
-        {
-            CacheReferences();
-            SetupRunner();
-        }
+        CacheReferences();
+        SetupRunner();
 
         return _networkRunner;
     }
@@ -129,6 +135,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             return default;
         }
 
+        _networkRunner.ProvideInput = true;
         TryRegisterMainMenuCallbacks();
 
         StartGameResult result = await _networkRunner.StartGame(new StartGameArgs()
@@ -165,9 +172,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         try
         {
             if (!_networkRunner.IsShutdown)
-            {
                 await _networkRunner.Shutdown();
-            }
         }
         catch (Exception ex)
         {
@@ -187,13 +192,45 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log($"Player left: {player}");
     }
 
-    public void OnInput(NetworkRunner runner, NetworkInput input) { }
+    public void OnInput(NetworkRunner runner, NetworkInput input)
+    {
+        PlayerNetworkInputData inputData = new PlayerNetworkInputData();
 
-    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+        Vector2 moveInput = Vector2.zero;
+
+        if (Input.GetKey(KeyCode.W))
+            moveInput.y += 1f;
+
+        if (Input.GetKey(KeyCode.S))
+            moveInput.y -= 1f;
+
+        if (Input.GetKey(KeyCode.D))
+            moveInput.x += 1f;
+
+        if (Input.GetKey(KeyCode.A))
+            moveInput.x -= 1f;
+
+        inputData.MoveInput = Vector2.ClampMagnitude(moveInput, 1f);
+
+        inputData.Buttons.Set((int)PlayerInputButton.Jump, Input.GetKey(KeyCode.Space));
+        inputData.Buttons.Set((int)PlayerInputButton.Sprint, Input.GetKey(KeyCode.LeftShift));
+        inputData.Buttons.Set((int)PlayerInputButton.Crouch, Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftControl));
+
+        input.Set(inputData);
+    }
+
+    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
+    {
+        input.Set(new PlayerNetworkInputData());
+    }
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         Debug.Log($"Runner shutdown: {shutdownReason}");
+
+        _isShuttingDown = false;
+        _selfCallbacksAdded = false;
+        _mainMenuCallbacksAdded = false;
     }
 
     public void OnConnectedToServer(NetworkRunner runner)
