@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: 2796955079069592424}
   - component: {fileID: 2306145414830265327}
   - component: {fileID: 1643129204841086932}
-  - component: {fileID: 1230728563986974221}
   - component: {fileID: -6558359621573049810}
   - component: {fileID: 265149033449573497}
   - component: {fileID: 6574671038988352209}
@@ -148,7 +147,6 @@ MonoBehaviour:
   - {fileID: 2796955079069592424}
   - {fileID: 2306145414830265327}
   - {fileID: 1643129204841086932}
-  - {fileID: 1230728563986974221}
   - {fileID: -6558359621573049810}
   - {fileID: 6574671038988352209}
   - {fileID: 4745300973869823781}
@@ -198,19 +196,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1582c0f2d71c21646b9e268bf545051a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoleHandler
+  playerMovement: {fileID: 0}
   _currentRole: 1
---- !u!114 &1230728563986974221
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3600554267242463573}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7cdb6cb2f37d42cba5777e56fb54969, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerInput
 --- !u!114 &-6558359621573049810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,8 +211,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 5
+  sprintSpeed: 8
+  crouchSpeed: 2.5
   rotationSpeed: 10
+  gravity: -25
   jumpForce: 5
+  groundSnapDistance: 0.55
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 0
+  groundTag: Ground
+  ignorePlayerToPlayerCollision: 1
+  _NetMoveInput: {x: 0, y: 0}
+  _NetSpeed01: 0
+  _NetGrounded:
+    _value: 0
+  _NetVerticalVelocity: 0
+  _NetCrouching:
+    _value: 0
 --- !u!54 &265149033449573497
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -252,7 +255,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 80
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &6574671038988352209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -297,7 +300,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSkinApplier
   _SkinIndex: 0
-  targetRenderer: {fileID: 0}
+  visualRoot: {fileID: 0}
+  hideDefaultRenderersWhenUsingPrefab: 1
+  templateAnimator: {fileID: 0}
+  includeInactiveRenderers: 1
+  targetRenderers: []
 --- !u!1 &5535873060997195435
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,9 +457,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollowRig
   target: {fileID: 0}
   offset: {x: 0, y: 4, z: -6}
-  followSpeed: 8
-  lookSpeed: 8
+  followSpeed: 14
+  lookSpeed: 16
   lookAtTarget: 1
+  lookOffset: {x: 0, y: 1.2, z: 0}
 --- !u!1 &8655580079025213408
 GameObject:
   m_ObjectHideFlags: 0
@@ -605,9 +613,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollowRig
   target: {fileID: 0}
   offset: {x: 0, y: 4, z: -6}
-  followSpeed: 8
-  lookSpeed: 8
+  followSpeed: 14
+  lookSpeed: 16
   lookAtTarget: 1
+  lookOffset: {x: 0, y: 1.2, z: 0}
 --- !u!1 &8779444187828829011
 GameObject:
   m_ObjectHideFlags: 0
