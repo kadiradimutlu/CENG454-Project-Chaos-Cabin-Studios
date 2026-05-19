@@ -1667,7 +1667,7 @@ Transform:
   m_GameObject: {fileID: 207147540}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -22.900024, y: 8, z: 619.3}
+  m_LocalPosition: {x: -22.900024, y: 7.4, z: 619.3}
   m_LocalScale: {x: 20.103647, y: 15.030744, z: 5.7308}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12905,17 +12905,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eacf77c340ede6c4c90a93990921e879, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawner
-  gameWorldRoot: {fileID: 0}
-  gameWorldObjectName: GameWorld
-  activateGameWorldBeforeSpawn: 1
   playerPrefab: {fileID: 3971168689283820697, guid: 18a2265b2804f804faca04034a01c6db, type: 3}
   spawnPoints:
   - {fileID: 1375832976}
   - {fileID: 1174099543}
   - {fileID: 1050431728}
   - {fileID: 1435969974}
-  spawnHeight: 2
-  spawnSpacing: 3
+  spawnedPlayersParent: {fileID: 0}
+  spawnYOffset: 1.2
 --- !u!4 &1655907833
 Transform:
   m_ObjectHideFlags: 0
