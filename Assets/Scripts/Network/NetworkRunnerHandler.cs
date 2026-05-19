@@ -180,8 +180,6 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    // ---------------- INetworkRunnerCallbacks ----------------
-
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         Debug.Log($"Player joined: {player}");
@@ -214,7 +212,10 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
 
         inputData.Buttons.Set((int)PlayerInputButton.Jump, Input.GetKey(KeyCode.Space));
         inputData.Buttons.Set((int)PlayerInputButton.Sprint, Input.GetKey(KeyCode.LeftShift));
-        inputData.Buttons.Set((int)PlayerInputButton.Crouch, Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftControl));
+        inputData.Buttons.Set(
+            (int)PlayerInputButton.Crouch,
+            Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
+        );
 
         input.Set(inputData);
     }
