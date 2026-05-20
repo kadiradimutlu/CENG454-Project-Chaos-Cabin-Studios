@@ -212,15 +212,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 5
   sprintSpeed: 8
-  crouchSpeed: 2.5
-  rotationSpeed: 10
-  gravity: -25
-  jumpForce: 5
-  groundSnapDistance: 0.55
+  crouchSpeed: 2.6
+  rotationSpeed: 14
+  gravity: -16
+  jumpForce: 11.5
+  groundedGravity: -2
+  groundSnapDistance: 0.35
+  jumpGroundIgnoreTime: 0.22
   groundMask:
     serializedVersion: 2
-    m_Bits: 0
-  groundTag: Ground
+    m_Bits: 4294967295
+  standingCapsuleHeight: 2
+  standingCapsuleCenterY: 1
+  crouchingCapsuleHeight: 1.25
+  crouchingCapsuleCenterY: 0.625
+  allowKeyboardCrouchFallback: 1
   ignorePlayerToPlayerCollision: 1
   _NetMoveInput: {x: 0, y: 0}
   _NetSpeed01: 0
@@ -228,6 +234,8 @@ MonoBehaviour:
     _value: 0
   _NetVerticalVelocity: 0
   _NetCrouching:
+    _value: 0
+  _NetSprinting:
     _value: 0
 --- !u!54 &265149033449573497
 Rigidbody:
@@ -269,6 +277,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
   animator: {fileID: 3638880797616173288}
+  movementStateName: Movement
+  crouchStateName: Crouch
+  jumpStateName: Jump
+  fallingStateName: Fall
+  landingStateName: Land
+  crossFadeDuration: 0.1
+  speedDampTime: 0.08
+  jumpVelocityThreshold: 0.35
+  fallingVelocityThreshold: -0.6
+  minimumJumpStateTime: 0.24
+  landingStateTime: 0.18
+  keepVisualAboveGround: 1
+  visualGroundClearance: 0.02
+  visualClampLerpSpeed: 18
 --- !u!114 &4745300973869823781
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -276,7 +298,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3600554267242463573}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
@@ -303,6 +325,8 @@ MonoBehaviour:
   visualRoot: {fileID: 0}
   hideDefaultRenderersWhenUsingPrefab: 1
   templateAnimator: {fileID: 0}
+  forceDisableRootMotion: 1
+  forceAlwaysAnimateCulling: 1
   includeInactiveRenderers: 1
   targetRenderers: []
 --- !u!1 &5535873060997195435

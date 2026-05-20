@@ -1,6 +1,7 @@
-using System.Collections;
+﻿using System.Collections;
 using Fusion;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Rigidbody))]
@@ -12,15 +13,23 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float sprintSpeed = 8f;
-    [SerializeField] private float crouchSpeed = 2.5f;
-    [SerializeField] private float rotationSpeed = 18f;
+    [SerializeField] private float crouchSpeed = 2.6f;
+    [SerializeField] private float rotationSpeed = 14f;
 
     [Header("Gravity / Jump")]
-    [SerializeField] private float gravity = -25f;
-    [SerializeField] private float jumpForce = 7f;
+    [SerializeField] private float gravity = -16f;
+    [SerializeField] private float jumpForce = 11.5f;
     [SerializeField] private float groundedGravity = -2f;
-    [SerializeField] private float groundSnapDistance = 0.9f;
+    [SerializeField] private float groundSnapDistance = 0.35f;
+    [SerializeField] private float jumpGroundIgnoreTime = 0.22f;
     [SerializeField] private LayerMask groundMask = ~0;
+
+    [Header("Crouch")]
+    [SerializeField] private float standingCapsuleHeight = 2f;
+    [SerializeField] private float standingCapsuleCenterY = 1f;
+    [SerializeField] private float crouchingCapsuleHeight = 1.25f;
+    [SerializeField] private float crouchingCapsuleCenterY = 0.625f;
+    [SerializeField] private bool allowKeyboardCrouchFallback = true;
 
     [Header("Player Collision")]
     [SerializeField] private bool ignorePlayerToPlayerCollision = true;
@@ -30,17 +39,20 @@ public class PlayerMovement : NetworkBehaviour
     [Networked] public NetworkBool NetGrounded { get; private set; }
     [Networked] public float NetVerticalVelocity { get; private set; }
     [Networked] public NetworkBool NetCrouching { get; private set; }
+    [Networked] public NetworkBool NetSprinting { get; private set; }
 
     public Vector2 CurrentMoveInput { get; private set; }
     public float CurrentSpeed01 { get; private set; }
     public bool CurrentGrounded { get; private set; }
     public float CurrentVerticalVelocity { get; private set; }
     public bool CurrentCrouching { get; private set; }
+    public bool CurrentSprinting { get; private set; }
 
     private Rigidbody rb;
     private CapsuleCollider capsule;
 
     private float verticalVelocity;
+    private float jumpGroundIgnoreTimer;
     private NetworkButtons previousButtons;
     private bool canSimulate;
 
@@ -48,7 +60,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         rb = GetComponent<Rigidbody>();
         capsule = GetComponent<CapsuleCollider>();
-        SetupCollider();
+        SetupCollider(false);
     }
 
     public override void Spawned()
@@ -59,7 +71,7 @@ public class PlayerMovement : NetworkBehaviour
         if (capsule == null)
             capsule = GetComponent<CapsuleCollider>();
 
-        canSimulate = HasStateAuthority || HasInputAuthority;
+        canSimulate = HasStateAuthority;
 
         rb.useGravity = false;
         rb.isKinematic = true;
@@ -71,6 +83,9 @@ public class PlayerMovement : NetworkBehaviour
             RigidbodyConstraints.FreezeRotationZ;
 
         verticalVelocity = groundedGravity;
+        jumpGroundIgnoreTimer = 0f;
+
+        SetupCollider(false);
 
         if (ignorePlayerToPlayerCollision)
             StartCoroutine(RefreshPlayerCollisionIgnores());
@@ -81,11 +96,11 @@ public class PlayerMovement : NetworkBehaviour
         if (!canSimulate)
         {
             PullAnimationStateFromNetwork();
+            ApplyCrouchCollider(CurrentCrouching);
             return;
         }
 
         PlayerNetworkInputData inputData = default;
-
         bool hasInput = GetInput(out inputData);
 
         if (!hasInput)
@@ -93,17 +108,45 @@ public class PlayerMovement : NetworkBehaviour
 
         float deltaTime = Runner.DeltaTime;
 
+        if (jumpGroundIgnoreTimer > 0f)
+            jumpGroundIgnoreTimer -= deltaTime;
+
         Vector2 moveInput = inputData.MoveInput;
 
         if (moveInput.sqrMagnitude > 1f)
             moveInput.Normalize();
 
-        bool sprinting = inputData.Buttons.IsSet((int)PlayerInputButton.Sprint);
         bool crouching = inputData.Buttons.IsSet((int)PlayerInputButton.Crouch);
+        bool sprinting = inputData.Buttons.IsSet((int)PlayerInputButton.Sprint);
+
+        if (allowKeyboardCrouchFallback && HasInputAuthority && Keyboard.current != null)
+        {
+            crouching =
+                crouching ||
+                Keyboard.current.leftCtrlKey.isPressed ||
+                Keyboard.current.rightCtrlKey.isPressed;
+        }
+
+        if (crouching)
+            sprinting = false;
+
+        ApplyCrouchCollider(crouching);
 
         bool jumpPressed =
             inputData.Buttons.IsSet((int)PlayerInputButton.Jump) &&
             !previousButtons.IsSet((int)PlayerInputButton.Jump);
+
+        bool grounded = jumpGroundIgnoreTimer <= 0f && CheckGround(transform.position, out _);
+
+        if (grounded && verticalVelocity < 0f)
+            verticalVelocity = groundedGravity;
+
+        if (jumpPressed && grounded && isMovementAllowed && !crouching)
+        {
+            verticalVelocity = jumpForce;
+            grounded = false;
+            jumpGroundIgnoreTimer = jumpGroundIgnoreTime;
+        }
 
         float speed = moveSpeed;
 
@@ -116,31 +159,17 @@ public class PlayerMovement : NetworkBehaviour
             ? new Vector3(moveInput.x, 0f, moveInput.y)
             : Vector3.zero;
 
-        bool grounded = CheckGround(transform.position, out RaycastHit groundHit);
-
-        if (grounded && verticalVelocity < 0f)
-            verticalVelocity = groundedGravity;
-
-        if (jumpPressed && grounded && isMovementAllowed)
-            verticalVelocity = jumpForce;
-
         verticalVelocity += gravity * deltaTime;
 
         Vector3 horizontalVelocity = moveDirection * speed;
-
-        Vector3 velocity = new Vector3(
-            horizontalVelocity.x,
-            verticalVelocity,
-            horizontalVelocity.z
-        );
-
+        Vector3 velocity = new Vector3(horizontalVelocity.x, verticalVelocity, horizontalVelocity.z);
         Vector3 nextPosition = transform.position + velocity * deltaTime;
 
-        if (verticalVelocity <= 0f && CheckGround(nextPosition, out RaycastHit snapHit))
+        if (jumpGroundIgnoreTimer <= 0f && verticalVelocity <= 0f && CheckGround(nextPosition, out RaycastHit snapHit))
         {
             float desiredY = GetRootYFromGround(snapHit.point.y);
 
-            if (nextPosition.y <= desiredY + 0.15f)
+            if (nextPosition.y <= desiredY + 0.20f)
             {
                 nextPosition.y = desiredY;
                 verticalVelocity = groundedGravity;
@@ -162,10 +191,19 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         CurrentMoveInput = moveInput;
-        CurrentSpeed01 = moveInput.magnitude * (sprinting ? 2f : (crouching ? 0.5f : 1f));
+        CurrentSprinting = sprinting;
+        CurrentCrouching = crouching;
         CurrentGrounded = grounded;
         CurrentVerticalVelocity = verticalVelocity;
-        CurrentCrouching = crouching;
+
+        float speed01 = moveInput.magnitude;
+
+        if (sprinting)
+            speed01 = Mathf.Clamp01(speed01 * 1.15f);
+        else if (crouching)
+            speed01 = Mathf.Clamp01(speed01 * 0.55f);
+
+        CurrentSpeed01 = speed01;
 
         if (HasStateAuthority)
         {
@@ -174,6 +212,7 @@ public class PlayerMovement : NetworkBehaviour
             NetGrounded = CurrentGrounded;
             NetVerticalVelocity = CurrentVerticalVelocity;
             NetCrouching = CurrentCrouching;
+            NetSprinting = CurrentSprinting;
         }
 
         previousButtons = inputData.Buttons;
@@ -182,7 +221,10 @@ public class PlayerMovement : NetworkBehaviour
     public override void Render()
     {
         if (!canSimulate)
+        {
             PullAnimationStateFromNetwork();
+            ApplyCrouchCollider(CurrentCrouching);
+        }
     }
 
     private void PullAnimationStateFromNetwork()
@@ -192,18 +234,32 @@ public class PlayerMovement : NetworkBehaviour
         CurrentGrounded = NetGrounded;
         CurrentVerticalVelocity = NetVerticalVelocity;
         CurrentCrouching = NetCrouching;
+        CurrentSprinting = NetSprinting;
     }
 
-    private void SetupCollider()
+    private void SetupCollider(bool crouching)
     {
         if (capsule == null)
             return;
 
         capsule.isTrigger = false;
-        capsule.center = new Vector3(0f, 1f, 0f);
-        capsule.radius = 0.35f;
-        capsule.height = 2f;
+        capsule.radius = 0.5f;
         capsule.direction = 1;
+
+        ApplyCrouchCollider(crouching);
+    }
+
+    private void ApplyCrouchCollider(bool crouching)
+    {
+        if (capsule == null)
+            return;
+
+        capsule.height = crouching ? crouchingCapsuleHeight : standingCapsuleHeight;
+        capsule.center = new Vector3(
+            0f,
+            crouching ? crouchingCapsuleCenterY : standingCapsuleCenterY,
+            0f
+        );
     }
 
     private bool CheckGround(Vector3 rootPosition, out RaycastHit hit)
@@ -214,20 +270,20 @@ public class PlayerMovement : NetworkBehaviour
             return false;
         }
 
-        Vector3 capsuleCenter = rootPosition + capsule.center;
+        int effectiveGroundMask = groundMask.value == 0 ? ~0 : groundMask.value;
 
+        Vector3 capsuleCenter = rootPosition + capsule.center;
         float halfHeight = capsule.height * 0.5f;
         float rayDistance = halfHeight + groundSnapDistance;
-
-        Vector3 origin = capsuleCenter + Vector3.up * 0.15f;
+        Vector3 origin = capsuleCenter + Vector3.up * 0.10f;
 
         bool didHit = Physics.SphereCast(
             origin,
-            Mathf.Max(0.05f, capsule.radius * 0.85f),
+            Mathf.Max(0.06f, capsule.radius * 0.82f),
             Vector3.down,
             out hit,
             rayDistance,
-            groundMask.value == 0 ? ~0 : groundMask,
+            effectiveGroundMask,
             QueryTriggerInteraction.Ignore
         );
 
@@ -245,6 +301,9 @@ public class PlayerMovement : NetworkBehaviour
 
     private float GetRootYFromGround(float groundY)
     {
+        if (capsule == null)
+            return groundY;
+
         return groundY - capsule.center.y + capsule.height * 0.5f;
     }
 
@@ -308,3 +367,9 @@ public class PlayerMovement : NetworkBehaviour
         isMovementAllowed = value;
     }
 }
+
+
+
+
+
+
