@@ -9,8 +9,9 @@ public class CameraFollowRig : MonoBehaviour
     [SerializeField] private Vector3 offset = new Vector3(0f, 4f, -6f);
 
     [Header("Smoothing")]
-    [SerializeField] private float followSpeed = 14f;
-    [SerializeField] private float lookSpeed = 16f;
+    [SerializeField] private float followSpeed = 18f;
+    [SerializeField] private float lookSpeed = 20f;
+    [SerializeField] private float snapDistance = 12f;
 
     [Header("Look")]
     [SerializeField] private bool lookAtTarget = true;
@@ -40,7 +41,7 @@ public class CameraFollowRig : MonoBehaviour
         if (snapInstantly)
         {
             transform.position = GetDesiredPosition();
-            ApplyLookRotation(true);
+            ApplyLookRotation(true, Time.deltaTime);
         }
 
         Debug.Log($"CameraFollowRig: target assigned -> {target.name}");
@@ -51,15 +52,21 @@ public class CameraFollowRig : MonoBehaviour
         if (!hasTarget || target == null)
             return;
 
+        float deltaTime = Mathf.Max(Time.deltaTime, 0.0001f);
         Vector3 desiredPosition = GetDesiredPosition();
+        float distance = Vector3.Distance(transform.position, desiredPosition);
 
-        transform.position = Vector3.Lerp(
-            transform.position,
-            desiredPosition,
-            followSpeed * Time.deltaTime
-        );
+        if (distance > snapDistance)
+        {
+            transform.position = desiredPosition;
+        }
+        else
+        {
+            float followT = 1f - Mathf.Exp(-followSpeed * deltaTime);
+            transform.position = Vector3.Lerp(transform.position, desiredPosition, followT);
+        }
 
-        ApplyLookRotation(false);
+        ApplyLookRotation(false, deltaTime);
     }
 
     private Vector3 GetDesiredPosition()
@@ -67,7 +74,7 @@ public class CameraFollowRig : MonoBehaviour
         return target.position + offset;
     }
 
-    private void ApplyLookRotation(bool instant)
+    private void ApplyLookRotation(bool instant, float deltaTime)
     {
         if (!lookAtTarget || target == null)
             return;
@@ -86,11 +93,8 @@ public class CameraFollowRig : MonoBehaviour
         }
         else
         {
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation,
-                lookSpeed * Time.deltaTime
-            );
+            float lookT = 1f - Mathf.Exp(-lookSpeed * deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, lookT);
         }
     }
 }
