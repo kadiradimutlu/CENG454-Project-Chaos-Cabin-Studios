@@ -261,6 +261,118 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         return spawnPoints[indexHint];
     }
 
+    public void TryRespawnAllPlayers()
+    {
+        if (!TryCacheRunner())
+        {
+            Debug.LogError("PlayerSpawner: NetworkRunner bulunamadı.");
+            return;
+        }
+
+        if (!_runner.IsServer)
+            return;
+
+        List<PlayerRef> activePlayers = new List<PlayerRef>(_runner.ActivePlayers);
+
+        if (activePlayers.Count == 0)
+        {
+            Debug.LogWarning("PlayerSpawner: Respawn edilecek aktif oyuncu yok.");
+            return;
+        }
+
+        activePlayers.Sort((a, b) => a.PlayerId.CompareTo(b.PlayerId));
+
+        for (int i = 0; i < activePlayers.Count; i++)
+            TryRespawnPlayer(activePlayers[i], i);
+    }
+
+    public void TryRespawnPlayer(PlayerRef player)
+    {
+        TryRespawnPlayer(player, GetSortedPlayerIndex(player));
+    }
+
+    private void TryRespawnPlayer(PlayerRef player, int indexHint)
+    {
+        if (_runner == null || !_runner.IsServer)
+            return;
+
+        if (player == default)
+            return;
+
+        NetworkObject spawnedObject = GetSpawnedPlayerObject(player);
+
+        if (spawnedObject == null)
+        {
+            Debug.LogWarning($"PlayerSpawner: Player {player.PlayerId} respawn edilemedi çünkü player object bulunamadı.");
+            return;
+        }
+
+        Transform spawnPoint = GetSpawnPoint(indexHint);
+
+        Vector3 spawnPosition = spawnPoint != null
+            ? spawnPoint.position
+            : Vector3.zero;
+
+        spawnPosition.y += spawnYOffset;
+
+        Quaternion spawnRotation = spawnPoint != null
+            ? spawnPoint.rotation
+            : Quaternion.identity;
+
+        PlayerMovement movement = spawnedObject.GetComponent<PlayerMovement>();
+
+        if (movement != null)
+            movement.ResetMovementForRespawn(spawnPosition, spawnRotation);
+        else
+            ForceSpawnTransform(spawnedObject, spawnPosition, spawnRotation);
+
+        PlayerHealth health = spawnedObject.GetComponent<PlayerHealth>();
+
+        if (health != null)
+            health.ResetHealth();
+
+        Debug.Log($"PlayerSpawner: Player {player.PlayerId} respawn edildi.");
+    }
+
+    private NetworkObject GetSpawnedPlayerObject(PlayerRef player)
+    {
+        if (_spawnedPlayers.TryGetValue(player, out NetworkObject spawnedObject) && spawnedObject != null)
+            return spawnedObject;
+
+        if (_runner == null)
+            return null;
+
+        spawnedObject = _runner.GetPlayerObject(player);
+
+        if (spawnedObject != null)
+            _spawnedPlayers[player] = spawnedObject;
+
+        return spawnedObject;
+    }
+
+    private int GetSortedPlayerIndex(PlayerRef player)
+    {
+        if (_runner == null)
+            return 0;
+
+        List<PlayerRef> activePlayers = new List<PlayerRef>(_runner.ActivePlayers);
+        activePlayers.Sort((a, b) => a.PlayerId.CompareTo(b.PlayerId));
+
+        for (int i = 0; i < activePlayers.Count; i++)
+        {
+            if (activePlayers[i] == player)
+                return i;
+        }
+
+        return 0;
+    }
+
+    [ContextMenu("Debug Respawn All Players")]
+    private void DebugRespawnAllPlayers()
+    {
+        TryRespawnAllPlayers();
+    }
+
     private void DespawnPlayer(PlayerRef player)
     {
         if (_runner == null || !_runner.IsServer)
