@@ -50,6 +50,7 @@ public class PlayerMovement : NetworkBehaviour
 
     private Rigidbody rb;
     private CapsuleCollider capsule;
+    private PlayerHealth playerHealth;
 
     [Networked] private float VerticalVelocity { get; set; }
     [Networked] private float JumpGroundIgnoreTimer { get; set; }
@@ -59,6 +60,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         rb = GetComponent<Rigidbody>();
         capsule = GetComponent<CapsuleCollider>();
+        playerHealth = GetComponent<PlayerHealth>();
         SetupCollider(false);
     }
 
@@ -69,6 +71,9 @@ public class PlayerMovement : NetworkBehaviour
 
         if (capsule == null)
             capsule = GetComponent<CapsuleCollider>();
+
+        if (playerHealth == null)
+            playerHealth = GetComponent<PlayerHealth>();
 
         rb.useGravity = false;
         rb.isKinematic = true;
@@ -106,6 +111,12 @@ public class PlayerMovement : NetworkBehaviour
 
         if (!hasInput)
             inputData.MoveInput = Vector2.zero;
+
+        if (IsEliminated())
+        {
+            inputData.MoveInput = Vector2.zero;
+            inputData.Buttons = default;
+        }
 
         float deltaTime = Runner.DeltaTime;
 
@@ -240,6 +251,14 @@ public class PlayerMovement : NetworkBehaviour
     private bool CanSimulateMovement()
     {
         return HasStateAuthority || HasInputAuthority;
+    }
+
+    private bool IsEliminated()
+    {
+        if (playerHealth == null)
+            playerHealth = GetComponent<PlayerHealth>();
+
+        return playerHealth != null && playerHealth.IsEliminated;
     }
 
     private void PullAnimationStateFromNetwork()
