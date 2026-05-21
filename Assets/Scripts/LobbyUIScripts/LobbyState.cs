@@ -13,18 +13,22 @@ public class LobbyState : NetworkBehaviour
     [Networked] public PlayerRef Slot1Player { get; set; }
     [Networked] public NetworkBool Slot1Ready { get; set; }
     [Networked] public int Slot1SkinIndex { get; set; }
+    [Networked] public RoleHandler.PlayerRole Slot1Role { get; set; }
 
     [Networked] public PlayerRef Slot2Player { get; set; }
     [Networked] public NetworkBool Slot2Ready { get; set; }
     [Networked] public int Slot2SkinIndex { get; set; }
+    [Networked] public RoleHandler.PlayerRole Slot2Role { get; set; }
 
     [Networked] public PlayerRef Slot3Player { get; set; }
     [Networked] public NetworkBool Slot3Ready { get; set; }
     [Networked] public int Slot3SkinIndex { get; set; }
+    [Networked] public RoleHandler.PlayerRole Slot3Role { get; set; }
 
     [Networked] public PlayerRef Slot4Player { get; set; }
     [Networked] public NetworkBool Slot4Ready { get; set; }
     [Networked] public int Slot4SkinIndex { get; set; }
+    [Networked] public RoleHandler.PlayerRole Slot4Role { get; set; }
 
     [Networked] public NetworkBool GameStarted { get; set; }
 
@@ -53,6 +57,8 @@ public class LobbyState : NetworkBehaviour
         public string StatusText;
         public int SkinIndex;
         public string SkinName;
+        public RoleHandler.PlayerRole Role;
+        public string RoleName;
     }
 
     public override void Spawned()
@@ -91,24 +97,28 @@ public class LobbyState : NetworkBehaviour
         {
             Slot1Ready = false;
             Slot1SkinIndex = 0;
+            Slot1Role = RoleHandler.PlayerRole.None;
         }
 
         if (Slot2Player == default)
         {
             Slot2Ready = false;
             Slot2SkinIndex = 0;
+            Slot2Role = RoleHandler.PlayerRole.None;
         }
 
         if (Slot3Player == default)
         {
             Slot3Ready = false;
             Slot3SkinIndex = 0;
+            Slot3Role = RoleHandler.PlayerRole.None;
         }
 
         if (Slot4Player == default)
         {
             Slot4Ready = false;
             Slot4SkinIndex = 0;
+            Slot4Role = RoleHandler.PlayerRole.None;
         }
 
         if (Slot1Player == default && GameStarted)
@@ -124,6 +134,7 @@ public class LobbyState : NetworkBehaviour
             Slot1Player = default;
             Slot1Ready = false;
             Slot1SkinIndex = 0;
+            Slot1Role = RoleHandler.PlayerRole.None;
             changed = true;
         }
 
@@ -132,6 +143,7 @@ public class LobbyState : NetworkBehaviour
             Slot2Player = default;
             Slot2Ready = false;
             Slot2SkinIndex = 0;
+            Slot2Role = RoleHandler.PlayerRole.None;
             changed = true;
         }
 
@@ -140,6 +152,7 @@ public class LobbyState : NetworkBehaviour
             Slot3Player = default;
             Slot3Ready = false;
             Slot3SkinIndex = 0;
+            Slot3Role = RoleHandler.PlayerRole.None;
             changed = true;
         }
 
@@ -148,6 +161,7 @@ public class LobbyState : NetworkBehaviour
             Slot4Player = default;
             Slot4Ready = false;
             Slot4SkinIndex = 0;
+            Slot4Role = RoleHandler.PlayerRole.None;
             changed = true;
         }
 
@@ -184,6 +198,7 @@ public class LobbyState : NetworkBehaviour
             Slot1Player = player;
             Slot1Ready = false;
             Slot1SkinIndex = 0;
+            Slot1Role = RoleHandler.PlayerRole.None;
             return true;
         }
 
@@ -192,6 +207,7 @@ public class LobbyState : NetworkBehaviour
             Slot2Player = player;
             Slot2Ready = false;
             Slot2SkinIndex = 0;
+            Slot2Role = RoleHandler.PlayerRole.None;
             return true;
         }
 
@@ -200,6 +216,7 @@ public class LobbyState : NetworkBehaviour
             Slot3Player = player;
             Slot3Ready = false;
             Slot3SkinIndex = 0;
+            Slot3Role = RoleHandler.PlayerRole.None;
             return true;
         }
 
@@ -208,6 +225,7 @@ public class LobbyState : NetworkBehaviour
             Slot4Player = player;
             Slot4Ready = false;
             Slot4SkinIndex = 0;
+            Slot4Role = RoleHandler.PlayerRole.None;
             return true;
         }
 
@@ -227,6 +245,7 @@ public class LobbyState : NetworkBehaviour
             Slot1Player = default;
             Slot1Ready = false;
             Slot1SkinIndex = 0;
+            Slot1Role = RoleHandler.PlayerRole.None;
         }
 
         if (Slot2Player == player)
@@ -234,6 +253,7 @@ public class LobbyState : NetworkBehaviour
             Slot2Player = default;
             Slot2Ready = false;
             Slot2SkinIndex = 0;
+            Slot2Role = RoleHandler.PlayerRole.None;
         }
 
         if (Slot3Player == player)
@@ -241,6 +261,7 @@ public class LobbyState : NetworkBehaviour
             Slot3Player = default;
             Slot3Ready = false;
             Slot3SkinIndex = 0;
+            Slot3Role = RoleHandler.PlayerRole.None;
         }
 
         if (Slot4Player == player)
@@ -248,6 +269,7 @@ public class LobbyState : NetworkBehaviour
             Slot4Player = default;
             Slot4Ready = false;
             Slot4SkinIndex = 0;
+            Slot4Role = RoleHandler.PlayerRole.None;
         }
 
         CompactSlots();
@@ -288,9 +310,18 @@ public class LobbyState : NetworkBehaviour
             Slot4SkinIndex
         };
 
+        RoleHandler.PlayerRole[] roleStates = new RoleHandler.PlayerRole[MaxPlayers]
+        {
+            Slot1Role,
+            Slot2Role,
+            Slot3Role,
+            Slot4Role
+        };
+
         PlayerRef[] compactPlayers = new PlayerRef[MaxPlayers];
         bool[] compactReady = new bool[MaxPlayers];
         int[] compactSkins = new int[MaxPlayers];
+        RoleHandler.PlayerRole[] compactRoles = new RoleHandler.PlayerRole[MaxPlayers];
 
         int writeIndex = 0;
 
@@ -301,6 +332,7 @@ public class LobbyState : NetworkBehaviour
                 compactPlayers[writeIndex] = players[i];
                 compactReady[writeIndex] = writeIndex == 0 ? false : readyStates[i];
                 compactSkins[writeIndex] = NormalizeSkinIndex(skinStates[i]);
+                compactRoles[writeIndex] = NormalizeRole(roleStates[i]);
                 writeIndex++;
             }
         }
@@ -308,18 +340,22 @@ public class LobbyState : NetworkBehaviour
         Slot1Player = compactPlayers[0];
         Slot1Ready = false;
         Slot1SkinIndex = compactSkins[0];
+        Slot1Role = Slot1Player != default ? compactRoles[0] : RoleHandler.PlayerRole.None;
 
         Slot2Player = compactPlayers[1];
         Slot2Ready = compactReady[1];
         Slot2SkinIndex = compactSkins[1];
+        Slot2Role = Slot2Player != default ? compactRoles[1] : RoleHandler.PlayerRole.None;
 
         Slot3Player = compactPlayers[2];
         Slot3Ready = compactReady[2];
         Slot3SkinIndex = compactSkins[2];
+        Slot3Role = Slot3Player != default ? compactRoles[2] : RoleHandler.PlayerRole.None;
 
         Slot4Player = compactPlayers[3];
         Slot4Ready = compactReady[3];
         Slot4SkinIndex = compactSkins[3];
+        Slot4Role = Slot4Player != default ? compactRoles[3] : RoleHandler.PlayerRole.None;
     }
 
     // ==================================================
@@ -428,6 +464,7 @@ public class LobbyState : NetworkBehaviour
     {
         bool hasPlayer = player != default;
         int skinIndex = hasPlayer ? GetSlotSkinIndex(slotIndex) : 0;
+        RoleHandler.PlayerRole role = hasPlayer ? GetSlotRole(slotIndex) : RoleHandler.PlayerRole.None;
 
         LobbySlotData data = new LobbySlotData
         {
@@ -444,24 +481,129 @@ public class LobbyState : NetworkBehaviour
                 : $"Player {slotIndex + 1}",
 
             // Empty slots show no waiting/status text.
-            StatusText = GetStatusText(hasPlayer, isHost, readyValue),
+            StatusText = GetStatusText(hasPlayer, isHost, readyValue, role),
 
             SkinIndex = skinIndex,
-            SkinName = hasPlayer ? GetSkinDisplayName(skinIndex) : string.Empty
+            SkinName = hasPlayer ? GetSkinDisplayName(skinIndex) : string.Empty,
+            Role = role,
+            RoleName = hasPlayer ? GetRoleDisplayName(role) : string.Empty
         };
 
         return data;
     }
 
-    private string GetStatusText(bool hasPlayer, bool isHost, bool readyValue)
+    private string GetStatusText(bool hasPlayer, bool isHost, bool readyValue, RoleHandler.PlayerRole role)
     {
         if (!hasPlayer)
             return string.Empty;
 
-        if (isHost)
-            return "Host";
+        string roleText = role == RoleHandler.PlayerRole.None
+            ? "No Role"
+            : GetRoleDisplayName(role);
 
-        return readyValue ? "Ready!" : "In Lobby";
+        if (isHost)
+            return $"Host | {roleText}";
+
+        string readyText = readyValue ? "Ready!" : "In Lobby";
+        return $"{readyText} | {roleText}";
+    }
+
+
+    // ==================================================
+    // ROLE SELECTION
+    // ==================================================
+
+    private RoleHandler.PlayerRole NormalizeRole(RoleHandler.PlayerRole role)
+    {
+        if (role == RoleHandler.PlayerRole.Runner || role == RoleHandler.PlayerRole.Trapper)
+            return role;
+
+        return RoleHandler.PlayerRole.None;
+    }
+
+    private RoleHandler.PlayerRole GetSlotRole(int slotIndex)
+    {
+        switch (slotIndex)
+        {
+            case 0: return NormalizeRole(Slot1Role);
+            case 1: return NormalizeRole(Slot2Role);
+            case 2: return NormalizeRole(Slot3Role);
+            case 3: return NormalizeRole(Slot4Role);
+            default: return RoleHandler.PlayerRole.None;
+        }
+    }
+
+    private void SetSlotRole(int slotIndex, RoleHandler.PlayerRole role)
+    {
+        role = NormalizeRole(role);
+
+        switch (slotIndex)
+        {
+            case 0:
+                Slot1Role = role;
+                break;
+            case 1:
+                Slot2Role = role;
+                break;
+            case 2:
+                Slot3Role = role;
+                break;
+            case 3:
+                Slot4Role = role;
+                break;
+        }
+    }
+
+    private string GetRoleDisplayName(RoleHandler.PlayerRole role)
+    {
+        switch (role)
+        {
+            case RoleHandler.PlayerRole.Runner:
+                return "Runner";
+            case RoleHandler.PlayerRole.Trapper:
+                return "Trapper";
+            default:
+                return "No Role";
+        }
+    }
+
+    public RoleHandler.PlayerRole GetPlayerRole(PlayerRef player)
+    {
+        int slotIndex = GetPlayerSlotIndex(player);
+
+        if (slotIndex < 0)
+            return RoleHandler.PlayerRole.None;
+
+        return GetSlotRole(slotIndex);
+    }
+
+    public string GetPlayerRoleName(PlayerRef player)
+    {
+        return GetRoleDisplayName(GetPlayerRole(player));
+    }
+
+    public void SetPlayerRoleServer(PlayerRef player, RoleHandler.PlayerRole role)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (player == default)
+            return;
+
+        if (!ContainsPlayer(player))
+            return;
+
+        role = NormalizeRole(role);
+
+        if (role == RoleHandler.PlayerRole.None)
+            return;
+
+        int slotIndex = GetPlayerSlotIndex(player);
+
+        if (slotIndex < 0)
+            return;
+
+        SetSlotRole(slotIndex, role);
     }
 
     // ==================================================
@@ -581,7 +723,49 @@ public class LobbyState : NetworkBehaviour
         if (!AreAllClientsReady())
             return false;
 
+        if (!HaveAllPlayersSelectedRole())
+            return false;
+
+        if (!HasAtLeastOneRunnerAndTrapper())
+            return false;
+
         return true;
+    }
+
+    public bool HaveAllPlayersSelectedRole()
+    {
+        if (Slot1Player != default && Slot1Role == RoleHandler.PlayerRole.None) return false;
+        if (Slot2Player != default && Slot2Role == RoleHandler.PlayerRole.None) return false;
+        if (Slot3Player != default && Slot3Role == RoleHandler.PlayerRole.None) return false;
+        if (Slot4Player != default && Slot4Role == RoleHandler.PlayerRole.None) return false;
+
+        return true;
+    }
+
+    public bool HasAtLeastOneRunnerAndTrapper()
+    {
+        int runnerCount = 0;
+        int trapperCount = 0;
+
+        CountRole(Slot1Player, Slot1Role, ref runnerCount, ref trapperCount);
+        CountRole(Slot2Player, Slot2Role, ref runnerCount, ref trapperCount);
+        CountRole(Slot3Player, Slot3Role, ref runnerCount, ref trapperCount);
+        CountRole(Slot4Player, Slot4Role, ref runnerCount, ref trapperCount);
+
+        return runnerCount >= 1 && trapperCount >= 1;
+    }
+
+    private void CountRole(PlayerRef player, RoleHandler.PlayerRole role, ref int runnerCount, ref int trapperCount)
+    {
+        if (player == default)
+            return;
+
+        role = NormalizeRole(role);
+
+        if (role == RoleHandler.PlayerRole.Runner)
+            runnerCount++;
+        else if (role == RoleHandler.PlayerRole.Trapper)
+            trapperCount++;
     }
 
     // ==================================================
@@ -742,6 +926,31 @@ public class LobbyState : NetworkBehaviour
         direction = direction < 0 ? -1 : 1;
 
         ChangePlayerSkinServer(sender, direction);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_SelectRole(int roleValue, RpcInfo info = default)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        PlayerRef sender = info.Source;
+
+        if (sender == default && Runner != null)
+            sender = Runner.LocalPlayer;
+
+        if (sender == default)
+            return;
+
+        if (!ContainsPlayer(sender))
+            return;
+
+        RoleHandler.PlayerRole role = NormalizeRole((RoleHandler.PlayerRole)roleValue);
+
+        if (role == RoleHandler.PlayerRole.None)
+            return;
+
+        SetPlayerRoleServer(sender, role);
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]

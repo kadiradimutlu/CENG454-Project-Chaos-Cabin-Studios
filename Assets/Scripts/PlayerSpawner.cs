@@ -6,8 +6,22 @@ using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
+    [Serializable]
+    public class PlayerRoleSpawnPoints
+    {
+        public Transform runnerSpawnPoint;
+        public Transform trapperSpawnPoint;
+    }
+
     [Header("Player Spawn")]
     [SerializeField] private NetworkObject playerPrefab;
+
+    [Header("Role Based Spawn Points")]
+    [Tooltip("Index 0 = Player 1, Index 1 = Player 2, Index 2 = Player 3, Index 3 = Player 4")]
+    [SerializeField] private PlayerRoleSpawnPoints[] roleSpawnPoints = new PlayerRoleSpawnPoints[4];
+
+    [Header("Legacy / Fallback Spawn Points")]
+    [Tooltip("If a role spawn point is empty, this array is used as fallback by player slot index.")]
     [SerializeField] private Transform[] spawnPoints;
 
     [Header("Hierarchy Parent")]
@@ -109,15 +123,21 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        activePlayers.Sort((a, b) => a.PlayerId.CompareTo(b.PlayerId));
+        activePlayers.Sort(ComparePlayersByLobbySlot);
 
         for (int i = 0; i < activePlayers.Count; i++)
         {
-            RoleHandler.PlayerRole role = i < 2
-                ? RoleHandler.PlayerRole.Runner
-                : RoleHandler.PlayerRole.Trapper;
+            PlayerRef player = activePlayers[i];
+            int slotIndex = GetSlotIndexForPlayer(player, i);
+            RoleHandler.PlayerRole role = GetRoleForPlayer(player);
 
-            SpawnPlayerIfNeeded(activePlayers[i], role, i);
+            if (role == RoleHandler.PlayerRole.None)
+            {
+                Debug.LogWarning($"PlayerSpawner: Player {player.PlayerId} role seçmediği için spawn edilmedi.");
+                continue;
+            }
+
+            SpawnPlayerIfNeeded(player, role, slotIndex);
         }
 
         _gameplaySpawnStarted = true;
@@ -141,7 +161,8 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        Transform spawnPoint = GetSpawnPoint(indexHint);
+        int slotIndex = GetSlotIndexForPlayer(player, indexHint);
+        Transform spawnPoint = GetSpawnPoint(slotIndex, role);
 
         Vector3 spawnPosition = spawnPoint != null
             ? spawnPoint.position
@@ -215,6 +236,44 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         return _lobbyState.GetPlayerSkinIndex(player);
     }
 
+    private RoleHandler.PlayerRole GetRoleForPlayer(PlayerRef player)
+    {
+        TryCacheLobbyState();
+
+        if (_lobbyState == null)
+            return RoleHandler.PlayerRole.None;
+
+        return _lobbyState.GetPlayerRole(player);
+    }
+
+    private int GetSlotIndexForPlayer(PlayerRef player, int fallbackIndex = 0)
+    {
+        TryCacheLobbyState();
+
+        if (_lobbyState != null)
+        {
+            int slotIndex = _lobbyState.GetPlayerSlotIndex(player);
+
+            if (slotIndex >= 0)
+                return slotIndex;
+        }
+
+        return Mathf.Max(0, fallbackIndex);
+    }
+
+    private int ComparePlayersByLobbySlot(PlayerRef a, PlayerRef b)
+    {
+        int aSlot = GetSlotIndexForPlayer(a, 999 + a.PlayerId);
+        int bSlot = GetSlotIndexForPlayer(b, 999 + b.PlayerId);
+
+        int slotCompare = aSlot.CompareTo(bSlot);
+
+        if (slotCompare != 0)
+            return slotCompare;
+
+        return a.PlayerId.CompareTo(b.PlayerId);
+    }
+
     private void ForceSpawnTransform(NetworkObject obj, Vector3 position, Quaternion rotation)
     {
         if (obj == null)
@@ -249,16 +308,50 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         obj.transform.SetParent(spawnedPlayersParent, true);
     }
 
-    private Transform GetSpawnPoint(int indexHint)
+    private Transform GetSpawnPoint(int slotIndex, RoleHandler.PlayerRole role)
+    {
+        if (slotIndex < 0)
+            slotIndex = 0;
+
+        Transform roleSpawnPoint = GetRoleSpawnPoint(slotIndex, role);
+
+        if (roleSpawnPoint != null)
+            return roleSpawnPoint;
+
+        return GetFallbackSpawnPoint(slotIndex);
+    }
+
+    private Transform GetRoleSpawnPoint(int slotIndex, RoleHandler.PlayerRole role)
+    {
+        if (roleSpawnPoints == null || roleSpawnPoints.Length == 0)
+            return null;
+
+        slotIndex = Mathf.Clamp(slotIndex, 0, roleSpawnPoints.Length - 1);
+        PlayerRoleSpawnPoints points = roleSpawnPoints[slotIndex];
+
+        if (points == null)
+            return null;
+
+        switch (role)
+        {
+            case RoleHandler.PlayerRole.Runner:
+                return points.runnerSpawnPoint;
+
+            case RoleHandler.PlayerRole.Trapper:
+                return points.trapperSpawnPoint;
+
+            default:
+                return null;
+        }
+    }
+
+    private Transform GetFallbackSpawnPoint(int slotIndex)
     {
         if (spawnPoints == null || spawnPoints.Length == 0)
             return null;
 
-        if (indexHint < 0)
-            indexHint = 0;
-
-        indexHint = Mathf.Clamp(indexHint, 0, spawnPoints.Length - 1);
-        return spawnPoints[indexHint];
+        slotIndex = Mathf.Clamp(slotIndex, 0, spawnPoints.Length - 1);
+        return spawnPoints[slotIndex];
     }
 
     public void TryRespawnAllPlayers()
@@ -280,10 +373,10 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        activePlayers.Sort((a, b) => a.PlayerId.CompareTo(b.PlayerId));
+        activePlayers.Sort(ComparePlayersByLobbySlot);
 
         for (int i = 0; i < activePlayers.Count; i++)
-            TryRespawnPlayer(activePlayers[i], i);
+            TryRespawnPlayer(activePlayers[i], GetSlotIndexForPlayer(activePlayers[i], i));
     }
 
     public void TryRespawnPlayer(PlayerRef player)
@@ -307,7 +400,9 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        Transform spawnPoint = GetSpawnPoint(indexHint);
+        RoleHandler.PlayerRole role = GetRoleForPlayer(player);
+        int slotIndex = GetSlotIndexForPlayer(player, indexHint);
+        Transform spawnPoint = GetSpawnPoint(slotIndex, role);
 
         Vector3 spawnPosition = spawnPoint != null
             ? spawnPoint.position
@@ -356,7 +451,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return 0;
 
         List<PlayerRef> activePlayers = new List<PlayerRef>(_runner.ActivePlayers);
-        activePlayers.Sort((a, b) => a.PlayerId.CompareTo(b.PlayerId));
+        activePlayers.Sort(ComparePlayersByLobbySlot);
 
         for (int i = 0; i < activePlayers.Count; i++)
         {
@@ -394,11 +489,16 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         if (_runner.IsServer && _gameplaySpawnStarted)
         {
-            int index = _spawnedPlayers.Count;
+            TryCacheLobbyState();
 
-            RoleHandler.PlayerRole role = index < 2
-                ? RoleHandler.PlayerRole.Runner
-                : RoleHandler.PlayerRole.Trapper;
+            int index = GetSlotIndexForPlayer(player, _spawnedPlayers.Count);
+            RoleHandler.PlayerRole role = GetRoleForPlayer(player);
+
+            if (role == RoleHandler.PlayerRole.None)
+            {
+                Debug.LogWarning($"PlayerSpawner: Player {player.PlayerId} role bilgisi bulunamadı, gameplay sırasında spawn edilmedi.");
+                return;
+            }
 
             SpawnPlayerIfNeeded(player, role, index);
         }
