@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Fusion;
 using Fusion.Sockets;
 using System.Collections.Generic;
@@ -193,29 +194,57 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         PlayerNetworkInputData inputData = new PlayerNetworkInputData();
-
         Vector2 moveInput = Vector2.zero;
 
-        if (Input.GetKey(KeyCode.W))
+        bool up = false;
+        bool down = false;
+        bool left = false;
+        bool right = false;
+        bool jump = false;
+        bool sprint = false;
+        bool crouch = false;
+
+#if ENABLE_LEGACY_INPUT_MANAGER
+        up = up || Input.GetKey(KeyCode.W);
+        down = down || Input.GetKey(KeyCode.S);
+        left = left || Input.GetKey(KeyCode.A);
+        right = right || Input.GetKey(KeyCode.D);
+        jump = jump || Input.GetKey(KeyCode.Space);
+        sprint = sprint || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        crouch = crouch || Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+#endif
+
+#if ENABLE_INPUT_SYSTEM
+        Keyboard keyboard = Keyboard.current;
+
+        if (keyboard != null)
+        {
+            up = up || keyboard.wKey.isPressed;
+            down = down || keyboard.sKey.isPressed;
+            left = left || keyboard.aKey.isPressed;
+            right = right || keyboard.dKey.isPressed;
+            jump = jump || keyboard.spaceKey.isPressed;
+            sprint = sprint || keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
+            crouch = crouch || keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed;
+        }
+#endif
+
+        if (up)
             moveInput.y += 1f;
 
-        if (Input.GetKey(KeyCode.S))
+        if (down)
             moveInput.y -= 1f;
 
-        if (Input.GetKey(KeyCode.D))
+        if (right)
             moveInput.x += 1f;
 
-        if (Input.GetKey(KeyCode.A))
+        if (left)
             moveInput.x -= 1f;
 
         inputData.MoveInput = Vector2.ClampMagnitude(moveInput, 1f);
-
-        inputData.Buttons.Set((int)PlayerInputButton.Jump, Input.GetKey(KeyCode.Space));
-        inputData.Buttons.Set((int)PlayerInputButton.Sprint, Input.GetKey(KeyCode.LeftShift));
-        inputData.Buttons.Set(
-            (int)PlayerInputButton.Crouch,
-            Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
-        );
+        inputData.Buttons.Set((int)PlayerInputButton.Jump, jump);
+        inputData.Buttons.Set((int)PlayerInputButton.Sprint, sprint);
+        inputData.Buttons.Set((int)PlayerInputButton.Crouch, crouch);
 
         input.Set(inputData);
     }
