@@ -50,7 +50,7 @@ public class RoleHandler : NetworkBehaviour
                 break;
 
             case PlayerRole.Trapper:
-                playerMovement.SetMovementAllowed(false);
+                playerMovement.SetMovementAllowed(true);
                 break;
 
             case PlayerRole.None:
