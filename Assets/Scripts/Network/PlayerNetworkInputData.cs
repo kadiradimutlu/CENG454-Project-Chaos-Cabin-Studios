@@ -12,4 +12,5 @@ public struct PlayerNetworkInputData : INetworkInput
 {
     public Vector2 MoveInput;
     public NetworkButtons Buttons;
+    public float CameraYaw;
 }

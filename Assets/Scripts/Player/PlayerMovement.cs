@@ -174,7 +174,7 @@ public class PlayerMovement : NetworkBehaviour
             speed = crouchSpeed;
 
         Vector3 moveDirection = isMovementAllowed
-            ? new Vector3(moveInput.x, 0f, moveInput.y)
+            ? GetCameraRelativeMoveDirection(moveInput, inputData.CameraYaw)
             : Vector3.zero;
 
         verticalVelocity += gravity * deltaTime;
@@ -294,6 +294,33 @@ public class PlayerMovement : NetworkBehaviour
             crouching ? crouchingCapsuleCenterY : standingCapsuleCenterY,
             0f
         );
+    }
+
+
+    private Vector3 GetCameraRelativeMoveDirection(Vector2 input, float cameraYaw)
+    {
+        if (input.sqrMagnitude <= 0.001f)
+            return Vector3.zero;
+
+        Quaternion yawRotation = Quaternion.Euler(0f, cameraYaw, 0f);
+        Vector3 forward = yawRotation * Vector3.forward;
+        Vector3 right = yawRotation * Vector3.right;
+
+        forward.y = 0f;
+        right.y = 0f;
+
+        if (forward.sqrMagnitude > 0.001f)
+            forward.Normalize();
+
+        if (right.sqrMagnitude > 0.001f)
+            right.Normalize();
+
+        Vector3 direction = right * input.x + forward * input.y;
+
+        if (direction.sqrMagnitude > 1f)
+            direction.Normalize();
+
+        return direction;
     }
 
     private bool CheckGround(Vector3 rootPosition, out RaycastHit hit)

@@ -246,6 +246,11 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         inputData.Buttons.Set((int)PlayerInputButton.Sprint, sprint);
         inputData.Buttons.Set((int)PlayerInputButton.Crouch, crouch);
 
+        if (CameraFollowRig.TryGetLocalYaw(out float cameraYaw))
+            inputData.CameraYaw = cameraYaw;
+        else
+            inputData.CameraYaw = 0f;
+
         input.Set(inputData);
     }
 
