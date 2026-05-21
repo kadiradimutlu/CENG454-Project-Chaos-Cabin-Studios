@@ -51,9 +51,9 @@ public class PlayerMovement : NetworkBehaviour
     private Rigidbody rb;
     private CapsuleCollider capsule;
 
-    private float verticalVelocity;
-    private float jumpGroundIgnoreTimer;
-    private NetworkButtons previousButtons;
+    [Networked] private float VerticalVelocity { get; set; }
+    [Networked] private float JumpGroundIgnoreTimer { get; set; }
+    [Networked] private NetworkButtons PreviousButtons { get; set; }
 
     private void Awake()
     {
@@ -79,8 +79,12 @@ public class PlayerMovement : NetworkBehaviour
             RigidbodyConstraints.FreezeRotationX |
             RigidbodyConstraints.FreezeRotationZ;
 
-        verticalVelocity = groundedGravity;
-        jumpGroundIgnoreTimer = 0f;
+        if (HasStateAuthority)
+        {
+            VerticalVelocity = groundedGravity;
+            JumpGroundIgnoreTimer = 0f;
+            PreviousButtons = default;
+        }
 
         SetupCollider(false);
 
@@ -104,6 +108,12 @@ public class PlayerMovement : NetworkBehaviour
             inputData.MoveInput = Vector2.zero;
 
         float deltaTime = Runner.DeltaTime;
+
+        float verticalVelocity = VerticalVelocity;
+        float jumpGroundIgnoreTimer = JumpGroundIgnoreTimer;
+
+        if (Mathf.Approximately(verticalVelocity, 0f) && CheckGround(transform.position, out _))
+            verticalVelocity = groundedGravity;
 
         if (jumpGroundIgnoreTimer > 0f)
             jumpGroundIgnoreTimer -= deltaTime;
@@ -131,7 +141,7 @@ public class PlayerMovement : NetworkBehaviour
 
         bool jumpPressed =
             inputData.Buttons.IsSet((int)PlayerInputButton.Jump) &&
-            !previousButtons.IsSet((int)PlayerInputButton.Jump);
+            !PreviousButtons.IsSet((int)PlayerInputButton.Jump);
 
         bool grounded = jumpGroundIgnoreTimer <= 0f && CheckGround(transform.position, out _);
 
@@ -202,6 +212,10 @@ public class PlayerMovement : NetworkBehaviour
 
         CurrentSpeed01 = speed01;
 
+        VerticalVelocity = verticalVelocity;
+        JumpGroundIgnoreTimer = jumpGroundIgnoreTimer;
+        PreviousButtons = inputData.Buttons;
+
         if (HasStateAuthority)
         {
             NetMoveInput = CurrentMoveInput;
@@ -211,8 +225,6 @@ public class PlayerMovement : NetworkBehaviour
             NetCrouching = CurrentCrouching;
             NetSprinting = CurrentSprinting;
         }
-
-        previousButtons = inputData.Buttons;
     }
 
     public override void Render()
@@ -354,7 +366,7 @@ public class PlayerMovement : NetworkBehaviour
 
     public void ApplyExternalVelocity(Vector3 velocity)
     {
-        verticalVelocity = velocity.y;
+        VerticalVelocity = velocity.y;
 
         Vector3 planar = new Vector3(velocity.x, 0f, velocity.z);
         transform.position += planar * Runner.DeltaTime;
