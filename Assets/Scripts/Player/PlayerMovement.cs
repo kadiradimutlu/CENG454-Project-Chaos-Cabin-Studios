@@ -396,6 +396,54 @@ public class PlayerMovement : NetworkBehaviour
         ApplyExternalVelocity(impulse);
     }
 
+    public void ResetMovementForRespawn(Vector3 position, Quaternion rotation)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (rb == null)
+            rb = GetComponent<Rigidbody>();
+
+        if (capsule == null)
+            capsule = GetComponent<CapsuleCollider>();
+
+        transform.SetPositionAndRotation(position, rotation);
+
+        if (rb != null)
+        {
+            rb.position = position;
+            rb.rotation = rotation;
+            rb.angularVelocity = Vector3.zero;
+
+#if UNITY_6000_0_OR_NEWER
+            rb.linearVelocity = Vector3.zero;
+#else
+            rb.velocity = Vector3.zero;
+#endif
+        }
+
+        isMovementAllowed = true;
+        VerticalVelocity = groundedGravity;
+        JumpGroundIgnoreTimer = 0f;
+        PreviousButtons = default;
+
+        CurrentMoveInput = Vector2.zero;
+        CurrentSpeed01 = 0f;
+        CurrentGrounded = true;
+        CurrentVerticalVelocity = groundedGravity;
+        CurrentCrouching = false;
+        CurrentSprinting = false;
+
+        NetMoveInput = Vector2.zero;
+        NetSpeed01 = 0f;
+        NetGrounded = true;
+        NetVerticalVelocity = groundedGravity;
+        NetCrouching = false;
+        NetSprinting = false;
+
+        SetupCollider(false);
+    }
+
     public void SetMovementAllowed(bool value)
     {
         isMovementAllowed = value;
