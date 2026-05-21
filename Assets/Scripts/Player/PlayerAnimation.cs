@@ -1,4 +1,4 @@
-﻿using Fusion;
+using Fusion;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -15,6 +15,7 @@ public class PlayerAnimation : NetworkBehaviour
     [SerializeField] private string landingStateName = "Land";
 
     [Header("Blending")]
+    [SerializeField] private bool useForwardOnlyMovementBlend = true;
     [SerializeField] private float crossFadeDuration = 0.10f;
     [SerializeField] private float speedDampTime = 0.08f;
     [SerializeField] private float jumpVelocityThreshold = 0.35f;
@@ -139,8 +140,17 @@ public class PlayerAnimation : NetworkBehaviour
         bool sprinting = movement.CurrentSprinting;
         float verticalVelocity = movement.CurrentVerticalVelocity;
 
-        animator.SetFloat(HorizontalHash, moveInput.x, speedDampTime, deltaTime);
-        animator.SetFloat(VerticalHash, moveInput.y, speedDampTime, deltaTime);
+        float animationHorizontal = moveInput.x;
+        float animationVertical = moveInput.y;
+
+        if (useForwardOnlyMovementBlend)
+        {
+            animationHorizontal = 0f;
+            animationVertical = speed01;
+        }
+
+        animator.SetFloat(HorizontalHash, animationHorizontal, speedDampTime, deltaTime);
+        animator.SetFloat(VerticalHash, animationVertical, speedDampTime, deltaTime);
         animator.SetFloat(SpeedHash, speed01, speedDampTime, deltaTime);
         animator.SetFloat(VerticalVelocityHash, verticalVelocity);
 
