@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using Fusion;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -54,7 +54,6 @@ public class PlayerMovement : NetworkBehaviour
     private float verticalVelocity;
     private float jumpGroundIgnoreTimer;
     private NetworkButtons previousButtons;
-    private bool canSimulate;
 
     private void Awake()
     {
@@ -70,8 +69,6 @@ public class PlayerMovement : NetworkBehaviour
 
         if (capsule == null)
             capsule = GetComponent<CapsuleCollider>();
-
-        canSimulate = HasStateAuthority;
 
         rb.useGravity = false;
         rb.isKinematic = true;
@@ -93,7 +90,7 @@ public class PlayerMovement : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (!canSimulate)
+        if (!CanSimulateMovement())
         {
             PullAnimationStateFromNetwork();
             ApplyCrouchCollider(CurrentCrouching);
@@ -220,11 +217,17 @@ public class PlayerMovement : NetworkBehaviour
 
     public override void Render()
     {
-        if (!canSimulate)
+        if (!CanSimulateMovement())
         {
             PullAnimationStateFromNetwork();
             ApplyCrouchCollider(CurrentCrouching);
         }
+    }
+
+
+    private bool CanSimulateMovement()
+    {
+        return HasStateAuthority || HasInputAuthority;
     }
 
     private void PullAnimationStateFromNetwork()
