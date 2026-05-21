@@ -16,11 +16,11 @@ GameObject:
   - component: {fileID: 2796955079069592424}
   - component: {fileID: 2306145414830265327}
   - component: {fileID: 1643129204841086932}
-  - component: {fileID: 1230728563986974221}
   - component: {fileID: -6558359621573049810}
   - component: {fileID: 265149033449573497}
   - component: {fileID: 6574671038988352209}
   - component: {fileID: 4745300973869823781}
+  - component: {fileID: -2987654311209876543}
   - component: {fileID: 4736110249863798448}
   m_Layer: 0
   m_Name: PlayerPrefab
@@ -148,10 +148,10 @@ MonoBehaviour:
   - {fileID: 2796955079069592424}
   - {fileID: 2306145414830265327}
   - {fileID: 1643129204841086932}
-  - {fileID: 1230728563986974221}
   - {fileID: -6558359621573049810}
   - {fileID: 6574671038988352209}
   - {fileID: 4745300973869823781}
+  - {fileID: -2987654311209876543}
   - {fileID: 4736110249863798448}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2796955079069592424
@@ -198,19 +198,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1582c0f2d71c21646b9e268bf545051a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoleHandler
+  playerMovement: {fileID: 0}
   _currentRole: 1
---- !u!114 &1230728563986974221
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3600554267242463573}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7cdb6cb2f37d42cba5777e56fb54969, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerInput
 --- !u!114 &-6558359621573049810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,8 +213,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 5
-  rotationSpeed: 10
-  jumpForce: 5
+  sprintSpeed: 8
+  crouchSpeed: 2.6
+  rotationSpeed: 14
+  gravity: -16
+  jumpForce: 11.5
+  groundedGravity: -2
+  groundSnapDistance: 0.35
+  jumpGroundIgnoreTime: 0.22
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  standingCapsuleHeight: 2
+  standingCapsuleCenterY: 1
+  crouchingCapsuleHeight: 1.25
+  crouchingCapsuleCenterY: 0.625
+  allowKeyboardCrouchFallback: 1
+  ignorePlayerToPlayerCollision: 1
+  _NetMoveInput: {x: 0, y: 0}
+  _NetSpeed01: 0
+  _NetGrounded:
+    _value: 0
+  _NetVerticalVelocity: 0
+  _NetCrouching:
+    _value: 0
+  _NetSprinting:
+    _value: 0
 --- !u!54 &265149033449573497
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -252,7 +265,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 80
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &6574671038988352209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,7 +279,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
   animator: {fileID: 3638880797616173288}
+  movementStateName: Movement
+  crouchStateName: Crouch
+  jumpStateName: Jump
+  fallingStateName: Fall
+  landingStateName: Land
+  crossFadeDuration: 0.1
+  speedDampTime: 0.08
+  jumpVelocityThreshold: 0.35
+  fallingVelocityThreshold: -0.6
+  minimumJumpStateTime: 0.24
+  landingStateTime: 0.18
+  keepVisualAboveGround: 1
+  visualGroundClearance: 0.02
+  visualClampLerpSpeed: 18
 --- !u!114 &4745300973869823781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3600554267242463573}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkMecanimAnimator
+  Animator: {fileID: 3638880797616173288}
+  ApplyTiming: 2
+  SyncSettings: 79
+  StateHashes: 00000000a1f7ab0dbb6691e72ef6da876d58e98428a981077af3fe2e3270625b602a1d72e67a3208b4204d21
+  TriggerHashes: 0000000087a0c606
+  TotalWords: 5
+--- !u!114 &-2987654311209876543
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -275,15 +320,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 3600554267242463573}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: 9b0a5d1d44834ee4968f8dc46b715081, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkMecanimAnimator
-  Animator: {fileID: 3638880797616173288}
-  ApplyTiming: 2
-  SyncSettings: 79
-  StateHashes: 00000000a1f7ab0dbb6691e7c76ba771622f40ce2320aa61a7037c8e28a981077af3fe2e249a8c8fcf590472fbcb4cdc7fe89a3371220edbf36d425e
-  TriggerHashes: 0000000087a0c606
-  TotalWords: 5
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHealth: 100
+  _CurrentHealth: 0
+  _IsEliminated:
+    _value: 0
 --- !u!114 &4736110249863798448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -297,7 +340,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSkinApplier
   _SkinIndex: 0
-  targetRenderer: {fileID: 0}
+  visualRoot: {fileID: 0}
+  hideDefaultRenderersWhenUsingPrefab: 1
+  templateAnimator: {fileID: 0}
+  forceDisableRootMotion: 1
+  forceAlwaysAnimateCulling: 1
+  includeInactiveRenderers: 1
+  targetRenderers: []
 --- !u!1 &5535873060997195435
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,9 +499,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollowRig
   target: {fileID: 0}
   offset: {x: 0, y: 4, z: -6}
-  followSpeed: 8
-  lookSpeed: 8
+  followSpeed: 14
+  lookSpeed: 16
   lookAtTarget: 1
+  lookOffset: {x: 0, y: 1.2, z: 0}
 --- !u!1 &8655580079025213408
 GameObject:
   m_ObjectHideFlags: 0
@@ -605,9 +655,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollowRig
   target: {fileID: 0}
   offset: {x: 0, y: 4, z: -6}
-  followSpeed: 8
-  lookSpeed: 8
+  followSpeed: 14
+  lookSpeed: 16
   lookAtTarget: 1
+  lookOffset: {x: 0, y: 1.2, z: 0}
 --- !u!1 &8779444187828829011
 GameObject:
   m_ObjectHideFlags: 0

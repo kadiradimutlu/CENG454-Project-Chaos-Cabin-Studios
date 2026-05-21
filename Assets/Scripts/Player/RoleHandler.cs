@@ -1,12 +1,10 @@
 using UnityEngine;
 using Fusion;
 
-public partial class RoleHandler : NetworkBehaviour
+public class RoleHandler : NetworkBehaviour
 {
     [Header("Components")]
-    private PlayerMovement _playerMovement;
-    
-    private PlayerMovement playerController; 
+    [SerializeField] private PlayerMovement playerMovement;
 
     public enum PlayerRole
     {
@@ -15,18 +13,14 @@ public partial class RoleHandler : NetworkBehaviour
         Trapper
     }
 
-    [Networked]
-    public PlayerRole currentRole { get; set; }
+    [Networked] public PlayerRole currentRole { get; set; }
 
     private PlayerRole _lastRole;
 
     public override void Spawned()
     {
-        if (_playerMovement == null)
-        {
-            _playerMovement = GetComponent<PlayerMovement>();
-            playerController = _playerMovement; 
-        }
+        if (playerMovement == null)
+            playerMovement = GetComponent<PlayerMovement>();
 
         _lastRole = PlayerRole.None;
         ApplyRoleSettings(currentRole);
@@ -34,44 +28,35 @@ public partial class RoleHandler : NetworkBehaviour
 
     public override void Render()
     {
-        if (_lastRole != currentRole)
-        {
-            ApplyRoleSettings(currentRole);
-            _lastRole = currentRole;
-        }
+        if (_lastRole == currentRole)
+            return;
+
+        ApplyRoleSettings(currentRole);
+        _lastRole = currentRole;
     }
 
     private void ApplyRoleSettings(PlayerRole role)
-
-{
-
-    if (role == PlayerRole.None) return;
- 
-    bool isLocalPlayer = Object.HasInputAuthority;
- 
-    if (role == PlayerRole.Trapper)
-
     {
+        if (playerMovement == null)
+            return;
 
-        if (_playerMovement != null)
+        if (!Object.HasInputAuthority && !Object.HasStateAuthority)
+            return;
+
+        switch (role)
         {
+            case PlayerRole.Runner:
+                playerMovement.SetMovementAllowed(true);
+                break;
 
-            //_playerMovement.isMovementAllowed = false;
+            case PlayerRole.Trapper:
+                playerMovement.SetMovementAllowed(true);
+                break;
 
+            case PlayerRole.None:
+            default:
+                playerMovement.SetMovementAllowed(true);
+                break;
+        }
     }
-
-    else if (role == PlayerRole.Runner)
-
-    {
-
-        if (_playerMovement != null)
-        {
-
-            //_playerMovement.isMovementAllowed = true;
-
-    }
-
 }
-}
-}}
- 

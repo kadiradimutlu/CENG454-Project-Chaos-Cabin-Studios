@@ -16,6 +16,13 @@ public class PlayerSkinApplier : NetworkBehaviour
     [Tooltip("The selected modular character receives the animator controller from this animator if needed.")]
     [SerializeField] private Animator templateAnimator;
 
+    [Header("Animator Settings")]
+    [Tooltip("For gameplay characters, root motion should normally stay disabled because PlayerMovement controls the transform.")]
+    [SerializeField] private bool forceDisableRootMotion = true;
+
+    [Tooltip("Keeps remote/networked character visuals animating even if Unity thinks their renderers are culled.")]
+    [SerializeField] private bool forceAlwaysAnimateCulling = true;
+
     [Header("Fallback Material Settings")]
     [SerializeField] private bool includeInactiveRenderers = true;
 
@@ -102,18 +109,35 @@ public class PlayerSkinApplier : NetworkBehaviour
 
     private void ConfigureAnimator(Animator newAnimator)
     {
-        if (newAnimator == null || templateAnimator == null)
+        if (newAnimator == null)
             return;
 
-        if (newAnimator.runtimeAnimatorController == null && templateAnimator.runtimeAnimatorController != null)
+        if (templateAnimator != null && newAnimator.runtimeAnimatorController == null && templateAnimator.runtimeAnimatorController != null)
             newAnimator.runtimeAnimatorController = templateAnimator.runtimeAnimatorController;
 
-        if (newAnimator.avatar == null && templateAnimator.avatar != null)
+        // Keep the modular character's own humanoid avatar when it has one.
+        // Replacing it with the old HumanMale avatar can break retargeting on the GanzSe mesh.
+        if (newAnimator.avatar == null && templateAnimator != null && templateAnimator.avatar != null)
             newAnimator.avatar = templateAnimator.avatar;
 
-        newAnimator.applyRootMotion = templateAnimator.applyRootMotion;
-        newAnimator.updateMode = templateAnimator.updateMode;
-        newAnimator.cullingMode = templateAnimator.cullingMode;
+        if (forceDisableRootMotion)
+            newAnimator.applyRootMotion = false;
+        else if (templateAnimator != null)
+            newAnimator.applyRootMotion = templateAnimator.applyRootMotion;
+
+        if (templateAnimator != null)
+            newAnimator.updateMode = templateAnimator.updateMode;
+
+        if (forceAlwaysAnimateCulling)
+            newAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+        else if (templateAnimator != null)
+            newAnimator.cullingMode = templateAnimator.cullingMode;
+
+        if (newAnimator.runtimeAnimatorController != null)
+        {
+            newAnimator.Rebind();
+            newAnimator.Update(0f);
+        }
     }
 
     private void AssignAnimatorToPlayerSystems(Animator newAnimator)
