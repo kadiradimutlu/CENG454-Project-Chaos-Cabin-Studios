@@ -26,13 +26,13 @@ public class DamageVolume : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (damageOnEnter)
+        if (instantElimination || damageOnEnter)
             TryApplyDamage(other, true);
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if (damageRepeatedly)
+        if (!instantElimination && damageRepeatedly)
             TryApplyDamage(other, false);
     }
 
