@@ -195,52 +195,57 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
     {
         PlayerNetworkInputData inputData = new PlayerNetworkInputData();
         Vector2 moveInput = Vector2.zero;
+
+        bool up = false;
+        bool down = false;
+        bool left = false;
+        bool right = false;
+        bool jump = false;
+        bool sprint = false;
+        bool crouch = false;
+
+#if ENABLE_LEGACY_INPUT_MANAGER
+        up = up || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
+        down = down || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow);
+        left = left || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
+        right = right || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
+        jump = jump || Input.GetKey(KeyCode.Space);
+        sprint = sprint || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        crouch = crouch || Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+#endif
+
+#if ENABLE_INPUT_SYSTEM
         Keyboard keyboard = Keyboard.current;
 
         if (keyboard != null)
         {
-            if (keyboard.wKey.isPressed)
-                moveInput.y += 1f;
-
-            if (keyboard.sKey.isPressed)
-                moveInput.y -= 1f;
-
-            if (keyboard.dKey.isPressed)
-                moveInput.x += 1f;
-
-            if (keyboard.aKey.isPressed)
-                moveInput.x -= 1f;
-
-            inputData.Buttons.Set((int)PlayerInputButton.Jump, keyboard.spaceKey.isPressed);
-            inputData.Buttons.Set((int)PlayerInputButton.Sprint, keyboard.leftShiftKey.isPressed);
-            inputData.Buttons.Set(
-                (int)PlayerInputButton.Crouch,
-                keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed
-            );
+            up = up || keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed;
+            down = down || keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed;
+            left = left || keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed;
+            right = right || keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed;
+            jump = jump || keyboard.spaceKey.isPressed;
+            sprint = sprint || keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
+            crouch = crouch || keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed;
         }
-        else
-        {
-            if (Input.GetKey(KeyCode.W))
-                moveInput.y += 1f;
+#endif
 
-            if (Input.GetKey(KeyCode.S))
-                moveInput.y -= 1f;
+        if (up)
+            moveInput.y += 1f;
 
-            if (Input.GetKey(KeyCode.D))
-                moveInput.x += 1f;
+        if (down)
+            moveInput.y -= 1f;
 
-            if (Input.GetKey(KeyCode.A))
-                moveInput.x -= 1f;
+        if (right)
+            moveInput.x += 1f;
 
-            inputData.Buttons.Set((int)PlayerInputButton.Jump, Input.GetKey(KeyCode.Space));
-            inputData.Buttons.Set((int)PlayerInputButton.Sprint, Input.GetKey(KeyCode.LeftShift));
-            inputData.Buttons.Set(
-                (int)PlayerInputButton.Crouch,
-                Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
-            );
-        }
+        if (left)
+            moveInput.x -= 1f;
 
         inputData.MoveInput = Vector2.ClampMagnitude(moveInput, 1f);
+        inputData.Buttons.Set((int)PlayerInputButton.Jump, jump);
+        inputData.Buttons.Set((int)PlayerInputButton.Sprint, sprint);
+        inputData.Buttons.Set((int)PlayerInputButton.Crouch, crouch);
+
         input.Set(inputData);
     }
 
