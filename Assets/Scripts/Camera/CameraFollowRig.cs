@@ -137,6 +137,13 @@ public class CameraFollowRig : MonoBehaviour
 
     private void HandleCursorState()
     {
+        if (PauseMenuManager.IsPaused)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            return;
+        }
+
         if (unlockCursorWithEscape && IsEscapePressed())
         {
             Cursor.lockState = CursorLockMode.None;
@@ -149,6 +156,9 @@ public class CameraFollowRig : MonoBehaviour
 
     private void HandleMouseLook()
     {
+        if (PauseMenuManager.IsPaused)
+            return;
+
         if (Cursor.lockState != CursorLockMode.Locked)
             return;
 
