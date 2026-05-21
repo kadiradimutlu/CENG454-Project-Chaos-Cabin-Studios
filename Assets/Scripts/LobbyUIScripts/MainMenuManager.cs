@@ -52,6 +52,16 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private TextMeshProUGUI player3ReadyButtonText;
     [SerializeField] private TextMeshProUGUI player4ReadyButtonText;
 
+    [Header("Lobby - Role Selection Per Slot")]
+    [Tooltip("Size 4. Element 0 = Player 1 Runner button, Element 1 = Player 2 Runner button, etc.")]
+    [SerializeField] private Button[] runnerRoleButtons;
+
+    [Tooltip("Size 4. Element 0 = Player 1 Trapper button, Element 1 = Player 2 Trapper button, etc.")]
+    [SerializeField] private Button[] trapperRoleButtons;
+
+    [Tooltip("Optional. Size 4. Shows selected role text for each lobby slot.")]
+    [SerializeField] private TextMeshProUGUI[] roleInfoTexts;
+
     [Header("Lobby - Skin Selection")]
     [SerializeField] private Button[] previousSkinButtons;
     [SerializeField] private Button[] nextSkinButtons;
@@ -90,6 +100,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         EnsureRunnerHandler();
         SetupSkinSelectionButtons();
+        SetupRoleSelectionButtons();
 
         SetGameplayView(false);
         ResetCopyRoomCodeButtonText();
@@ -402,6 +413,51 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             return;
 
         _lobbyState.RPC_ToggleReady();
+    }
+
+
+    private void SetupRoleSelectionButtons()
+    {
+        SetupRoleButtonArray(runnerRoleButtons, RoleHandler.PlayerRole.Runner);
+        SetupRoleButtonArray(trapperRoleButtons, RoleHandler.PlayerRole.Trapper);
+    }
+
+    private void SetupRoleButtonArray(Button[] buttons, RoleHandler.PlayerRole role)
+    {
+        if (buttons == null)
+            return;
+
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            int slotIndex = i;
+
+            if (buttons[i] == null)
+                continue;
+
+            buttons[i].onClick.RemoveAllListeners();
+            buttons[i].onClick.AddListener(() => ClickSelectRoleForSlot(slotIndex, role));
+        }
+    }
+
+    private void ClickSelectRoleForSlot(int slotIndex, RoleHandler.PlayerRole role)
+    {
+        if (_isLeavingLobby || _isStartingFusion)
+            return;
+
+        if (_runner == null || !IsLobbyStateAlive())
+            return;
+
+        if (_lobbyState.GameStarted)
+            return;
+
+        int localSlotIndex = _lobbyState.GetPlayerSlotIndex(_runner.LocalPlayer);
+
+        // Her oyuncu sadece kendi slotundaki Runner/Trapper butonlarını kullanabilir.
+        if (localSlotIndex != slotIndex)
+            return;
+
+        _lobbyState.RPC_SelectRole((int)role);
+        RefreshLobbyUI();
     }
 
     private void SetupSkinSelectionButtons()
@@ -801,7 +857,8 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (player3ReadyButtonText) player3ReadyButtonText.text = "Ready";
         if (player4ReadyButtonText) player4ReadyButtonText.text = "Ready";
 
-        ClearSkinSelectionUI();
+        // Do not clear/re-enable slot UI every refresh.
+        // Clearing here causes role/skin buttons to flicker because RefreshLobbyUI runs repeatedly.
 
         if (roomCodeText != null)
         {
@@ -819,6 +876,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (_runner == null || !IsLobbyStateAlive())
         {
+            ClearSkinSelectionUI();
+            ClearRoleSelectionUI();
+
             if (startButton != null)
             {
                 startButton.gameObject.SetActive(false);
@@ -867,6 +927,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         int localSlotIndex = _lobbyState.GetPlayerSlotIndex(_runner.LocalPlayer);
 
         RefreshSkinSelectionUI(slots, localSlotIndex);
+        RefreshRoleSelectionUI(localSlotIndex);
 
         _localReady = _lobbyState.GetPlayerReady(_runner.LocalPlayer);
 
@@ -905,6 +966,101 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
             startButton.gameObject.SetActive(isHostForStart);
             startButton.interactable = isHostForStart && canStartGame;
+        }
+    }
+
+
+    private void RefreshRoleSelectionUI(int localSlotIndex)
+    {
+        LobbyState.LobbySlotData[] slots = IsLobbyStateAlive()
+            ? _lobbyState.GetSlots()
+            : null;
+
+        for (int i = 0; i < 4; i++)
+        {
+            bool slotExists = slots != null && i < slots.Length;
+            bool slotHasPlayer = slotExists && slots[i].HasPlayer;
+            bool isLocalSlot = i == localSlotIndex;
+            bool canChooseThisSlot = _runner != null &&
+                                     IsLobbyStateAlive() &&
+                                     !_lobbyState.GameStarted &&
+                                     slotHasPlayer &&
+                                     isLocalSlot;
+
+            RoleHandler.PlayerRole slotRole = slotExists
+                ? slots[i].Role
+                : RoleHandler.PlayerRole.None;
+
+            Button runnerButton = GetArrayItem(runnerRoleButtons, i);
+            if (runnerButton != null)
+            {
+                runnerButton.gameObject.SetActive(slotHasPlayer);
+                runnerButton.interactable = canChooseThisSlot && slotRole != RoleHandler.PlayerRole.Runner;
+            }
+
+            Button trapperButton = GetArrayItem(trapperRoleButtons, i);
+            if (trapperButton != null)
+            {
+                trapperButton.gameObject.SetActive(slotHasPlayer);
+                trapperButton.interactable = canChooseThisSlot && slotRole != RoleHandler.PlayerRole.Trapper;
+            }
+
+            TextMeshProUGUI roleInfoText = GetArrayItem(roleInfoTexts, i);
+            if (roleInfoText != null)
+            {
+                roleInfoText.gameObject.SetActive(slotHasPlayer);
+
+                if (slotHasPlayer)
+                {
+                    string roleName = slotRole == RoleHandler.PlayerRole.None
+                        ? "No Role"
+                        : slots[i].RoleName;
+
+                    roleInfoText.text = $"Role: {roleName}";
+                }
+                else
+                {
+                    roleInfoText.text = string.Empty;
+                }
+            }
+        }
+    }
+
+    private T GetArrayItem<T>(T[] array, int index) where T : class
+    {
+        if (array == null)
+            return null;
+
+        if (index < 0 || index >= array.Length)
+            return null;
+
+        return array[index];
+    }
+
+    private void ClearRoleSelectionUI()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            Button runnerButton = GetArrayItem(runnerRoleButtons, i);
+            if (runnerButton != null)
+            {
+                runnerButton.gameObject.SetActive(false);
+                runnerButton.interactable = false;
+            }
+
+            Button trapperButton = GetArrayItem(trapperRoleButtons, i);
+            if (trapperButton != null)
+            {
+                trapperButton.gameObject.SetActive(false);
+                trapperButton.interactable = false;
+            }
+
+            TextMeshProUGUI roleInfoText = GetArrayItem(roleInfoTexts, i);
+            if (roleInfoText != null)
+            {
+                roleInfoText.text = string.Empty;
+                roleInfoText.gameObject.SetActive(false);
+            }
         }
     }
 
