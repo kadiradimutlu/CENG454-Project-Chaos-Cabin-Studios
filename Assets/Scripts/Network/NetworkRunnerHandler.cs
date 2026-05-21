@@ -205,10 +205,10 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         bool crouch = false;
 
 #if ENABLE_LEGACY_INPUT_MANAGER
-        up = up || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
-        down = down || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow);
-        left = left || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
-        right = right || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
+        up = up || Input.GetKey(KeyCode.W);
+        down = down || Input.GetKey(KeyCode.S);
+        left = left || Input.GetKey(KeyCode.A);
+        right = right || Input.GetKey(KeyCode.D);
         jump = jump || Input.GetKey(KeyCode.Space);
         sprint = sprint || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
         crouch = crouch || Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
@@ -219,10 +219,10 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
 
         if (keyboard != null)
         {
-            up = up || keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed;
-            down = down || keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed;
-            left = left || keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed;
-            right = right || keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed;
+            up = up || keyboard.wKey.isPressed;
+            down = down || keyboard.sKey.isPressed;
+            left = left || keyboard.aKey.isPressed;
+            right = right || keyboard.dKey.isPressed;
             jump = jump || keyboard.spaceKey.isPressed;
             sprint = sprint || keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
             crouch = crouch || keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed;
