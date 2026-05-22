@@ -1013,7 +1013,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
                 if (slotHasPlayer)
                 {
                     string roleName = slotRole == RoleHandler.PlayerRole.None
-                        ? "No Role"
+                        ? "Choose"
                         : slots[i].RoleName;
 
                     roleInfoText.text = $"Role: {roleName}";

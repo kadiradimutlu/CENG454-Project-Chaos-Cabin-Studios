@@ -498,7 +498,7 @@ public class LobbyState : NetworkBehaviour
             return string.Empty;
 
         string roleText = role == RoleHandler.PlayerRole.None
-            ? "No Role"
+            ? "Choose"
             : GetRoleDisplayName(role);
 
         if (isHost)
@@ -563,7 +563,7 @@ public class LobbyState : NetworkBehaviour
             case RoleHandler.PlayerRole.Trapper:
                 return "Trapper";
             default:
-                return "No Role";
+                return "Choose";
         }
     }
 
