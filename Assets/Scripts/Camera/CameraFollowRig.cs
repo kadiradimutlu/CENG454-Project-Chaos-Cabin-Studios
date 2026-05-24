@@ -36,6 +36,7 @@ public class CameraFollowRig : MonoBehaviour
     private bool hasTarget;
     private float yaw;
     private float pitch = 18f;
+    private float mouseSensitivityMultiplier = SettingsManager.DefaultMouseSensitivity;
 
     public float CurrentYaw => yaw;
 
@@ -85,10 +86,23 @@ public class CameraFollowRig : MonoBehaviour
         Debug.Log($"CameraFollowRig: target assigned -> {target.name}");
     }
 
+    private void OnEnable()
+    {
+        mouseSensitivityMultiplier = SettingsManager.MouseSensitivity;
+        SettingsManager.MouseSensitivityChanged += HandleMouseSensitivityChanged;
+    }
+
     private void OnDisable()
     {
         if (LocalRig == this)
             LocalRig = null;
+
+        SettingsManager.MouseSensitivityChanged -= HandleMouseSensitivityChanged;
+    }
+
+    private void HandleMouseSensitivityChanged(float value)
+    {
+        mouseSensitivityMultiplier = value;
     }
 
     private void OnDestroy()
@@ -167,10 +181,12 @@ public class CameraFollowRig : MonoBehaviour
         if (mouseDelta.sqrMagnitude <= 0.001f)
             return;
 
-        yaw += mouseDelta.x * mouseSensitivityX;
+        float sensitivity = Mathf.Max(0.01f, mouseSensitivityMultiplier);
+
+        yaw += mouseDelta.x * mouseSensitivityX * sensitivity;
 
         float yDirection = invertY ? 1f : -1f;
-        pitch += mouseDelta.y * mouseSensitivityY * yDirection;
+        pitch += mouseDelta.y * mouseSensitivityY * yDirection * sensitivity;
         pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
     }
 
