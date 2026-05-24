@@ -1,26 +1,27 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Fusion;
+using UnityEngine.SceneManagement;
 using Fusion.Sockets;
 using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
-
+ 
 [RequireComponent(typeof(NetworkRunner))]
 [RequireComponent(typeof(NetworkSceneManagerDefault))]
 public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
 {
     public static NetworkRunnerHandler Instance { get; private set; }
-
+ 
     private NetworkRunner _networkRunner;
     private NetworkSceneManagerDefault _sceneManager;
     private MainMenuManager _mainMenuManager;
-
+ 
     private bool _selfCallbacksAdded = false;
     private bool _mainMenuCallbacksAdded = false;
     private bool _hasBeenStarted = false;
     private bool _isShuttingDown = false;
-
+ 
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -28,13 +29,13 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             Destroy(gameObject);
             return;
         }
-
+ 
         Instance = this;
-
+ 
         CacheReferences();
         SetupRunner();
     }
-
+ 
     private void OnDestroy()
     {
         if (_networkRunner != null && _selfCallbacksAdded)
@@ -42,23 +43,23 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             _networkRunner.RemoveCallbacks(this);
             _selfCallbacksAdded = false;
         }
-
+ 
         if (Instance == this)
             Instance = null;
     }
-
+ 
     private void CacheReferences()
     {
         if (_networkRunner == null)
             _networkRunner = GetComponent<NetworkRunner>();
-
+ 
         if (_sceneManager == null)
             _sceneManager = GetComponent<NetworkSceneManagerDefault>();
-
+ 
         if (_mainMenuManager == null)
             _mainMenuManager = FindObjectOfType<MainMenuManager>();
     }
-
+ 
     private void SetupRunner()
     {
         if (_networkRunner == null)
@@ -66,32 +67,32 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             Debug.LogError("NetworkRunner bulunamadı.");
             return;
         }
-
+ 
         if (_sceneManager == null)
         {
             Debug.LogError("NetworkSceneManagerDefault bulunamadı.");
             return;
         }
-
+ 
         _networkRunner.ProvideInput = true;
-
+ 
         if (!_selfCallbacksAdded)
         {
             _networkRunner.AddCallbacks(this);
             _selfCallbacksAdded = true;
         }
-
+ 
         TryRegisterMainMenuCallbacks();
     }
-
+ 
     private void TryRegisterMainMenuCallbacks()
     {
         if (_networkRunner == null)
             return;
-
+ 
         if (_mainMenuManager == null)
             _mainMenuManager = FindObjectOfType<MainMenuManager>();
-
+ 
         if (_mainMenuManager != null && !_mainMenuCallbacksAdded)
         {
             _networkRunner.AddCallbacks(_mainMenuManager);
@@ -99,54 +100,62 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             Debug.Log("MainMenuManager callback olarak NetworkRunner'a eklendi.");
         }
     }
-
+ 
     public NetworkRunner GetRunner()
     {
         CacheReferences();
         SetupRunner();
-
+ 
         return _networkRunner;
     }
-
+ 
     public bool IsReusable()
     {
         return _networkRunner != null && !_hasBeenStarted && !_isShuttingDown;
     }
-
+ 
     public async Task<StartGameResult> StartGame(GameMode mode, string roomName)
     {
         CacheReferences();
         SetupRunner();
-
+ 
         if (_networkRunner == null)
         {
             Debug.LogError("NetworkRunner bulunamadı.");
             return default;
         }
-
+ 
         if (_sceneManager == null)
         {
             Debug.LogError("NetworkSceneManagerDefault bulunamadı.");
             return default;
         }
-
+ 
         if (_hasBeenStarted)
         {
             Debug.LogWarning("Bu NetworkRunner daha önce kullanıldı. Yeni instance oluşturulmalı.");
             return default;
         }
-
+ 
         _networkRunner.ProvideInput = true;
         TryRegisterMainMenuCallbacks();
-
+ 
+        // FIX: aktif sahnenin Fusion tarafından "yüklenmiş" sayılması için Scene parametresi
+        // veriyoruz. Bu olmadan sahnedeki sabit NetworkObject'ler (butonlar, trap pack'leri)
+        // attach edilmez ve Object null kalır -> RPC çalışmaz. Scene verilince Fusion sahne
+        // objelerini Master Client'ta attach edip NetworkId'lerini diğer client'lara dağıtır.
+        int activeSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneRef sceneRef = activeSceneIndex >= 0 ? SceneRef.FromIndex(activeSceneIndex) : default;
+ 
         StartGameResult result = await _networkRunner.StartGame(new StartGameArgs()
         {
             GameMode = mode,
             SessionName = roomName,
             SceneManager = _sceneManager,
+            Scene = sceneRef,
             PlayerCount = 4
         });
-
+ 
         if (result.Ok)
         {
             _hasBeenStarted = true;
@@ -156,20 +165,20 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         {
             Debug.LogError($"StartGame başarısız: {result.ShutdownReason}");
         }
-
+ 
         return result;
     }
-
+ 
     public async Task ShutdownRunner()
     {
         if (_networkRunner == null)
             return;
-
+ 
         if (_isShuttingDown)
             return;
-
+ 
         _isShuttingDown = true;
-
+ 
         try
         {
             if (!_networkRunner.IsShutdown)
@@ -180,22 +189,22 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             Debug.LogError($"ShutdownRunner hata verdi: {ex.Message}");
         }
     }
-
+ 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         Debug.Log($"Player joined: {player}");
     }
-
+ 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         Debug.Log($"Player left: {player}");
     }
-
+ 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         PlayerNetworkInputData inputData = new PlayerNetworkInputData();
         Vector2 moveInput = Vector2.zero;
-
+ 
         bool up = false;
         bool down = false;
         bool left = false;
@@ -203,7 +212,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         bool jump = false;
         bool sprint = false;
         bool crouch = false;
-
+ 
 #if ENABLE_LEGACY_INPUT_MANAGER
         up = up || Input.GetKey(KeyCode.W);
         down = down || Input.GetKey(KeyCode.S);
@@ -213,10 +222,10 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
         sprint = sprint || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
         crouch = crouch || Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
 #endif
-
+ 
 #if ENABLE_INPUT_SYSTEM
         Keyboard keyboard = Keyboard.current;
-
+ 
         if (keyboard != null)
         {
             up = up || keyboard.wKey.isPressed;
@@ -228,77 +237,77 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             crouch = crouch || keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed;
         }
 #endif
-
+ 
         if (up)
             moveInput.y += 1f;
-
+ 
         if (down)
             moveInput.y -= 1f;
-
+ 
         if (right)
             moveInput.x += 1f;
-
+ 
         if (left)
             moveInput.x -= 1f;
-
+ 
         inputData.MoveInput = Vector2.ClampMagnitude(moveInput, 1f);
         inputData.Buttons.Set((int)PlayerInputButton.Jump, jump);
         inputData.Buttons.Set((int)PlayerInputButton.Sprint, sprint);
         inputData.Buttons.Set((int)PlayerInputButton.Crouch, crouch);
-
+ 
         if (CameraFollowRig.TryGetLocalYaw(out float cameraYaw))
             inputData.CameraYaw = cameraYaw;
         else
             inputData.CameraYaw = 0f;
-
+ 
         input.Set(inputData);
     }
-
+ 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
     {
         input.Set(new PlayerNetworkInputData());
     }
-
+ 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         Debug.Log($"Runner shutdown: {shutdownReason}");
-
+ 
         _isShuttingDown = false;
         _selfCallbacksAdded = false;
         _mainMenuCallbacksAdded = false;
     }
-
+ 
     public void OnConnectedToServer(NetworkRunner runner)
     {
         Debug.Log("Connected to server.");
     }
-
+ 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
         Debug.Log($"Disconnected from server: {reason}");
     }
-
+ 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
-
+ 
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
-
+ 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-
+ 
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
-
+ 
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-
+ 
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-
+ 
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
-
+ 
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
-
+ 
     public void OnSceneLoadDone(NetworkRunner runner) { }
-
+ 
     public void OnSceneLoadStart(NetworkRunner runner) { }
-
+ 
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-
+ 
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
 }
