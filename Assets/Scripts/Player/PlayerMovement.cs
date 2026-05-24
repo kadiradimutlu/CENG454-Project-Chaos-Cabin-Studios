@@ -34,6 +34,11 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Player Collision")]
     [SerializeField] private bool ignorePlayerToPlayerCollision = true;
 
+    [Header("Obstacle Collision")]
+    [SerializeField] private LayerMask obstacleMask = ~0;
+    [SerializeField] private float obstacleSkin = 0.04f;
+    [SerializeField] private bool slideAlongObstacles = true;
+
     [Networked] public Vector2 NetMoveInput { get; private set; }
     [Networked] public float NetSpeed01 { get; private set; }
     [Networked] public NetworkBool NetGrounded { get; private set; }
@@ -201,8 +206,9 @@ public class PlayerMovement : NetworkBehaviour
         verticalVelocity += gravity * deltaTime;
 
         Vector3 horizontalVelocity = moveDirection * speed;
-        Vector3 velocity = new Vector3(horizontalVelocity.x, verticalVelocity, horizontalVelocity.z);
-        Vector3 nextPosition = transform.position + velocity * deltaTime;
+        Vector3 horizontalStep = new Vector3(horizontalVelocity.x, 0f, horizontalVelocity.z) * deltaTime;
+        Vector3 nextPosition = ResolveHorizontalMovement(transform.position, horizontalStep);
+        nextPosition.y += verticalVelocity * deltaTime;
 
         if (jumpGroundIgnoreTimer <= 0f && verticalVelocity <= 0f && CheckGround(nextPosition, out RaycastHit snapHit))
         {
@@ -315,6 +321,116 @@ public class PlayerMovement : NetworkBehaviour
             crouching ? crouchingCapsuleCenterY : standingCapsuleCenterY,
             0f
         );
+    }
+
+
+    private Vector3 ResolveHorizontalMovement(Vector3 startPosition, Vector3 horizontalStep)
+    {
+        if (horizontalStep.sqrMagnitude <= 0.000001f || capsule == null)
+            return startPosition + horizontalStep;
+
+        Vector3 direction = horizontalStep.normalized;
+        float distance = horizontalStep.magnitude;
+
+        if (!CastObstacle(startPosition, direction, distance + obstacleSkin, out RaycastHit hit))
+            return startPosition + horizontalStep;
+
+        float allowedDistance = Mathf.Max(0f, hit.distance - obstacleSkin);
+        Vector3 result = startPosition + direction * Mathf.Min(allowedDistance, distance);
+
+        if (!slideAlongObstacles)
+            return result;
+
+        Vector3 remainingStep = horizontalStep - direction * allowedDistance;
+        Vector3 slideStep = Vector3.ProjectOnPlane(remainingStep, hit.normal);
+        slideStep.y = 0f;
+
+        if (slideStep.sqrMagnitude <= 0.000001f)
+            return result;
+
+        Vector3 slideDirection = slideStep.normalized;
+        float slideDistance = slideStep.magnitude;
+
+        if (CastObstacle(result, slideDirection, slideDistance + obstacleSkin, out RaycastHit slideHit))
+        {
+            float slideAllowed = Mathf.Max(0f, slideHit.distance - obstacleSkin);
+            result += slideDirection * Mathf.Min(slideAllowed, slideDistance);
+        }
+        else
+        {
+            result += slideStep;
+        }
+
+        return result;
+    }
+
+    private bool CastObstacle(Vector3 rootPosition, Vector3 direction, float distance, out RaycastHit closestHit)
+    {
+        closestHit = default;
+
+        if (capsule == null || distance <= 0f)
+            return false;
+
+        int effectiveObstacleMask = obstacleMask.value == 0 ? ~0 : obstacleMask.value;
+        GetCapsuleCastPoints(rootPosition, out Vector3 bottom, out Vector3 top, out float radius);
+
+        RaycastHit[] hits = Physics.CapsuleCastAll(
+            bottom,
+            top,
+            radius,
+            direction,
+            distance,
+            effectiveObstacleMask,
+            QueryTriggerInteraction.Ignore
+        );
+
+        bool found = false;
+        float bestDistance = float.MaxValue;
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            RaycastHit hit = hits[i];
+
+            if (ShouldIgnoreObstacleHit(hit))
+                continue;
+
+            if (hit.distance < bestDistance)
+            {
+                bestDistance = hit.distance;
+                closestHit = hit;
+                found = true;
+            }
+        }
+
+        return found;
+    }
+
+    private void GetCapsuleCastPoints(Vector3 rootPosition, out Vector3 bottom, out Vector3 top, out float radius)
+    {
+        radius = Mathf.Max(0.05f, capsule.radius * 0.92f);
+        Vector3 center = rootPosition + capsule.center;
+        float halfHeight = Mathf.Max(capsule.height * 0.5f, radius);
+        float pointOffset = Mathf.Max(0f, halfHeight - radius);
+
+        bottom = center + Vector3.down * pointOffset + Vector3.up * 0.06f;
+        top = center + Vector3.up * pointOffset;
+    }
+
+    private bool ShouldIgnoreObstacleHit(RaycastHit hit)
+    {
+        if (hit.collider == null)
+            return true;
+
+        if (hit.collider == capsule || hit.collider.transform.IsChildOf(transform))
+            return true;
+
+        if (hit.collider.GetComponentInParent<PlayerMovement>() != null)
+            return true;
+
+        if (hit.normal.y > 0.65f)
+            return true;
+
+        return false;
     }
 
 
