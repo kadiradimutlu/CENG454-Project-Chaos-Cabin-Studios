@@ -160,6 +160,7 @@ GameObject:
   - component: {fileID: 4736110249863798448}
   - component: {fileID: 3589316290187259848}
   - component: {fileID: 6001041684308089228}
+  - component: {fileID: 2849667779660718462}
   m_Layer: 0
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -291,6 +292,7 @@ MonoBehaviour:
   - {fileID: -2987654311209876543}
   - {fileID: 4736110249863798448}
   - {fileID: 6001041684308089228}
+  - {fileID: 2849667779660718462}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2796955079069592424
 MonoBehaviour:
@@ -363,6 +365,7 @@ MonoBehaviour:
     _value: 0
   _NetSprinting:
     _value: 0
+  _SpeedMultiplier: 0
 --- !u!54 &265149033449573497
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -502,6 +505,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RoleHandler
   playerMovement: {fileID: 0}
   _currentRole: 0
+--- !u!114 &2849667779660718462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3600554267242463573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8bc5b1d70e9491ea7dfbb6fbef7a3c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDamageFeedback
+  playerHealth: {fileID: -2987654311209876543}
+  visualRoot: {fileID: 0}
+  audioSource: {fileID: 0}
+  damageClip: {fileID: 0}
+  eliminationClip: {fileID: 0}
+  damageFlashColor: {r: 1, g: 0.15, b: 0.1, a: 1}
+  eliminationFlashColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  damageFlashDuration: 0.12
+  eliminationFlashDuration: 0.35
 --- !u!1 &5535873060997195435
 GameObject:
   m_ObjectHideFlags: 0
