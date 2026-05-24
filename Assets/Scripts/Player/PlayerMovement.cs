@@ -56,6 +56,12 @@ public class PlayerMovement : NetworkBehaviour
     [Networked] private float JumpGroundIgnoreTimer { get; set; }
     [Networked] private NetworkButtons PreviousButtons { get; set; }
 
+    // --- Slow / speed modifier (server-authoritative, tick based) ---
+    // SpeedMultiplier 1 = normal. < 1 = slowed. Replicated to all peers.
+    [Networked] public float SpeedMultiplier { get; private set; }
+    // The network tick at which the active slow expires. 0 = no active slow.
+    [Networked] private int SlowExpiryTick { get; set; }
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -89,6 +95,8 @@ public class PlayerMovement : NetworkBehaviour
             VerticalVelocity = groundedGravity;
             JumpGroundIgnoreTimer = 0f;
             PreviousButtons = default;
+            SpeedMultiplier = 1f;
+            SlowExpiryTick = 0;
         }
 
         SetupCollider(false);
@@ -119,6 +127,15 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         float deltaTime = Runner.DeltaTime;
+
+        // Expire an active slow once its tick deadline has passed (StateAuthority only).
+        // Tick-based instead of a timer/coroutine so the effect self-clears even if the
+        // trap that applied it is destroyed -> no "permanent slow" bug.
+        if (HasStateAuthority && SlowExpiryTick != 0 && Runner.Tick >= SlowExpiryTick)
+        {
+            SpeedMultiplier = 1f;
+            SlowExpiryTick = 0;
+        }
 
         float verticalVelocity = VerticalVelocity;
         float jumpGroundIgnoreTimer = JumpGroundIgnoreTimer;
@@ -172,6 +189,10 @@ public class PlayerMovement : NetworkBehaviour
             speed = sprintSpeed;
         else if (crouching)
             speed = crouchSpeed;
+
+        // Apply slow / speed modifier. Clamp guards against an uninitialized 0 multiplier
+        // (which would freeze the player) and against absurd values.
+        speed *= Mathf.Clamp(SpeedMultiplier <= 0f ? 1f : SpeedMultiplier, 0.05f, 1f);
 
         Vector3 moveDirection = isMovementAllowed
             ? GetCameraRelativeMoveDirection(moveInput, inputData.CameraYaw)
@@ -453,6 +474,8 @@ public class PlayerMovement : NetworkBehaviour
         VerticalVelocity = groundedGravity;
         JumpGroundIgnoreTimer = 0f;
         PreviousButtons = default;
+        SpeedMultiplier = 1f;
+        SlowExpiryTick = 0;
 
         CurrentMoveInput = Vector2.zero;
         CurrentSpeed01 = 0f;
@@ -474,6 +497,36 @@ public class PlayerMovement : NetworkBehaviour
     public void SetMovementAllowed(bool value)
     {
         isMovementAllowed = value;
+    }
+
+    
+    public void ApplySlow(float multiplier, float duration)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        multiplier = Mathf.Clamp(multiplier, 0.05f, 1f);
+        duration = Mathf.Max(0f, duration);
+
+        if (duration <= 0f)
+            return;
+
+        
+        float effective = SpeedMultiplier <= 0f ? 1f : SpeedMultiplier;
+        SpeedMultiplier = (SlowExpiryTick != 0) ? Mathf.Min(effective, multiplier) : multiplier;
+
+        int durationTicks = Mathf.CeilToInt(duration / Runner.DeltaTime);
+        SlowExpiryTick = Runner.Tick + durationTicks;
+    }
+
+    
+    public void ClearSlow()
+    {
+        if (!HasStateAuthority)
+            return;
+
+        SpeedMultiplier = 1f;
+        SlowExpiryTick = 0;
     }
 }
 
