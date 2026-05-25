@@ -96,6 +96,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     private bool _isLeavingLobby = false;
     private bool _isStartingFusion = false;
 
+    private RoleHandler.PlayerRole _cachedHostRole = RoleHandler.PlayerRole.None;
+    private int _cachedHostSkinIndex = 0;
+
     private void Awake()
     {
         EnsureRunnerHandler();
@@ -106,6 +109,12 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         ResetCopyRoomCodeButtonText();
         OpenPanel(mainMenuPanel);
         RefreshLobbyUI();
+    }
+
+    private void OnEnable()
+    {
+        SetupSkinSelectionButtons();
+        SetupRoleSelectionButtons();
     }
 
     private void Update()
@@ -229,6 +238,277 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     private bool IsLobbyStateAlive()
     {
         return _lobbyState != null;
+    }
+
+    private bool IsLocalHostRunnerReady()
+    {
+        return _runner != null && _runner.IsServer;
+    }
+
+    private int GetLocalSkinCount()
+    {
+        CharacterSkinDatabase database = CharacterSkinDatabase.Instance;
+
+        if (database == null)
+            return 4;
+
+        return Mathf.Max(1, database.SkinCount);
+    }
+
+    private int NormalizeLocalSkinIndex(int skinIndex)
+    {
+        int skinCount = GetLocalSkinCount();
+
+        if (skinIndex < 0)
+            return skinCount - 1;
+
+        if (skinIndex >= skinCount)
+            return 0;
+
+        return skinIndex;
+    }
+
+    private string GetLocalSkinName(int skinIndex)
+    {
+        CharacterSkinDatabase database = CharacterSkinDatabase.Instance;
+
+        if (database == null)
+            return $"Skin {skinIndex + 1}";
+
+        return database.GetSkinName(skinIndex);
+    }
+
+    private string GetLocalRoleName(RoleHandler.PlayerRole role)
+    {
+        if (role == RoleHandler.PlayerRole.Runner)
+            return "Runner";
+
+        if (role == RoleHandler.PlayerRole.Trapper)
+            return "Trapper";
+
+        return "Choose";
+    }
+
+    private void ApplyCachedHostLoadoutToLobbyState()
+    {
+        if (!IsLocalHostRunnerReady() || !IsLobbyStateAlive())
+            return;
+
+        if (_cachedHostRole != RoleHandler.PlayerRole.None)
+            _lobbyState.SetSlotRoleServerByIndex(0, _cachedHostRole);
+
+        LobbyState.LobbySlotData[] slots = _lobbyState.GetSlots();
+
+        if (slots != null && slots.Length > 0)
+        {
+            int currentSkin = slots[0].SkinIndex;
+            int guard = 0;
+
+            while (currentSkin != _cachedHostSkinIndex && guard < GetLocalSkinCount() + 2)
+            {
+                _lobbyState.ChangeSlotSkinServerByIndex(0, 1);
+                slots = _lobbyState.GetSlots();
+                currentSkin = slots[0].SkinIndex;
+                guard++;
+            }
+        }
+    }
+
+    private bool HandleHostSlotRoleClick(int slotIndex, RoleHandler.PlayerRole role)
+    {
+        if (slotIndex != 0 || !IsLocalHostRunnerReady())
+            return false;
+
+        if (IsLobbyStateAlive() && _lobbyState.GameStarted)
+            return true;
+
+        _cachedHostRole = role;
+
+        if (IsLobbyStateAlive())
+            _lobbyState.SetSlotRoleServerByIndex(0, role);
+
+        RefreshLobbyUI();
+        return true;
+    }
+
+    private bool HandleHostSlotSkinClick(int slotIndex, int direction)
+    {
+        if (slotIndex != 0 || !IsLocalHostRunnerReady())
+            return false;
+
+        if (IsLobbyStateAlive() && _lobbyState.GameStarted)
+            return true;
+
+        direction = direction < 0 ? -1 : 1;
+        _cachedHostSkinIndex = NormalizeLocalSkinIndex(_cachedHostSkinIndex + direction);
+
+        if (IsLobbyStateAlive())
+            _lobbyState.ChangeSlotSkinServerByIndex(0, direction);
+
+        RefreshLobbyUI();
+        return true;
+    }
+
+    private bool RefreshHostOnlyLobbyFallback()
+    {
+        if (!IsLocalHostRunnerReady())
+            return false;
+
+        if (player1NameText) player1NameText.text = "Player 1 (Host)";
+        SetStatusText(player1StatusText, $"Host | {GetLocalRoleName(_cachedHostRole)}");
+
+        if (roomCodeText != null)
+        {
+            roomCodeText.text = string.IsNullOrEmpty(_currentRoomCode)
+                ? "Room Code: ------"
+                : $"Room Code: {_currentRoomCode}";
+        }
+
+        if (startButton != null)
+        {
+            startButton.gameObject.SetActive(true);
+            startButton.interactable = false;
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            bool isHostSlot = i == 0;
+
+            Button runnerButton = GetArrayItem(runnerRoleButtons, i);
+            if (runnerButton != null)
+            {
+                runnerButton.gameObject.SetActive(isHostSlot);
+                runnerButton.interactable = isHostSlot && _cachedHostRole != RoleHandler.PlayerRole.Runner;
+            }
+
+            Button trapperButton = GetArrayItem(trapperRoleButtons, i);
+            if (trapperButton != null)
+            {
+                trapperButton.gameObject.SetActive(isHostSlot);
+                trapperButton.interactable = isHostSlot && _cachedHostRole != RoleHandler.PlayerRole.Trapper;
+            }
+
+            TextMeshProUGUI roleInfoText = GetArrayItem(roleInfoTexts, i);
+            if (roleInfoText != null)
+            {
+                roleInfoText.gameObject.SetActive(isHostSlot);
+                roleInfoText.text = isHostSlot ? $"Role: {GetLocalRoleName(_cachedHostRole)}" : string.Empty;
+            }
+
+            bool showSkin = isHostSlot;
+
+            if (skinNameTexts != null && i < skinNameTexts.Length && skinNameTexts[i] != null)
+            {
+                skinNameTexts[i].gameObject.SetActive(showSkin);
+                skinNameTexts[i].text = showSkin ? GetLocalSkinName(_cachedHostSkinIndex) : string.Empty;
+            }
+
+            if (previousSkinButtons != null && i < previousSkinButtons.Length && previousSkinButtons[i] != null)
+            {
+                previousSkinButtons[i].gameObject.SetActive(showSkin);
+                previousSkinButtons[i].interactable = showSkin;
+            }
+
+            if (nextSkinButtons != null && i < nextSkinButtons.Length && nextSkinButtons[i] != null)
+            {
+                nextSkinButtons[i].gameObject.SetActive(showSkin);
+                nextSkinButtons[i].interactable = showSkin;
+            }
+
+            LobbyCharacterPreview previewDisplay = GetCharacterPreviewDisplay(i);
+            if (previewDisplay != null)
+            {
+                if (!previewDisplay.gameObject.activeSelf)
+                    previewDisplay.gameObject.SetActive(true);
+
+                if (showSkin)
+                {
+                    previewDisplay.ShowCharacter(_cachedHostSkinIndex);
+                    previewDisplay.SetPreviewVisible(true);
+                }
+                else
+                {
+                    previewDisplay.ClearPreview();
+                    previewDisplay.SetPreviewVisible(false);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private bool TryGetLocalLobbyPlayer(out PlayerRef player)
+    {
+        player = default;
+
+        if (_runner == null)
+            return false;
+
+        if (_runner.LocalPlayer != default)
+        {
+            player = _runner.LocalPlayer;
+            return true;
+        }
+
+        if (_runner.IsServer)
+        {
+            foreach (PlayerRef activePlayer in _runner.ActivePlayers)
+            {
+                if (activePlayer != default)
+                {
+                    player = activePlayer;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void EnsureLocalHostAssignedToSlotOne()
+    {
+        if (_runner == null || !_runner.IsServer || !IsLobbyStateAlive())
+            return;
+
+        if (_lobbyState.GetSlotPlayer(0) != default)
+            return;
+
+        if (TryGetLocalLobbyPlayer(out PlayerRef hostPlayer))
+            _lobbyState.AssignPlayer(hostPlayer);
+    }
+
+    private int GetLocalLobbySlotIndex()
+    {
+        if (_runner == null || !IsLobbyStateAlive())
+            return -1;
+
+        EnsureLocalHostAssignedToSlotOne();
+
+        if (TryGetLocalLobbyPlayer(out PlayerRef localPlayer))
+        {
+            int slotIndex = _lobbyState.GetPlayerSlotIndex(localPlayer);
+
+            if (slotIndex >= 0)
+                return slotIndex;
+        }
+
+        if (_runner.IsServer)
+            return 0;
+
+        return -1;
+    }
+
+    private bool IsLocalLobbyHost()
+    {
+        if (_runner == null || !IsLobbyStateAlive())
+            return false;
+
+        EnsureLocalHostAssignedToSlotOne();
+
+        if (TryGetLocalLobbyPlayer(out PlayerRef localPlayer) && _lobbyState.IsHostPlayer(localPlayer))
+            return true;
+
+        return _runner.IsServer;
     }
 
     private void SafeClearLobbyState()
@@ -403,18 +683,46 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void ClickReady()
     {
-        if (_isLeavingLobby || _isStartingFusion)
+        if (_isLeavingLobby)
             return;
 
         if (_runner == null || !IsLobbyStateAlive())
             return;
 
-        if (_lobbyState.IsHostPlayer(_runner.LocalPlayer))
+        if (IsLocalLobbyHost())
+            return;
+
+        int localSlotIndex = GetLocalLobbySlotIndex();
+
+        if (localSlotIndex < 0)
+            return;
+
+        if (_lobbyState.GetSlots()[localSlotIndex].Role == RoleHandler.PlayerRole.None)
             return;
 
         _lobbyState.RPC_ToggleReady();
     }
 
+
+    public void ClickPlayer1Runner()
+    {
+        ClickSelectRoleForSlot(0, RoleHandler.PlayerRole.Runner);
+    }
+
+    public void ClickPlayer1Trapper()
+    {
+        ClickSelectRoleForSlot(0, RoleHandler.PlayerRole.Trapper);
+    }
+
+    public void ClickPlayer1PreviousSkin()
+    {
+        ClickChangeSkin(0, -1);
+    }
+
+    public void ClickPlayer1NextSkin()
+    {
+        ClickChangeSkin(0, 1);
+    }
 
     private void SetupRoleSelectionButtons()
     {
@@ -441,7 +749,10 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void ClickSelectRoleForSlot(int slotIndex, RoleHandler.PlayerRole role)
     {
-        if (_isLeavingLobby || _isStartingFusion)
+        if (_isLeavingLobby)
+            return;
+
+        if (HandleHostSlotRoleClick(slotIndex, role))
             return;
 
         if (_runner == null || !IsLobbyStateAlive())
@@ -450,10 +761,12 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (_lobbyState.GameStarted)
             return;
 
-        int localSlotIndex = _lobbyState.GetPlayerSlotIndex(_runner.LocalPlayer);
+        int localSlotIndex = GetLocalLobbySlotIndex();
 
-        // Her oyuncu sadece kendi slotundaki Runner/Trapper butonlarını kullanabilir.
         if (localSlotIndex != slotIndex)
+            return;
+
+        if (!_lobbyState.CanSlotEditLoadout(slotIndex))
             return;
 
         _lobbyState.RPC_SelectRole((int)role);
@@ -485,18 +798,28 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void ClickChangeSkin(int slotIndex, int direction)
     {
-        if (_isLeavingLobby || _isStartingFusion)
+        if (_isLeavingLobby)
+            return;
+
+        if (HandleHostSlotSkinClick(slotIndex, direction))
             return;
 
         if (_runner == null || !IsLobbyStateAlive())
             return;
 
-        int localSlotIndex = _lobbyState.GetPlayerSlotIndex(_runner.LocalPlayer);
+        if (_lobbyState.GameStarted)
+            return;
+
+        int localSlotIndex = GetLocalLobbySlotIndex();
 
         if (localSlotIndex != slotIndex)
             return;
 
+        if (!_lobbyState.CanSlotEditLoadout(slotIndex))
+            return;
+
         _lobbyState.RPC_ChangeSkin(direction);
+        RefreshLobbyUI();
     }
 
     public void ClickStartGame()
@@ -521,7 +844,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        bool isHost = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
+        bool isHost = IsLocalLobbyHost();
         bool canStart = _lobbyState.CanHostStartGame();
         int playerCount = _lobbyState.GetPlayerCount();
 
@@ -749,13 +1072,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (mode == GameMode.Host)
         {
             SpawnLobbyStateIfNeeded();
-
-            if (_lobbyState != null &&
-                _runner.LocalPlayer != default &&
-                !_lobbyState.ContainsPlayer(_runner.LocalPlayer))
-            {
-                _lobbyState.AssignPlayer(_runner.LocalPlayer);
-            }
+            EnsureLocalHostAssignedToSlotOne();
         }
 
         TryFindLobbyState();
@@ -774,9 +1091,10 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         _lobbyState = _runner.Spawn(lobbyStatePrefab, Vector3.zero, Quaternion.identity, null);
 
-        if (_lobbyState != null && _runner.LocalPlayer != default)
+        if (_lobbyState != null)
         {
-            _lobbyState.AssignPlayer(_runner.LocalPlayer);
+            EnsureLocalHostAssignedToSlotOne();
+            ApplyCachedHostLoadoutToLobbyState();
         }
     }
 
@@ -794,6 +1112,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             return;
 
         _lobbyState = state;
+        ApplyCachedHostLoadoutToLobbyState();
         RefreshLobbyUI();
     }
 
@@ -835,6 +1154,12 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             panel.SetActive(true);
 
         _currentPanel = panel;
+
+        if (panel == lobbyPanel)
+        {
+            SetupSkinSelectionButtons();
+            SetupRoleSelectionButtons();
+        }
     }
 
     private void RefreshLobbyUI()
@@ -874,7 +1199,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             copyRoomCodeButton.interactable = hasRoomCode;
         }
 
-        if (_runner == null || !IsLobbyStateAlive())
+        if (_runner == null)
         {
             ClearSkinSelectionUI();
             ClearRoleSelectionUI();
@@ -888,16 +1213,26 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        LobbyState.LobbySlotData[] slots = _lobbyState.GetSlots();
-
-        if (_runner.IsServer && _runner.LocalPlayer != default)
+        if (!IsLobbyStateAlive())
         {
-            if (!slots[0].HasPlayer)
+            if (RefreshHostOnlyLobbyFallback())
+                return;
+
+            ClearSkinSelectionUI();
+            ClearRoleSelectionUI();
+
+            if (startButton != null)
             {
-                _lobbyState.AssignPlayer(_runner.LocalPlayer);
-                slots = _lobbyState.GetSlots();
+                startButton.gameObject.SetActive(false);
+                startButton.interactable = false;
             }
+
+            return;
         }
+
+        EnsureLocalHostAssignedToSlotOne();
+        ApplyCachedHostLoadoutToLobbyState();
+        LobbyState.LobbySlotData[] slots = _lobbyState.GetSlots();
 
         if (slots.Length > 0)
         {
@@ -923,13 +1258,15 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             SetStatusText(player4StatusText, slots[3].StatusText);
         }
 
-        bool isHost = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
-        int localSlotIndex = _lobbyState.GetPlayerSlotIndex(_runner.LocalPlayer);
+        bool isHost = IsLocalLobbyHost();
+        int localSlotIndex = GetLocalLobbySlotIndex();
 
         RefreshSkinSelectionUI(slots, localSlotIndex);
         RefreshRoleSelectionUI(localSlotIndex);
 
-        _localReady = _lobbyState.GetPlayerReady(_runner.LocalPlayer);
+        _localReady = false;
+        if (TryGetLocalLobbyPlayer(out PlayerRef localLobbyPlayer))
+            _localReady = _lobbyState.GetPlayerReady(localLobbyPlayer);
 
         if (!isHost)
         {
@@ -961,7 +1298,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (startButton != null)
         {
-            bool isHostForStart = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
+            bool isHostForStart = IsLocalLobbyHost();
             bool canStartGame = _lobbyState.CanHostStartGame();
 
             startButton.gameObject.SetActive(isHostForStart);
@@ -979,13 +1316,14 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         for (int i = 0; i < 4; i++)
         {
             bool slotExists = slots != null && i < slots.Length;
-            bool slotHasPlayer = slotExists && slots[i].HasPlayer;
+            bool isHostEditableSlot = _runner != null && _runner.IsServer && i == 0;
+            bool slotHasPlayer = (slotExists && slots[i].HasPlayer) || isHostEditableSlot;
             bool isLocalSlot = i == localSlotIndex;
             bool canChooseThisSlot = _runner != null &&
                                      IsLobbyStateAlive() &&
-                                     !_lobbyState.GameStarted &&
                                      slotHasPlayer &&
-                                     isLocalSlot;
+                                     isLocalSlot &&
+                                     _lobbyState.CanSlotEditLoadout(i);
 
             RoleHandler.PlayerRole slotRole = slotExists
                 ? slots[i].Role
@@ -1069,7 +1407,8 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         for (int i = 0; i < 4; i++)
         {
             bool hasSlot = slots != null && i < slots.Length;
-            bool hasPlayer = hasSlot && slots[i].HasPlayer;
+            bool isHostEditableSlot = _runner != null && _runner.IsServer && i == 0;
+            bool hasPlayer = (hasSlot && slots[i].HasPlayer) || isHostEditableSlot;
             bool isLocalSlot = i == localSlotIndex;
 
             string skinName = hasPlayer ? slots[i].SkinName : string.Empty;
@@ -1081,7 +1420,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
                 skinNameTexts[i].gameObject.SetActive(hasPlayer);
             }
 
-            bool canChangeSkin = hasPlayer && isLocalSlot && !_lobbyState.GameStarted;
+            bool canChangeSkin = hasPlayer && isLocalSlot && _lobbyState.CanSlotEditLoadout(i);
 
             if (previousSkinButtons != null && i < previousSkinButtons.Length && previousSkinButtons[i] != null)
             {
@@ -1233,15 +1572,18 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (runner.IsServer)
         {
             SpawnLobbyStateIfNeeded();
+            EnsureLocalHostAssignedToSlotOne();
 
             if (_lobbyState != null)
             {
-                bool assigned = _lobbyState.AssignPlayer(player);
+                bool assigned = _lobbyState.ContainsPlayer(player) || _lobbyState.AssignPlayer(player);
 
                 if (!assigned)
                 {
                     Debug.LogWarning($"Player could not be assigned: {player.PlayerId}");
                 }
+
+                ApplyCachedHostLoadoutToLobbyState();
             }
         }
 
