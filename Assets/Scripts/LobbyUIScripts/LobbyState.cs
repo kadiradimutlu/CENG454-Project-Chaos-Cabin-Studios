@@ -197,8 +197,8 @@ public class LobbyState : NetworkBehaviour
         {
             Slot1Player = player;
             Slot1Ready = false;
-            Slot1SkinIndex = 0;
-            Slot1Role = RoleHandler.PlayerRole.None;
+            Slot1SkinIndex = NormalizeSkinIndex(Slot1SkinIndex);
+            Slot1Role = NormalizeRole(Slot1Role);
             return true;
         }
 
@@ -385,6 +385,46 @@ public class LobbyState : NetworkBehaviour
         return -1;
     }
 
+    public PlayerRef GetSlotPlayer(int slotIndex)
+    {
+        switch (slotIndex)
+        {
+            case 0: return Slot1Player;
+            case 1: return Slot2Player;
+            case 2: return Slot3Player;
+            case 3: return Slot4Player;
+            default: return default;
+        }
+    }
+
+    public bool IsSlotReady(int slotIndex)
+    {
+        switch (slotIndex)
+        {
+            case 0: return false;
+            case 1: return Slot2Ready;
+            case 2: return Slot3Ready;
+            case 3: return Slot4Ready;
+            default: return false;
+        }
+    }
+
+    public bool CanSlotEditLoadout(int slotIndex)
+    {
+        if (GameStarted)
+            return false;
+
+        PlayerRef player = GetSlotPlayer(slotIndex);
+
+        if (player == default && slotIndex != 0)
+            return false;
+
+        if (IsSlotReady(slotIndex))
+            return false;
+
+        return true;
+    }
+
     public bool GetPlayerReady(PlayerRef player)
     {
         if (Slot1Player == player) return false;
@@ -463,8 +503,9 @@ public class LobbyState : NetworkBehaviour
     private LobbySlotData BuildSlotData(int slotIndex, PlayerRef player, bool readyValue, bool isHost)
     {
         bool hasPlayer = player != default;
-        int skinIndex = hasPlayer ? GetSlotSkinIndex(slotIndex) : 0;
-        RoleHandler.PlayerRole role = hasPlayer ? GetSlotRole(slotIndex) : RoleHandler.PlayerRole.None;
+        bool useStoredLoadout = hasPlayer || slotIndex == 0;
+        int skinIndex = useStoredLoadout ? GetSlotSkinIndex(slotIndex) : 0;
+        RoleHandler.PlayerRole role = useStoredLoadout ? GetSlotRole(slotIndex) : RoleHandler.PlayerRole.None;
 
         LobbySlotData data = new LobbySlotData
         {
@@ -484,9 +525,9 @@ public class LobbyState : NetworkBehaviour
             StatusText = GetStatusText(hasPlayer, isHost, readyValue, role),
 
             SkinIndex = skinIndex,
-            SkinName = hasPlayer ? GetSkinDisplayName(skinIndex) : string.Empty,
+            SkinName = useStoredLoadout ? GetSkinDisplayName(skinIndex) : string.Empty,
             Role = role,
-            RoleName = hasPlayer ? GetRoleDisplayName(role) : string.Empty
+            RoleName = useStoredLoadout ? GetRoleDisplayName(role) : string.Empty
         };
 
         return data;
@@ -590,9 +631,6 @@ public class LobbyState : NetworkBehaviour
         if (player == default)
             return;
 
-        if (!ContainsPlayer(player))
-            return;
-
         role = NormalizeRole(role);
 
         if (role == RoleHandler.PlayerRole.None)
@@ -601,6 +639,25 @@ public class LobbyState : NetworkBehaviour
         int slotIndex = GetPlayerSlotIndex(player);
 
         if (slotIndex < 0)
+            return;
+
+        if (!CanSlotEditLoadout(slotIndex))
+            return;
+
+        SetSlotRole(slotIndex, role);
+    }
+
+    public void SetSlotRoleServerByIndex(int slotIndex, RoleHandler.PlayerRole role)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        role = NormalizeRole(role);
+
+        if (role == RoleHandler.PlayerRole.None)
+            return;
+
+        if (!CanSlotEditLoadout(slotIndex))
             return;
 
         SetSlotRole(slotIndex, role);
@@ -699,6 +756,27 @@ public class LobbyState : NetworkBehaviour
         if (slotIndex < 0)
             return;
 
+        if (!CanSlotEditLoadout(slotIndex))
+            return;
+
+        direction = direction < 0 ? -1 : 1;
+
+        int currentSkinIndex = GetSlotSkinIndex(slotIndex);
+        int nextSkinIndex = currentSkinIndex + direction;
+
+        SetSlotSkinIndex(slotIndex, nextSkinIndex);
+    }
+
+    public void ChangeSlotSkinServerByIndex(int slotIndex, int direction)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (!CanSlotEditLoadout(slotIndex))
+            return;
+
+        direction = direction < 0 ? -1 : 1;
+
         int currentSkinIndex = GetSlotSkinIndex(slotIndex);
         int nextSkinIndex = currentSkinIndex + direction;
 
@@ -778,6 +856,9 @@ public class LobbyState : NetworkBehaviour
             return;
 
         if (!CanPlayerUseReady(player))
+            return;
+
+        if (value && GetPlayerRole(player) == RoleHandler.PlayerRole.None)
             return;
 
         if (Slot2Player == player)
