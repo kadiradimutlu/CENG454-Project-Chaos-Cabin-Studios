@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 23e173dbba6aa4017ab9c42321ad0024
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2655988077585873504
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 236625
+  packageName: Poly Halloween
+  packageVersion: 1.1
+  assetPath: Assets/polyperfect/Poly Christmas/Meshes/FBXImporter_Static.preset
+  uploadId: 796666
