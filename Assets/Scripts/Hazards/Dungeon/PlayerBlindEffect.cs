@@ -65,3 +65,33 @@ public class PlayerBlindEffect : NetworkBehaviour
         BlindStrength = 0f;
         BlindExpiryTick = 0;
     }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (HasStateAuthority && BlindExpiryTick != 0 && Runner.Tick >= BlindExpiryTick)
+        {
+            BlindStrength = 0f;
+            BlindExpiryTick = 0;
+        }
+    }
+
+    public override void Render()
+    {
+        if (!Object.HasInputAuthority || blindOverlay == null)
+            return;
+
+        float targetAlpha = IsBlinded ? BlindStrength : 0f;
+        currentAlpha = Mathf.MoveTowards(currentAlpha, targetAlpha, fadeSpeed * Time.deltaTime);
+        SetOverlayAlpha(currentAlpha);
+    }
+
+    private void SetOverlayAlpha(float a)
+    {
+        if (blindOverlay == null)
+            return;
+
+        Color c = blindOverlay.color;
+        c.a = a;
+        blindOverlay.color = c;
+    }
+}
