@@ -32,6 +32,12 @@ public class LobbyState : NetworkBehaviour
 
     [Networked] public NetworkBool GameStarted { get; set; }
 
+    [Header("Shared Round State")]
+    [Networked] public int RoundStateValue { get; set; }
+    [Networked] public int RoundWinnerValue { get; set; }
+    [Networked] public TickTimer RoundCountdownTimer { get; set; }
+    [Networked] public TickTimer SharedRoundTimer { get; set; }
+
     [Header("Lobby Chat")]
     [Networked] public int ChatMessageVersion { get; set; }
 
@@ -846,6 +852,131 @@ public class LobbyState : NetworkBehaviour
             trapperCount++;
     }
 
+
+    // ==================================================
+    // ROUND STATE
+    // ==================================================
+
+    public void ResetRoundStateServer()
+    {
+        if (!HasStateAuthority)
+            return;
+
+        RoundStateValue = 0;
+        RoundWinnerValue = 0;
+        RoundCountdownTimer = TickTimer.None;
+        SharedRoundTimer = TickTimer.None;
+    }
+
+    public void StartRoundCountdownServer(float seconds)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (RoundStateValue != 0 && RoundStateValue != 3)
+            return;
+
+        RoundStateValue = 1;
+        RoundWinnerValue = 0;
+        RoundCountdownTimer = TickTimer.CreateFromSeconds(Runner, Mathf.Max(0.1f, seconds));
+        SharedRoundTimer = TickTimer.None;
+
+        Debug.Log("LobbyState: Shared round countdown started.");
+    }
+
+    public void BeginRoundPlayingServer(float seconds)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (RoundStateValue != 1)
+            return;
+
+        RoundStateValue = 2;
+        RoundWinnerValue = 0;
+        RoundCountdownTimer = TickTimer.None;
+        SharedRoundTimer = TickTimer.CreateFromSeconds(Runner, Mathf.Max(1f, seconds));
+
+        Debug.Log("LobbyState: Shared round playing started.");
+    }
+
+    public void FinishRoundServer(int winnerValue)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (RoundStateValue == 3)
+            return;
+
+        RoundStateValue = 3;
+        RoundWinnerValue = Mathf.Clamp(winnerValue, 0, 2);
+        RoundCountdownTimer = TickTimer.None;
+        SharedRoundTimer = TickTimer.None;
+
+        Debug.Log($"LobbyState: Shared round finished. Winner={RoundWinnerValue}");
+    }
+
+    public bool IsSharedCountdownExpired()
+    {
+        if (RoundStateValue != 1)
+            return false;
+
+        return RoundCountdownTimer.Expired(Runner);
+    }
+
+    public bool IsSharedRoundTimerExpired()
+    {
+        if (RoundStateValue != 2)
+            return false;
+
+        return SharedRoundTimer.Expired(Runner);
+    }
+
+    public float GetSharedCountdownRemaining()
+    {
+        if (RoundStateValue != 1)
+            return 0f;
+
+        float? remaining = RoundCountdownTimer.RemainingTime(Runner);
+        return remaining.HasValue ? Mathf.Max(0f, remaining.Value) : 0f;
+    }
+
+    public float GetSharedRoundRemaining(float fallbackDuration)
+    {
+        if (RoundStateValue == 2)
+        {
+            float? remaining = SharedRoundTimer.RemainingTime(Runner);
+            return remaining.HasValue ? Mathf.Max(0f, remaining.Value) : 0f;
+        }
+
+        if (RoundStateValue == 3)
+            return 0f;
+
+        return Mathf.Max(1f, fallbackDuration);
+    }
+
+    public bool CanAcceptRunnerFinish(PlayerRef player)
+    {
+        if (RoundStateValue != 2)
+            return false;
+
+        if (player == default)
+            return false;
+
+        return GetPlayerRole(player) == RoleHandler.PlayerRole.Runner;
+    }
+
+    public void ReportRunnerFinishedServer(PlayerRef player)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (!CanAcceptRunnerFinish(player))
+            return;
+
+        FinishRoundServer(1);
+    }
+
     // ==================================================
     // READY CONTROL
     // ==================================================
@@ -1068,6 +1199,22 @@ public class LobbyState : NetworkBehaviour
         Debug.Log($"Lobby chat message: {line}");
     }
 
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_RequestRunnerFinished(PlayerRef player, RpcInfo info = default)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (player == default)
+            player = info.Source;
+
+        if (player == default)
+            return;
+
+        ReportRunnerFinishedServer(player);
+    }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestStartGame(RpcInfo info = default)
     {
@@ -1109,6 +1256,7 @@ public class LobbyState : NetworkBehaviour
             return;
         }
 
+        ResetRoundStateServer();
         GameStarted = true;
         Debug.Log("GameStarted has been set to TRUE.");
     }
