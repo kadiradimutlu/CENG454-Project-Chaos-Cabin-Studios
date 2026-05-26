@@ -78,4 +78,67 @@ public class DungeonBlindField : NetworkBehaviour
         CooldownUntilTick = Runner.Tick + cooldownTicks;
     }
 
+    private void ApplyBlindToZoneRunners()
+    {
+#if UNITY_2023_1_OR_NEWER
+        RunnerZoneTracker[] trackers = FindObjectsByType<RunnerZoneTracker>(FindObjectsSortMode.None);
+#else
+        RunnerZoneTracker[] trackers = FindObjectsOfType<RunnerZoneTracker>();
+#endif
+
+        foreach (RunnerZoneTracker tracker in trackers)
+        {
+            if (tracker == null)
+                continue;
+
+            if (!tracker.IsInZone(zoneType))
+                continue;
+
+            PlayerHealth health = tracker.GetComponent<PlayerHealth>();
+            if (health == null)
+                health = tracker.GetComponentInParent<PlayerHealth>();
+            if (health != null && health.IsEliminated)
+                continue;
+
+            RoleHandler role = tracker.GetComponent<RoleHandler>();
+            if (role == null)
+                role = tracker.GetComponentInParent<RoleHandler>();
+            if (role != null && role.currentRole != RoleHandler.PlayerRole.Runner)
+                continue;
+
+            PlayerBlindEffect blind = tracker.GetComponent<PlayerBlindEffect>();
+            if (blind == null)
+                blind = tracker.GetComponentInParent<PlayerBlindEffect>();
+            if (blind == null)
+                continue;
+
+            blind.ApplyBlind(blindStrength, duration);
+        }
+    }
+
+    public override void Render()
+    {
+        bool active = IsActive;
+
+        if (active == lastActiveVisualState)
+            return;
+
+        lastActiveVisualState = active;
+
+        if (activationVisuals == null)
+            return;
+
+        foreach (GameObject go in activationVisuals)
+        {
+            if (go != null)
+                go.SetActive(active);
+        }
+    }
+
+    private void OnValidate()
+    {
+        blindStrength = Mathf.Clamp(blindStrength, 0.05f, 1f);
+        duration = Mathf.Max(0f, duration);
+        cooldown = Mathf.Max(0f, cooldown);
+    }
 }
