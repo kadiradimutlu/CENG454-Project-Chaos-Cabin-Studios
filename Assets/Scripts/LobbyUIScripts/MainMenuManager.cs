@@ -99,6 +99,14 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     private RoleHandler.PlayerRole _cachedHostRole = RoleHandler.PlayerRole.None;
     private int _cachedHostSkinIndex = 0;
 
+    public LobbyState ActiveLobbyState
+    {
+        get
+        {
+            return IsLobbyStateAlive() ? _lobbyState : null;
+        }
+    }
+
     private void Awake()
     {
         EnsureRunnerHandler();
