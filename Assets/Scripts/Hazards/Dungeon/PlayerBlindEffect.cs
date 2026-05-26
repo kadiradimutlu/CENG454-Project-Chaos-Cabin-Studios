@@ -18,3 +18,50 @@ public class PlayerBlindEffect : NetworkBehaviour
 
     public bool IsBlinded =>
         BlindExpiryTick != 0 && Runner != null && Runner.Tick < BlindExpiryTick;
+
+
+    public override void Spawned()
+    {
+        if (HasStateAuthority)
+        {
+            BlindStrength = 0f;
+            BlindExpiryTick = 0;
+        }
+
+        if (blindOverlay != null)
+        {
+            currentAlpha = 0f;
+            SetOverlayAlpha(0f);
+
+            if (!Object.HasInputAuthority)
+                blindOverlay.gameObject.SetActive(false);
+        }
+    }
+
+    public void ApplyBlind(float strength, float duration)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        strength = Mathf.Clamp01(strength);
+        duration = Mathf.Max(0f, duration);
+
+        if (duration <= 0f)
+            return;
+
+        BlindStrength = (BlindExpiryTick != 0)
+            ? Mathf.Max(BlindStrength, strength)
+            : strength;
+
+        int durationTicks = Mathf.CeilToInt(duration / Runner.DeltaTime);
+        BlindExpiryTick = Runner.Tick + durationTicks;
+    }
+
+    public void ClearBlind()
+    {
+        if (!HasStateAuthority)
+            return;
+
+        BlindStrength = 0f;
+        BlindExpiryTick = 0;
+    }
