@@ -27,4 +27,41 @@ public class PressDownBox : NetworkBehaviour
 
     private readonly HashSet<PlayerMovement> riders = new HashSet<PlayerMovement>();
 
+
+    public override void Spawned()
+    {
+        upPosition = transform.position;
+        lastBoxPosition = upPosition;
+        capturedUp = true;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (Object == null || !Object.HasStateAuthority)
+            return;
+
+        if (!string.IsNullOrEmpty(requiredTag) && !other.CompareTag(requiredTag))
+            return;
+
+        PlayerMovement player = other.GetComponentInParent<PlayerMovement>();
+        if (player != null)
+            riders.Add(player);
+
+        if (HasTriggered)
+            return;
+
+        HasTriggered = true;
+        StartTick = Runner.Tick;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (Object == null || !Object.HasStateAuthority)
+            return;
+
+        PlayerMovement player = other.GetComponentInParent<PlayerMovement>();
+        if (player != null)
+            riders.Remove(player);
+    }
+
 }
