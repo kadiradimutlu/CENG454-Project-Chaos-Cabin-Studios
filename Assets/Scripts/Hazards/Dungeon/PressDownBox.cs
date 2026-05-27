@@ -64,4 +64,78 @@ public class PressDownBox : NetworkBehaviour
             riders.Remove(player);
     }
 
+
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!capturedUp)
+            return;
+
+        Vector3 target = ComputeBoxPosition();
+        Vector3 delta = target - lastBoxPosition;
+
+        if (Object.HasStateAuthority && delta.sqrMagnitude > 0f)
+        {
+            foreach (PlayerMovement rider in riders)
+            {
+                if (rider != null)
+                    rider.RidePlatform(delta);
+            }
+        }
+
+        transform.position = target;
+        lastBoxPosition = target;
+    }
+
+    public override void Render()
+    {
+        if (!capturedUp)
+            return;
+
+        transform.position = ComputeBoxPosition();
+    }
+
+    private Vector3 ComputeBoxPosition()
+    {
+        if (!HasTriggered || StartTick == 0)
+            return upPosition;
+
+        float elapsed = (Runner.Tick - StartTick) * Runner.DeltaTime;
+        float down = Mathf.Max(0.0001f, moveDuration);
+        float stay = Mathf.Max(0f, stayDownDuration);
+
+        Vector3 downPosition = upPosition + Vector3.down * dropDistance;
+
+        if (elapsed < down)
+        {
+            float t = elapsed / down;
+            return Vector3.Lerp(upPosition, downPosition, Smooth(t));
+        }
+
+        if (elapsed < down + stay)
+        {
+            return downPosition;
+        }
+
+        if (elapsed < down + stay + down)
+        {
+            float t = (elapsed - down - stay) / down;
+            return Vector3.Lerp(downPosition, upPosition, Smooth(t));
+        }
+
+        return upPosition;
+    }
+
+    private static float Smooth(float t)
+    {
+        t = Mathf.Clamp01(t);
+        return t * t * (3f - 2f * t);
+    }
+
+    private void OnValidate()
+    {
+        dropDistance = Mathf.Max(0f, dropDistance);
+        moveDuration = Mathf.Max(0.01f, moveDuration);
+        stayDownDuration = Mathf.Max(0f, stayDownDuration);
+    }
 }
