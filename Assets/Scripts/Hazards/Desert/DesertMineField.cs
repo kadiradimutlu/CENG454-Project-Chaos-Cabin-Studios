@@ -44,4 +44,17 @@ public class DesertMinefield : NetworkBehaviour
     {
         ServerActivate();
     }
+
+    private void ServerActivate()
+    {
+        if (!Object.HasStateAuthority)
+            return;
+
+        if (IsHidden || IsOnCooldown)
+            return;
+
+        HiddenUntilTick = Runner.Tick + SecondsToTicks(invisibleDuration);
+        if (cooldown > 0f)
+            CooldownUntilTick = Runner.Tick + SecondsToTicks(cooldown);
+    }
 }
