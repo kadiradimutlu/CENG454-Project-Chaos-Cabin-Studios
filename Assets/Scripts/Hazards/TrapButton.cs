@@ -85,13 +85,16 @@ public class TrapButton : NetworkBehaviour
     {
         Debug.Log($"[TrapButton] {name}: TriggerBoundTrap. slowField={slowField!=null}, minefield={minefield!=null}, blindField={blindField!=null}", this);
 
+      
         if (slowField != null)
             slowField.Activate();
-        if (minefield != null)
-            minefield.Activate();
         if (blindField != null)
             blindField.Activate();
-
+        if (minefield != null)
+        {
+            Debug.Log($"[TrapButton] {name}: TriggerBoundTrap -> minefield.Activate() local.", this);
+            minefield.Activate();
+        }
         if (slowField == null && minefield == null && blindField == null)
             Debug.LogWarning($"[TrapButton] {name}: HİÇBİR slot dolu değil! Inspector'da Slow Field, Minefield veya Blind Field'a trap sürükle.", this);
     }
@@ -99,6 +102,13 @@ public class TrapButton : NetworkBehaviour
     private void OnPressedCountChanged()
     {
         PlayPressAnimation();
+
+       
+        if (minefield != null)
+        {
+            Debug.Log($"[TrapButton] {name}: OnPressedCountChanged -> minefield.Activate() local.", this);
+            minefield.Activate();
+        }
     }
 
     private void PlayPressAnimation()
