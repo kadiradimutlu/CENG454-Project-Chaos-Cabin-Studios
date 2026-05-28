@@ -22,4 +22,9 @@ public class DesertMinefield : NetworkBehaviour
 
     public bool IsHidden => Runner != null && HiddenUntilTick != 0 && Runner.Tick < HiddenUntilTick;
     public bool IsOnCooldown => Runner != null && CooldownUntilTick != 0 && Runner.Tick < CooldownUntilTick;
+    public override void Spawned()
+    {
+        CacheRenderers();
+        ApplyVisibility(visible: true, force: true);
+    }
 }
