@@ -57,4 +57,11 @@ public class DesertMinefield : NetworkBehaviour
         if (cooldown > 0f)
             CooldownUntilTick = Runner.Tick + SecondsToTicks(cooldown);
     }
+
+    public override void Render()
+    {
+        bool shouldBeVisible = !IsHidden;
+        if (shouldBeVisible != _lastAppliedVisible)
+            ApplyVisibility(shouldBeVisible, force: false);
+    }
 }
