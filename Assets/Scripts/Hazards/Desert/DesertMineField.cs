@@ -1,4 +1,4 @@
-sing Fusion;
+using Fusion;
 using UnityEngine;
 
 [DisallowMultipleComponent]
