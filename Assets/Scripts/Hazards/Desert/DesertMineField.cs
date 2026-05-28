@@ -27,4 +27,15 @@ public class DesertMinefield : NetworkBehaviour
         CacheRenderers();
         ApplyVisibility(visible: true, force: true);
     }
+
+    public void Activate()
+    {
+        if (Object == null)
+            return;
+
+        if (Object.HasStateAuthority)
+            ServerActivate();
+        else
+            RPC_RequestActivate();
+    }
 }
