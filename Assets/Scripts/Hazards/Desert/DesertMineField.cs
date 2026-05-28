@@ -101,4 +101,10 @@ public class DesertMinefield : NetworkBehaviour
     {
         ApplyVisibility(visible: true, force: true);
     }
+
+    private void OnValidate()
+    {
+        invisibleDuration = Mathf.Max(0.1f, invisibleDuration);
+        cooldown = Mathf.Max(0f, cooldown);
+    }
 }
