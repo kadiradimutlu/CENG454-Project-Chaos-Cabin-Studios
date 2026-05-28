@@ -120,6 +120,12 @@ public class RoundManager : NetworkBehaviour
 
         if (lobbyState.RoundStateValue == (int)RoundState.Playing)
         {
+            if (AreAllRunnersEliminated())
+            {
+                EndRound(RoundWinner.Trappers);
+                return;
+            }
+
             if (lobbyState.IsSharedRoundTimerExpired())
                 EndRound(RoundWinner.Trappers);
         }
@@ -281,6 +287,52 @@ public class RoundManager : NetworkBehaviour
 
         int value = Mathf.Clamp(lobbyState.RoundWinnerValue, 0, 2);
         return (RoundWinner)value;
+    }
+
+    private bool AreAllRunnersEliminated()
+    {
+        if (lobbyState == null || lobbyState.RoundStateValue != (int)RoundState.Playing)
+            return false;
+
+        PlayerHealth[] healths = FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None);
+
+        bool foundRunner = false;
+
+        for (int i = 0; i < healths.Length; i++)
+        {
+            PlayerHealth health = healths[i];
+
+            if (health == null)
+                continue;
+
+            if (!IsRunnerHealth(health))
+                continue;
+
+            foundRunner = true;
+
+            if (!health.IsEliminated)
+                return false;
+        }
+
+        return foundRunner;
+    }
+
+    private bool IsRunnerHealth(PlayerHealth health)
+    {
+        NetworkObject networkObject = health.GetComponent<NetworkObject>();
+
+        if (networkObject != null && networkObject.InputAuthority != default && lobbyState != null)
+            return lobbyState.GetPlayerRole(networkObject.InputAuthority) == RoleHandler.PlayerRole.Runner;
+
+        RoleHandler roleHandler = health.GetComponentInChildren<RoleHandler>(true);
+
+        if (roleHandler == null)
+            return false;
+
+        if (!roleHandler.TryGetRole(out RoleHandler.PlayerRole role))
+            return false;
+
+        return role == RoleHandler.PlayerRole.Runner;
     }
 
     private bool HasRoundAuthority()
