@@ -64,4 +64,9 @@ public class DesertMinefield : NetworkBehaviour
         if (shouldBeVisible != _lastAppliedVisible)
             ApplyVisibility(shouldBeVisible, force: false);
     }
+     private void CacheRenderers()
+    {
+        Transform root = targetRoot != null ? targetRoot : transform;
+        _renderers = root.GetComponentsInChildren<Renderer>(includeInactive);
+    }
 }
