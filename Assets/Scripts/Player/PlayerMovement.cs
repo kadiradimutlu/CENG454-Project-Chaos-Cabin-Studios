@@ -644,6 +644,14 @@ public class PlayerMovement : NetworkBehaviour
         SpeedMultiplier = 1f;
         SlowExpiryTick = 0;
     }
+
+        public void RidePlatform(Vector3 platformDelta)
+    {
+        if (!HasStateAuthority)
+            return;
+ 
+        transform.position += platformDelta;
+    }
 }
 
 

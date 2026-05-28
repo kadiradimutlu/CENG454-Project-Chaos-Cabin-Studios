@@ -32,6 +32,12 @@ public class LobbyState : NetworkBehaviour
 
     [Networked] public NetworkBool GameStarted { get; set; }
 
+    [Header("Shared Round State")]
+    [Networked] public int RoundStateValue { get; set; }
+    [Networked] public int RoundWinnerValue { get; set; }
+    [Networked] public TickTimer RoundCountdownTimer { get; set; }
+    [Networked] public TickTimer SharedRoundTimer { get; set; }
+
     [Header("Lobby Chat")]
     [Networked] public int ChatMessageVersion { get; set; }
 
@@ -197,8 +203,8 @@ public class LobbyState : NetworkBehaviour
         {
             Slot1Player = player;
             Slot1Ready = false;
-            Slot1SkinIndex = 0;
-            Slot1Role = RoleHandler.PlayerRole.None;
+            Slot1SkinIndex = NormalizeSkinIndex(Slot1SkinIndex);
+            Slot1Role = NormalizeRole(Slot1Role);
             return true;
         }
 
@@ -385,6 +391,46 @@ public class LobbyState : NetworkBehaviour
         return -1;
     }
 
+    public PlayerRef GetSlotPlayer(int slotIndex)
+    {
+        switch (slotIndex)
+        {
+            case 0: return Slot1Player;
+            case 1: return Slot2Player;
+            case 2: return Slot3Player;
+            case 3: return Slot4Player;
+            default: return default;
+        }
+    }
+
+    public bool IsSlotReady(int slotIndex)
+    {
+        switch (slotIndex)
+        {
+            case 0: return false;
+            case 1: return Slot2Ready;
+            case 2: return Slot3Ready;
+            case 3: return Slot4Ready;
+            default: return false;
+        }
+    }
+
+    public bool CanSlotEditLoadout(int slotIndex)
+    {
+        if (GameStarted)
+            return false;
+
+        PlayerRef player = GetSlotPlayer(slotIndex);
+
+        if (player == default && slotIndex != 0)
+            return false;
+
+        if (IsSlotReady(slotIndex))
+            return false;
+
+        return true;
+    }
+
     public bool GetPlayerReady(PlayerRef player)
     {
         if (Slot1Player == player) return false;
@@ -463,8 +509,9 @@ public class LobbyState : NetworkBehaviour
     private LobbySlotData BuildSlotData(int slotIndex, PlayerRef player, bool readyValue, bool isHost)
     {
         bool hasPlayer = player != default;
-        int skinIndex = hasPlayer ? GetSlotSkinIndex(slotIndex) : 0;
-        RoleHandler.PlayerRole role = hasPlayer ? GetSlotRole(slotIndex) : RoleHandler.PlayerRole.None;
+        bool useStoredLoadout = hasPlayer || slotIndex == 0;
+        int skinIndex = useStoredLoadout ? GetSlotSkinIndex(slotIndex) : 0;
+        RoleHandler.PlayerRole role = useStoredLoadout ? GetSlotRole(slotIndex) : RoleHandler.PlayerRole.None;
 
         LobbySlotData data = new LobbySlotData
         {
@@ -484,9 +531,9 @@ public class LobbyState : NetworkBehaviour
             StatusText = GetStatusText(hasPlayer, isHost, readyValue, role),
 
             SkinIndex = skinIndex,
-            SkinName = hasPlayer ? GetSkinDisplayName(skinIndex) : string.Empty,
+            SkinName = useStoredLoadout ? GetSkinDisplayName(skinIndex) : string.Empty,
             Role = role,
-            RoleName = hasPlayer ? GetRoleDisplayName(role) : string.Empty
+            RoleName = useStoredLoadout ? GetRoleDisplayName(role) : string.Empty
         };
 
         return data;
@@ -590,9 +637,6 @@ public class LobbyState : NetworkBehaviour
         if (player == default)
             return;
 
-        if (!ContainsPlayer(player))
-            return;
-
         role = NormalizeRole(role);
 
         if (role == RoleHandler.PlayerRole.None)
@@ -601,6 +645,25 @@ public class LobbyState : NetworkBehaviour
         int slotIndex = GetPlayerSlotIndex(player);
 
         if (slotIndex < 0)
+            return;
+
+        if (!CanSlotEditLoadout(slotIndex))
+            return;
+
+        SetSlotRole(slotIndex, role);
+    }
+
+    public void SetSlotRoleServerByIndex(int slotIndex, RoleHandler.PlayerRole role)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        role = NormalizeRole(role);
+
+        if (role == RoleHandler.PlayerRole.None)
+            return;
+
+        if (!CanSlotEditLoadout(slotIndex))
             return;
 
         SetSlotRole(slotIndex, role);
@@ -699,6 +762,27 @@ public class LobbyState : NetworkBehaviour
         if (slotIndex < 0)
             return;
 
+        if (!CanSlotEditLoadout(slotIndex))
+            return;
+
+        direction = direction < 0 ? -1 : 1;
+
+        int currentSkinIndex = GetSlotSkinIndex(slotIndex);
+        int nextSkinIndex = currentSkinIndex + direction;
+
+        SetSlotSkinIndex(slotIndex, nextSkinIndex);
+    }
+
+    public void ChangeSlotSkinServerByIndex(int slotIndex, int direction)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (!CanSlotEditLoadout(slotIndex))
+            return;
+
+        direction = direction < 0 ? -1 : 1;
+
         int currentSkinIndex = GetSlotSkinIndex(slotIndex);
         int nextSkinIndex = currentSkinIndex + direction;
 
@@ -768,6 +852,131 @@ public class LobbyState : NetworkBehaviour
             trapperCount++;
     }
 
+
+    // ==================================================
+    // ROUND STATE
+    // ==================================================
+
+    public void ResetRoundStateServer()
+    {
+        if (!HasStateAuthority)
+            return;
+
+        RoundStateValue = 0;
+        RoundWinnerValue = 0;
+        RoundCountdownTimer = TickTimer.None;
+        SharedRoundTimer = TickTimer.None;
+    }
+
+    public void StartRoundCountdownServer(float seconds)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (RoundStateValue != 0 && RoundStateValue != 3)
+            return;
+
+        RoundStateValue = 1;
+        RoundWinnerValue = 0;
+        RoundCountdownTimer = TickTimer.CreateFromSeconds(Runner, Mathf.Max(0.1f, seconds));
+        SharedRoundTimer = TickTimer.None;
+
+        Debug.Log("LobbyState: Shared round countdown started.");
+    }
+
+    public void BeginRoundPlayingServer(float seconds)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (RoundStateValue != 1)
+            return;
+
+        RoundStateValue = 2;
+        RoundWinnerValue = 0;
+        RoundCountdownTimer = TickTimer.None;
+        SharedRoundTimer = TickTimer.CreateFromSeconds(Runner, Mathf.Max(1f, seconds));
+
+        Debug.Log("LobbyState: Shared round playing started.");
+    }
+
+    public void FinishRoundServer(int winnerValue)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (RoundStateValue == 3)
+            return;
+
+        RoundStateValue = 3;
+        RoundWinnerValue = Mathf.Clamp(winnerValue, 0, 2);
+        RoundCountdownTimer = TickTimer.None;
+        SharedRoundTimer = TickTimer.None;
+
+        Debug.Log($"LobbyState: Shared round finished. Winner={RoundWinnerValue}");
+    }
+
+    public bool IsSharedCountdownExpired()
+    {
+        if (RoundStateValue != 1)
+            return false;
+
+        return RoundCountdownTimer.Expired(Runner);
+    }
+
+    public bool IsSharedRoundTimerExpired()
+    {
+        if (RoundStateValue != 2)
+            return false;
+
+        return SharedRoundTimer.Expired(Runner);
+    }
+
+    public float GetSharedCountdownRemaining()
+    {
+        if (RoundStateValue != 1)
+            return 0f;
+
+        float? remaining = RoundCountdownTimer.RemainingTime(Runner);
+        return remaining.HasValue ? Mathf.Max(0f, remaining.Value) : 0f;
+    }
+
+    public float GetSharedRoundRemaining(float fallbackDuration)
+    {
+        if (RoundStateValue == 2)
+        {
+            float? remaining = SharedRoundTimer.RemainingTime(Runner);
+            return remaining.HasValue ? Mathf.Max(0f, remaining.Value) : 0f;
+        }
+
+        if (RoundStateValue == 3)
+            return 0f;
+
+        return Mathf.Max(1f, fallbackDuration);
+    }
+
+    public bool CanAcceptRunnerFinish(PlayerRef player)
+    {
+        if (RoundStateValue != 2)
+            return false;
+
+        if (player == default)
+            return false;
+
+        return GetPlayerRole(player) == RoleHandler.PlayerRole.Runner;
+    }
+
+    public void ReportRunnerFinishedServer(PlayerRef player)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (!CanAcceptRunnerFinish(player))
+            return;
+
+        FinishRoundServer(1);
+    }
+
     // ==================================================
     // READY CONTROL
     // ==================================================
@@ -778,6 +987,9 @@ public class LobbyState : NetworkBehaviour
             return;
 
         if (!CanPlayerUseReady(player))
+            return;
+
+        if (value && GetPlayerRole(player) == RoleHandler.PlayerRole.None)
             return;
 
         if (Slot2Player == player)
@@ -987,6 +1199,22 @@ public class LobbyState : NetworkBehaviour
         Debug.Log($"Lobby chat message: {line}");
     }
 
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_RequestRunnerFinished(PlayerRef player, RpcInfo info = default)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (player == default)
+            player = info.Source;
+
+        if (player == default)
+            return;
+
+        ReportRunnerFinishedServer(player);
+    }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestStartGame(RpcInfo info = default)
     {
@@ -1028,6 +1256,7 @@ public class LobbyState : NetworkBehaviour
             return;
         }
 
+        ResetRoundStateServer();
         GameStarted = true;
         Debug.Log("GameStarted has been set to TRUE.");
     }
