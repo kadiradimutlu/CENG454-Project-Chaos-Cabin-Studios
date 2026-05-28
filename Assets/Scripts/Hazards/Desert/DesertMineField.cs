@@ -90,4 +90,11 @@ public class DesertMinefield : NetworkBehaviour
 
         _lastAppliedVisible = visible;
     }
+
+    private int SecondsToTicks(float seconds)
+    {
+        if (Runner == null || Runner.DeltaTime <= 0f)
+            return 1;
+        return Mathf.Max(1, Mathf.CeilToInt(Mathf.Max(0f, seconds) / Runner.DeltaTime));
+    }
 }
