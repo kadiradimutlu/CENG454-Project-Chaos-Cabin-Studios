@@ -19,4 +19,7 @@ public class DesertMinefield : NetworkBehaviour
   
     private Renderer[] _renderers;
     private bool _lastAppliedVisible = true;
+
+    public bool IsHidden => Runner != null && HiddenUntilTick != 0 && Runner.Tick < HiddenUntilTick;
+    public bool IsOnCooldown => Runner != null && CooldownUntilTick != 0 && Runner.Tick < CooldownUntilTick;
 }
