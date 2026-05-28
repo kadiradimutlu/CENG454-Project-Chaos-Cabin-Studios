@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 6574671038988352209}
   - component: {fileID: 4745300973869823781}
   - component: {fileID: -2987654311209876543}
+  - component: {fileID: 7763814639274412381}
   - component: {fileID: 4736110249863798448}
   - component: {fileID: 3589316290187259848}
   - component: {fileID: 6001041684308089228}
@@ -157,6 +158,7 @@ MonoBehaviour:
   - {fileID: 6574671038988352209}
   - {fileID: 4745300973869823781}
   - {fileID: -2987654311209876543}
+  - {fileID: 7763814639274412381}
   - {fileID: 4736110249863798448}
   - {fileID: 6001041684308089228}
   - {fileID: 2849667779660718462}
@@ -330,6 +332,24 @@ MonoBehaviour:
   _CurrentHealth: 0
   _IsEliminated:
     _value: 0
+--- !u!114 &7763814639274412381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3600554267242463573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a7c3b815f4d4dc4a8b70826bc42e211, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RunnerLife
+  startingDeathRights: 2
+  respawnYOffset: 1.2
+  playerHealth: {fileID: -2987654311209876543}
+  playerMovement: {fileID: -6558359621573049810}
+  roleHandler: {fileID: 6001041684308089228}
+  _RemainingDeathRights: 0
 --- !u!114 &4736110249863798448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -366,6 +386,8 @@ MonoBehaviour:
   roleText: {fileID: 0}
   faceCamera: 1
   billboardRoot: {fileID: 7250736141540469394}
+  labelOffset: {x: 0, y: 2.4, z: 0}
+  labelFontSize: 3.2
 --- !u!114 &6001041684308089228
 MonoBehaviour:
   m_ObjectHideFlags: 0

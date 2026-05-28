@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,6 +39,13 @@ public class LobbyChatUI : MonoBehaviour
 
         TryFindLobbyState();
         RefreshChat(true);
+    }
+
+    private void OnDisable()
+    {
+        _lobbyState = null;
+        _lastSeenChatVersion = -1;
+        _shouldScrollToBottom = false;
     }
 
     private void OnDestroy()
@@ -109,7 +117,16 @@ public class LobbyChatUI : MonoBehaviour
             return;
         }
 
-        _lobbyState.RPC_SendChatMessage(message);
+        try
+        {
+            _lobbyState.RPC_SendChatMessage(message);
+        }
+        catch (InvalidOperationException)
+        {
+            _lobbyState = null;
+            Debug.LogWarning("LobbyChatUI: LobbyState hazır değil, mesaj gönderilemedi.");
+            return;
+        }
 
         chatInputField.text = string.Empty;
         chatInputField.ActivateInputField();
@@ -127,13 +144,40 @@ public class LobbyChatUI : MonoBehaviour
             return;
         }
 
-        if (!force && _lastSeenChatVersion == _lobbyState.ChatMessageVersion)
+        int chatVersion;
+
+        try
+        {
+            chatVersion = _lobbyState.ChatMessageVersion;
+        }
+        catch (InvalidOperationException)
+        {
+            _lobbyState = null;
+
+            if (force)
+                ClearChatView();
+
+            return;
+        }
+
+        if (!force && _lastSeenChatVersion == chatVersion)
             return;
 
-        _lastSeenChatVersion = _lobbyState.ChatMessageVersion;
+        _lastSeenChatVersion = chatVersion;
 
         if (chatHistoryText != null)
-            chatHistoryText.text = _lobbyState.GetChatLog();
+        {
+            try
+            {
+                chatHistoryText.text = _lobbyState.GetChatLog();
+            }
+            catch (InvalidOperationException)
+            {
+                _lobbyState = null;
+                ClearChatView();
+                return;
+            }
+        }
 
         if (alwaysAutoScrollToBottom || force)
             _shouldScrollToBottom = true;

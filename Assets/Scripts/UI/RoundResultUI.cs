@@ -10,6 +10,7 @@ public class RoundResultUI : MonoBehaviour
 
     private LobbyState lobbyState;
     private Graphic[] graphics;
+    private CanvasGroup canvasGroup;
 
     private void Awake()
     {
@@ -19,14 +20,14 @@ public class RoundResultUI : MonoBehaviour
         if (resultText == null && resultPanel != null)
             resultText = resultPanel.GetComponentInChildren<TMP_Text>(true);
 
-        CacheGraphics();
+        CacheComponents();
         SetVisible(false);
     }
 
     private void OnEnable()
     {
         lobbyState = null;
-        CacheGraphics();
+        CacheComponents();
         SetVisible(false);
     }
 
@@ -58,7 +59,14 @@ public class RoundResultUI : MonoBehaviour
         if (resultPanel != null && !resultPanel.activeSelf)
             resultPanel.SetActive(true);
 
-        CacheGraphics();
+        CacheComponents();
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = value ? 1f : 0f;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
 
         if (graphics == null)
             return;
@@ -73,12 +81,19 @@ public class RoundResultUI : MonoBehaviour
         }
     }
 
-    private void CacheGraphics()
+    private void CacheComponents()
     {
         if (resultPanel == null)
             return;
 
         graphics = resultPanel.GetComponentsInChildren<Graphic>(true);
+        canvasGroup = resultPanel.GetComponent<CanvasGroup>();
+
+        if (canvasGroup == null)
+            canvasGroup = resultPanel.AddComponent<CanvasGroup>();
+
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
     }
 
     private void CacheLobbyState()

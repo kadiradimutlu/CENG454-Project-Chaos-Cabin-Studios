@@ -17,9 +17,12 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
 
     private int lastHealth = -1;
     private bool lastEliminated;
+    private RunnerLife runnerLife;
 
     public override void Spawned()
     {
+        CacheRunnerLife();
+
         if (Object.HasStateAuthority)
             ResetHealth();
 
@@ -63,7 +66,12 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
         if (damage == 0)
             return;
 
-        CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
+        int nextHealth = Mathf.Max(0, CurrentHealth - damage);
+
+        if (nextHealth == 0 && TryUseRunnerLife())
+            return;
+
+        CurrentHealth = nextHealth;
 
         if (CurrentHealth == 0)
             IsEliminated = true;
@@ -90,8 +98,30 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
         if (!Object.HasStateAuthority)
             return;
 
+        if (IsEliminated)
+            return;
+
+        if (TryUseRunnerLife())
+            return;
+
         CurrentHealth = 0;
         IsEliminated = true;
+    }
+
+    private bool TryUseRunnerLife()
+    {
+        CacheRunnerLife();
+
+        if (runnerLife == null)
+            return false;
+
+        return runnerLife.TryRespawnAfterLethalDamage();
+    }
+
+    private void CacheRunnerLife()
+    {
+        if (runnerLife == null)
+            runnerLife = GetComponent<RunnerLife>();
     }
 
     private void StoreLastValues()
