@@ -38,4 +38,10 @@ public class DesertMinefield : NetworkBehaviour
         else
             RPC_RequestActivate();
     }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_RequestActivate(RpcInfo info = default)
+    {
+        ServerActivate();
+    }
 }
