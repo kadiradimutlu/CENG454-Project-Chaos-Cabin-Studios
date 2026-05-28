@@ -205,6 +205,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         ForceSpawnTransform(spawnedObject, spawnPosition, spawnRotation);
         ParentSpawnedObject(spawnedObject);
+        ResetRunnerLifeForNewRound(spawnedObject, spawnPosition, spawnRotation);
 
         _runner.SetPlayerObject(player, spawnedObject);
         _spawnedPlayers[player] = spawnedObject;
@@ -289,6 +290,24 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
             return slotCompare;
 
         return a.PlayerId.CompareTo(b.PlayerId);
+    }
+
+    public bool TryGetSpawnPoseForPlayer(PlayerRef player, out Vector3 position, out Quaternion rotation)
+    {
+        RoleHandler.PlayerRole role = GetRoleForPlayer(player);
+        int slotIndex = GetSlotIndexForPlayer(player, 0);
+        Transform spawnPoint = GetSpawnPoint(slotIndex, role);
+
+        if (spawnPoint == null)
+        {
+            position = Vector3.zero;
+            rotation = Quaternion.identity;
+            return false;
+        }
+
+        position = spawnPoint.position;
+        rotation = spawnPoint.rotation;
+        return true;
     }
 
     private Transform GetSpawnPoint(int slotIndex, RoleHandler.PlayerRole role)
@@ -462,12 +481,25 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         else
             ForceSpawnTransform(spawnedObject, spawnPosition, spawnRotation);
 
+        ResetRunnerLifeForNewRound(spawnedObject, spawnPosition, spawnRotation);
+
         PlayerHealth health = spawnedObject.GetComponent<PlayerHealth>();
 
         if (health != null)
             health.ResetHealth();
 
         Debug.Log($"PlayerSpawner: Player {player.PlayerId} respawn edildi. Slot={slotIndex + 1} | Role={role}");
+    }
+
+    private void ResetRunnerLifeForNewRound(NetworkObject obj, Vector3 spawnPosition, Quaternion spawnRotation)
+    {
+        if (obj == null)
+            return;
+
+        RunnerLife runnerLife = obj.GetComponent<RunnerLife>();
+
+        if (runnerLife != null)
+            runnerLife.ResetForNewRound(spawnPosition, spawnRotation);
     }
 
     private NetworkObject GetSpawnedPlayerObject(PlayerRef player)
