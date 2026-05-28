@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,14 +22,19 @@ public class PauseMenuManager : MonoBehaviour
     [SerializeField] private Button backToMainMenuButton;
     [SerializeField] private Button quitButton;
 
+    private readonly List<GraphicRaycaster> disabledRaycasters = new List<GraphicRaycaster>();
+
     private bool _isLeavingOrQuitting;
     private CursorLockMode _previousLockMode;
     private bool _previousCursorVisible;
+    private Canvas _pauseCanvas;
+    private GraphicRaycaster _pauseRaycaster;
+    private CanvasGroup _pauseCanvasGroup;
 
     private void Awake()
     {
         if (mainMenuManager == null)
-            mainMenuManager = FindObjectOfType<MainMenuManager>();
+            mainMenuManager = FindFirstObjectByType<MainMenuManager>();
 
         ClosePauseInstant();
 
@@ -105,11 +111,17 @@ public class PauseMenuManager : MonoBehaviour
 
         if (pauseSettingsPanel != null)
             pauseSettingsPanel.SetActive(false);
+
+        PreparePauseInput();
+        DisableOtherRaycasters();
     }
 
     public void ResumeGame()
     {
         IsPaused = false;
+
+        RestoreRaycasters();
+        DisablePauseInput();
 
         Cursor.lockState = _previousLockMode;
         Cursor.visible = _previousCursorVisible;
@@ -134,6 +146,8 @@ public class PauseMenuManager : MonoBehaviour
 
         if (pauseSettingsPanel != null)
             pauseSettingsPanel.SetActive(true);
+
+        PreparePauseInput();
     }
 
     public void BackFromSettingsPanel()
@@ -146,6 +160,8 @@ public class PauseMenuManager : MonoBehaviour
 
         if (pauseMainPanel != null)
             pauseMainPanel.SetActive(true);
+
+        PreparePauseInput();
     }
 
     public void BackToMainMenu()
@@ -179,9 +195,7 @@ public class PauseMenuManager : MonoBehaviour
         ClosePauseInstant();
 
         if (mainMenuManager != null)
-        {
             mainMenuManager.LeaveLobby();
-        }
 
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
@@ -194,6 +208,9 @@ public class PauseMenuManager : MonoBehaviour
     {
         IsPaused = false;
 
+        RestoreRaycasters();
+        DisablePauseInput();
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
@@ -205,5 +222,107 @@ public class PauseMenuManager : MonoBehaviour
 
         if (pauseSettingsPanel != null)
             pauseSettingsPanel.SetActive(false);
+    }
+
+    private void PreparePauseInput()
+    {
+        if (pauseRootPanel == null)
+            return;
+
+        pauseRootPanel.transform.SetAsLastSibling();
+
+        if (_pauseCanvas == null)
+            _pauseCanvas = pauseRootPanel.GetComponent<Canvas>();
+
+        if (_pauseCanvas == null)
+            _pauseCanvas = pauseRootPanel.AddComponent<Canvas>();
+
+        _pauseCanvas.overrideSorting = true;
+        _pauseCanvas.sortingOrder = 10000;
+
+        if (_pauseRaycaster == null)
+            _pauseRaycaster = pauseRootPanel.GetComponent<GraphicRaycaster>();
+
+        if (_pauseRaycaster == null)
+            _pauseRaycaster = pauseRootPanel.AddComponent<GraphicRaycaster>();
+
+        _pauseRaycaster.enabled = true;
+
+        if (_pauseCanvasGroup == null)
+            _pauseCanvasGroup = pauseRootPanel.GetComponent<CanvasGroup>();
+
+        if (_pauseCanvasGroup == null)
+            _pauseCanvasGroup = pauseRootPanel.AddComponent<CanvasGroup>();
+
+        _pauseCanvasGroup.alpha = 1f;
+        _pauseCanvasGroup.interactable = true;
+        _pauseCanvasGroup.blocksRaycasts = true;
+    }
+
+    private void DisablePauseInput()
+    {
+        if (_pauseCanvasGroup != null)
+        {
+            _pauseCanvasGroup.interactable = false;
+            _pauseCanvasGroup.blocksRaycasts = false;
+        }
+    }
+
+    private void DisableOtherRaycasters()
+    {
+        disabledRaycasters.Clear();
+
+        GraphicRaycaster[] raycasters = FindObjectsByType<GraphicRaycaster>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+
+        for (int i = 0; i < raycasters.Length; i++)
+        {
+            GraphicRaycaster raycaster = raycasters[i];
+
+            if (raycaster == null || !raycaster.enabled)
+                continue;
+
+            if (IsPauseObject(raycaster.transform))
+                continue;
+
+            raycaster.enabled = false;
+            disabledRaycasters.Add(raycaster);
+        }
+    }
+
+    private void RestoreRaycasters()
+    {
+        for (int i = 0; i < disabledRaycasters.Count; i++)
+        {
+            if (disabledRaycasters[i] != null)
+                disabledRaycasters[i].enabled = true;
+        }
+
+        disabledRaycasters.Clear();
+    }
+
+    private bool IsPauseObject(Transform target)
+    {
+        if (target == null)
+            return false;
+
+        if (IsSameOrChild(target, pauseRootPanel))
+            return true;
+
+        if (IsSameOrChild(target, pauseMainPanel))
+            return true;
+
+        if (IsSameOrChild(target, pauseSettingsPanel))
+            return true;
+
+        return false;
+    }
+
+    private bool IsSameOrChild(Transform target, GameObject root)
+    {
+        if (root == null)
+            return false;
+
+        Transform rootTransform = root.transform;
+        return target == rootTransform || target.IsChildOf(rootTransform);
     }
 }
