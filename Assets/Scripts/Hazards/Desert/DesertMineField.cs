@@ -97,4 +97,8 @@ public class DesertMinefield : NetworkBehaviour
             return 1;
         return Mathf.Max(1, Mathf.CeilToInt(Mathf.Max(0f, seconds) / Runner.DeltaTime));
     }
+    private void OnDisable()
+    {
+        ApplyVisibility(visible: true, force: true);
+    }
 }
