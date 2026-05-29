@@ -469,6 +469,18 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         Quaternion spawnRotation = spawnPoint != null ? spawnPoint.rotation : Quaternion.identity;
 
+        RunnerLife runnerLife = spawnedObject.GetComponent<RunnerLife>();
+        bool usedCheckpoint = false;
+
+        if (runnerLife != null &&
+            role == RoleHandler.PlayerRole.Runner &&
+            RunnerCheckpoint.TryGetSavedCheckpoint(runnerLife, out Vector3 checkpointPosition, out Quaternion checkpointRotation))
+        {
+            spawnPosition = checkpointPosition;
+            spawnRotation = checkpointRotation;
+            usedCheckpoint = true;
+        }
+
         RoleHandler roleHandler = spawnedObject.GetComponentInChildren<RoleHandler>(true);
 
         if (roleHandler != null && role != RoleHandler.PlayerRole.None)
@@ -481,15 +493,23 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         else
             ForceSpawnTransform(spawnedObject, spawnPosition, spawnRotation);
 
-        ResetRunnerLifeForNewRound(spawnedObject, spawnPosition, spawnRotation);
+        // Burada checkpoint progress'i temizlemiyoruz.
+        // Ölünce/respawn olunca en yüksek checkpoint kalmaya devam etmeli.
+        if (runnerLife != null)
+            runnerLife.ResetForNewRound(spawnPosition, spawnRotation);
 
         PlayerHealth health = spawnedObject.GetComponent<PlayerHealth>();
 
         if (health != null)
             health.ResetHealth();
 
-        Debug.Log($"PlayerSpawner: Player {player.PlayerId} respawn edildi. Slot={slotIndex + 1} | Role={role}");
+        Debug.Log(
+            $"PlayerSpawner: Player {player.PlayerId} respawn edildi. " +
+            $"Slot={slotIndex + 1} | Role={role} | " +
+            $"Respawn={(usedCheckpoint ? "Checkpoint" : "BaseSpawn")}"
+        );
     }
+
 
     private void ResetRunnerLifeForNewRound(NetworkObject obj, Vector3 spawnPosition, Quaternion spawnRotation)
     {
@@ -499,7 +519,10 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         RunnerLife runnerLife = obj.GetComponent<RunnerLife>();
 
         if (runnerLife != null)
+        {
+            RunnerCheckpoint.ResetProgress(runnerLife);
             runnerLife.ResetForNewRound(spawnPosition, spawnRotation);
+        }
     }
 
     private NetworkObject GetSpawnedPlayerObject(PlayerRef player)
@@ -549,7 +572,14 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         NetworkObject spawnedObject = GetSpawnedPlayerObject(player);
 
         if (spawnedObject != null)
+        {
+            RunnerLife runnerLife = spawnedObject.GetComponent<RunnerLife>();
+
+            if (runnerLife != null)
+                RunnerCheckpoint.ResetProgress(runnerLife);
+
             _runner.Despawn(spawnedObject);
+        }
 
         _spawnedPlayers.Remove(player);
         Debug.Log($"PlayerSpawner: Player {player.PlayerId} despawn edildi.");
@@ -597,6 +627,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         _lobbyState = null;
         _callbacksRegistered = false;
         _gameplaySpawnStarted = false;
+        RunnerCheckpoint.ClearAllProgress();
         _spawnedPlayers.Clear();
     }
 
@@ -613,6 +644,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
         _lobbyState = null;
         _callbacksRegistered = false;
         _gameplaySpawnStarted = false;
+        RunnerCheckpoint.ClearAllProgress();
         _spawnedPlayers.Clear();
     }
 
