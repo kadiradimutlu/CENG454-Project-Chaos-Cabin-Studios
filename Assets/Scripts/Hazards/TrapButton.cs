@@ -12,6 +12,7 @@ public class TrapButton : NetworkBehaviour
     [SerializeField] private DesertSlowField slowField;
     [SerializeField] private DesertMinefield minefield;
     [SerializeField] private DungeonBlindField blindField;
+    [SerializeField] private SnowFallDown snowFallDown;
 
 
     [Header("Interaction")]
@@ -50,8 +51,7 @@ public class TrapButton : NetworkBehaviour
 
     public void PressButton()
     {
-        Debug.Log($"[TrapButton] {name}: PressButton(). slowField atandı mı={slowField!=null}, minefield atandı mı={minefield!=null}, blindField atandı mı={blindField!=null}, Object null mu={Object==null}", this);
-
+        
         if (Object != null)
         {
             if (Object.HasStateAuthority)
@@ -83,7 +83,7 @@ public class TrapButton : NetworkBehaviour
 
     private void TriggerBoundTrap()
     {
-        Debug.Log($"[TrapButton] {name}: TriggerBoundTrap. slowField={slowField!=null}, minefield={minefield!=null}, blindField={blindField!=null}", this);
+        Debug.Log($"[TrapButton] {name}: TriggerBoundTrap. slowField={slowField!=null}, minefield={minefield!=null}, blindField={blindField!=null}, snowFallDown={snowFallDown!=null}", this);
 
       
         if (slowField != null)
@@ -95,7 +95,10 @@ public class TrapButton : NetworkBehaviour
             Debug.Log($"[TrapButton] {name}: TriggerBoundTrap -> minefield.Activate() local.", this);
             minefield.Activate();
         }
-        if (slowField == null && minefield == null && blindField == null)
+        if (snowFallDown != null)
+            snowFallDown.Activate();
+
+        if (slowField == null && minefield == null && blindField == null && snowFallDown == null)
             Debug.LogWarning($"[TrapButton] {name}: HİÇBİR slot dolu değil! Inspector'da Slow Field, Minefield veya Blind Field'a trap sürükle.", this);
     }
 
