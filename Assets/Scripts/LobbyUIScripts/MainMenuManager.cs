@@ -5,6 +5,7 @@ using Fusion;
 using Fusion.Sockets;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
@@ -20,6 +21,14 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private GameObject gameWorld;
     [SerializeField] private GameObject menuCameraObject;
     [SerializeField] private GameObject playerSpawnManagerObject;
+
+    [Header("Menu Audio")]
+    [SerializeField] private AudioSource mainMenuAudioSource;
+    [SerializeField] private AudioClip mainMenuMusicClip;
+    [SerializeField] private AudioMixerGroup mainMenuMixerGroup;
+    [SerializeField] private AudioMixer mainAudioMixer;
+    [SerializeField] private string mainMenuVolumeParameter = "MainMenuVolume";
+    [SerializeField] private bool playMainMenuMusicInLobby = true;
 
     [Header("Join Code UI")]
     [SerializeField] private TMP_InputField codeInputField;
@@ -110,6 +119,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     private void Awake()
     {
         EnsureRunnerHandler();
+        SetupMainMenuAudio();
         SetupSkinSelectionButtons();
         SetupRoleSelectionButtons();
 
@@ -530,6 +540,102 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             copyRoomCodeButtonText.text = "Copy";
     }
 
+    private void SetupMainMenuAudio()
+    {
+        if (mainMenuAudioSource == null)
+            mainMenuAudioSource = GetComponent<AudioSource>();
+
+        if (mainMenuAudioSource == null)
+            mainMenuAudioSource = gameObject.AddComponent<AudioSource>();
+
+        if (mainMenuMusicClip != null)
+            mainMenuAudioSource.clip = mainMenuMusicClip;
+
+        mainMenuAudioSource.loop = true;
+        mainMenuAudioSource.playOnAwake = false;
+        mainMenuAudioSource.spatialBlend = 0f;
+
+        if (mainMenuMixerGroup != null)
+        {
+            mainMenuAudioSource.outputAudioMixerGroup = mainMenuMixerGroup;
+
+            if (mainAudioMixer == null)
+                mainAudioMixer = mainMenuMixerGroup.audioMixer;
+        }
+        else
+        {
+            Debug.LogWarning("MainMenuManager: Main Menu Mixer Group is not assigned. Main menu music will not be controlled by MainAudioMixer until you assign a mixer group.");
+        }
+    }
+
+    public void SetMainMenuMusicVolume(float normalizedVolume)
+    {
+        if (mainAudioMixer == null)
+        {
+            Debug.LogWarning("MainMenuManager: Main Audio Mixer is not assigned.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(mainMenuVolumeParameter))
+        {
+            Debug.LogWarning("MainMenuManager: Main menu volume parameter name is empty.");
+            return;
+        }
+
+        normalizedVolume = Mathf.Clamp01(normalizedVolume);
+        float volumeDb = normalizedVolume <= 0.0001f
+            ? -80f
+            : Mathf.Log10(normalizedVolume) * 20f;
+
+        bool parameterFound = mainAudioMixer.SetFloat(mainMenuVolumeParameter, volumeDb);
+
+        if (!parameterFound)
+        {
+            Debug.LogWarning($"MainMenuManager: AudioMixer parameter '{mainMenuVolumeParameter}' was not found. Expose this exact parameter name in MainAudioMixer.");
+        }
+    }
+
+    private void PlayMainMenuMusic()
+    {
+        if (mainMenuAudioSource == null)
+            return;
+
+        if (mainMenuMusicClip != null && mainMenuAudioSource.clip != mainMenuMusicClip)
+            mainMenuAudioSource.clip = mainMenuMusicClip;
+
+        if (mainMenuAudioSource.clip == null)
+            return;
+
+        if (!mainMenuAudioSource.isPlaying)
+            mainMenuAudioSource.Play();
+    }
+
+    private void StopMainMenuMusic()
+    {
+        if (mainMenuAudioSource == null)
+            return;
+
+        if (mainMenuAudioSource.isPlaying)
+            mainMenuAudioSource.Stop();
+    }
+
+    private void UpdateMainMenuMusicState()
+    {
+        bool isInGameplay = gameWorld != null && gameWorld.activeSelf;
+
+        bool isMenuPanelOpen =
+            _currentPanel == mainMenuPanel ||
+            _currentPanel == settingsPanel ||
+            _currentPanel == hostJoinPanel ||
+            _currentPanel == joinCodePanel ||
+            (playMainMenuMusicInLobby && _currentPanel == lobbyPanel);
+
+        if (!isInGameplay && isMenuPanelOpen)
+            PlayMainMenuMusic();
+        else
+            StopMainMenuMusic();
+    }
+
     private void SetGameplayView(bool gameplayActive)
     {
         if (gameWorld != null)
@@ -550,6 +656,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (lobbyPanel) lobbyPanel.SetActive(false);
 
         _currentPanel = null;
+        UpdateMainMenuMusicState();
     }
 
     private void SetStatusText(TextMeshProUGUI textObject, string value)
@@ -1137,6 +1244,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         CloseAllPanels();
         SetGameplayView(true);
+        StopMainMenuMusic();
 
         if (playerSpawnManagerObject != null)
         {
@@ -1168,6 +1276,8 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             SetupSkinSelectionButtons();
             SetupRoleSelectionButtons();
         }
+
+        UpdateMainMenuMusicState();
     }
 
     private void RefreshLobbyUI()
