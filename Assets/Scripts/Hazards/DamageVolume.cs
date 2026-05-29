@@ -163,6 +163,12 @@ public class DamageVolume : MonoBehaviour
         if (playerHealth == null)
             return;
 
+        RoleHandler roleHandler = other.GetComponentInParent<RoleHandler>();
+
+        //bunu da mı eklemediniz  https://www.youtube.com/shorts/c6aypfcOz2E
+        if (roleHandler == null || roleHandler.currentRole != RoleHandler.PlayerRole.Runner)
+            return;
+
         if (!ignoreCooldown && !CanDamageNow(playerHealth))
             return;
 
