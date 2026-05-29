@@ -39,6 +39,11 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] private float obstacleSkin = 0.04f;
     [SerializeField] private bool slideAlongObstacles = true;
 
+    [Header("Snow Zone Multiplier")]
+    [SerializeField] private float iceAcceleration = 4.5f;
+    [SerializeField] private float iceDeceleration = 1.25f;
+    [SerializeField] private float iceTopSpeedMultiplier = 1.05f;
+
     [Networked] public Vector2 NetMoveInput { get; private set; }
     [Networked] public float NetSpeed01 { get; private set; }
     [Networked] public NetworkBool NetGrounded { get; private set; }
@@ -66,6 +71,7 @@ public class PlayerMovement : NetworkBehaviour
     [Networked] public float SpeedMultiplier { get; private set; }
     // The network tick at which the active slow expires. 0 = no active slow.
     [Networked] private int SlowExpiryTick { get; set; }
+    [Networked] private Vector3 IceHorizontalVelocity { get; set; }
 
     private void Awake()
     {
@@ -102,6 +108,7 @@ public class PlayerMovement : NetworkBehaviour
             PreviousButtons = default;
             SpeedMultiplier = 1f;
             SlowExpiryTick = 0;
+            IceHorizontalVelocity = Vector3.zero;
         }
 
         SetupCollider(false);
@@ -205,7 +212,8 @@ public class PlayerMovement : NetworkBehaviour
 
         verticalVelocity += gravity * deltaTime;
 
-        Vector3 horizontalVelocity = moveDirection * speed;
+        Vector3 desiredHorizontalVelocity = moveDirection * speed;
+        Vector3 horizontalVelocity = GetHorizontalVelocityForSurface(desiredHorizontalVelocity, deltaTime);
         Vector3 horizontalStep = new Vector3(horizontalVelocity.x, 0f, horizontalVelocity.z) * deltaTime;
         Vector3 nextPosition = ResolveHorizontalMovement(transform.position, horizontalStep);
         nextPosition.y += verticalVelocity * deltaTime;
@@ -286,6 +294,48 @@ public class PlayerMovement : NetworkBehaviour
             playerHealth = GetComponent<PlayerHealth>();
 
         return playerHealth != null && playerHealth.IsEliminated;
+    }
+
+    private bool IsRunnerOnSnow()
+    {
+        RoleHandler role = GetComponent<RoleHandler>();
+
+        if (role == null || role.currentRole != RoleHandler.PlayerRole.Runner)
+            return false;
+
+        RunnerZoneTracker tracker = GetComponent<RunnerZoneTracker>();
+
+        if (tracker == null)
+            return false;
+
+        return tracker.IsInZone(ZoneType.Snow);
+    }
+
+    private Vector3 GetHorizontalVelocityForSurface(Vector3 desiredHorizontalVelocity, float deltaTime)
+    {
+        if (!isMovementAllowed)
+        {
+            IceHorizontalVelocity = Vector3.zero;
+            return Vector3.zero;
+        }
+
+        if (!IsRunnerOnSnow())
+        {
+            IceHorizontalVelocity = Vector3.zero;
+            return desiredHorizontalVelocity;
+        }
+
+        Vector3 target = desiredHorizontalVelocity * Mathf.Max(0.2f, iceTopSpeedMultiplier);
+        float accelerationStep = Mathf.Max(0f, iceAcceleration) * deltaTime;
+        float decelerationStep = Mathf.Max(0f, iceDeceleration) * deltaTime;
+
+        if (desiredHorizontalVelocity.sqrMagnitude > 0.0001f)
+            IceHorizontalVelocity = Vector3.MoveTowards(IceHorizontalVelocity, target, accelerationStep);
+        else
+            IceHorizontalVelocity = Vector3.MoveTowards(IceHorizontalVelocity, Vector3.zero, decelerationStep);
+
+        IceHorizontalVelocity = new Vector3(IceHorizontalVelocity.x, 0f, IceHorizontalVelocity.z);
+        return IceHorizontalVelocity;
     }
 
     private void PullAnimationStateFromNetwork()
@@ -592,6 +642,7 @@ public class PlayerMovement : NetworkBehaviour
         PreviousButtons = default;
         SpeedMultiplier = 1f;
         SlowExpiryTick = 0;
+        IceHorizontalVelocity = Vector3.zero;
 
         CurrentMoveInput = Vector2.zero;
         CurrentSpeed01 = 0f;
@@ -651,6 +702,13 @@ public class PlayerMovement : NetworkBehaviour
             return;
  
         transform.position += platformDelta;
+    }
+
+    private void OnValidate()
+    {
+        iceAcceleration = Mathf.Max(0f, iceAcceleration);
+        iceDeceleration = Mathf.Max(0f, iceDeceleration);
+        iceTopSpeedMultiplier = Mathf.Clamp(iceTopSpeedMultiplier, 0.2f, 2f);
     }
 }
 
