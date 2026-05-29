@@ -11,7 +11,28 @@ public class SnowFallDown : NetworkBehaviour
     protected GameObject demirObject;
     protected GameObject massObject;
 
+    [Networked] protected NetworkBool Triggered { get; set; }
+    [Networked] protected NetworkBool DemirRemoved { get; set; }
+    [Networked] protected NetworkBool MassRemoved { get; set; }
+
     public override void Spawned() => ResolveTargets();
+
+    public void Activate()
+    {
+        if (Object == null) return; // Offline için sonraki commit
+        if (Object.HasStateAuthority) ServerActivate();
+        else RPC_RequestActivate();
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_RequestActivate() => ServerActivate();
+
+    private void ServerActivate()
+    {
+        if (!Object.HasStateAuthority || Triggered) return;
+        Triggered = true;
+        DemirRemoved = true;
+    }
 
     protected void ResolveTargets()
     {
