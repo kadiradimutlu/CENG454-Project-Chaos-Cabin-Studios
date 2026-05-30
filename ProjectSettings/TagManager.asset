@@ -6,6 +6,12 @@ TagManager:
   tags:
   - LobbyCamera
   - Ground
+  - Demir
+  - Mass
+  - Demir2
+  - Mass2
+  - Demir3
+  - Mass3
   layers:
   - Default
   - TransparentFX

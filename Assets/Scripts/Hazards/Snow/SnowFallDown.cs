@@ -3,9 +3,8 @@ using UnityEngine;
 
 public class SnowFallDown : NetworkBehaviour
 {
-[SerializeField] private Transform targetRoot;
-[SerializeField] private string demirTag = "Demir";
-[SerializeField] private string massTag = "Mass";
+[SerializeField] private GameObject demirObject;
+[SerializeField] private GameObject massObject;
 [SerializeField] private float massDestroyDelay = 6f;
 
 [Networked] private NetworkBool Triggered { get; set; }
@@ -13,21 +12,24 @@ public class SnowFallDown : NetworkBehaviour
 [Networked] private NetworkBool MassRemoved { get; set; }
 [Networked] private int MassRemoveAtTick { get; set; }
 
-private GameObject demirObject;
-private GameObject massObject;
 private bool demirApplied;
 private bool massApplied;
+private bool missingTargetLogged;
 
-
-private void ResolveTargets()
-{
-    Transform root = targetRoot != null ? targetRoot : transform;
-    if (demirObject == null) demirObject = FindByTagInChildren(root, demirTag);
-    if (massObject == null) massObject = FindByTagInChildren(root, massTag);
-}
 
 public void Activate()
 {
+    if (Object == null)
+    {
+        return;
+    }
+
+    if (!missingTargetLogged && (demirObject == null || massObject == null))
+    {
+        missingTargetLogged = true;
+        return;
+    }
+
     if (Object.HasStateAuthority) ServerActivate();
     else RPC_RequestActivate();
 }
@@ -42,7 +44,6 @@ public override void FixedUpdateNetwork()
 
 public override void Render()
 {
-    ResolveTargets();
     if (DemirRemoved && !demirApplied) { RemoveObject(ref demirObject); demirApplied = true; }
     if (MassRemoved && !massApplied) { RemoveObject(ref massObject); massApplied = true; }
 }
@@ -68,15 +69,5 @@ private void ServerActivate()
     DemirRemoved = true;
     int delayTicks = Mathf.Max(1, Mathf.CeilToInt(massDestroyDelay / Runner.DeltaTime));
     MassRemoveAtTick = Runner.Tick + delayTicks;
-}
-
-private static GameObject FindByTagInChildren(Transform root, string tagName)
-{
-    if (root == null || string.IsNullOrWhiteSpace(tagName)) return null;
-    foreach (Transform t in root.GetComponentsInChildren<Transform>(true))
-    {
-        if (t.CompareTag(tagName)) return t.gameObject;
-    }
-    return null;
 }
 }
