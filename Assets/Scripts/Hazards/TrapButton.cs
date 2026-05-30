@@ -14,6 +14,12 @@ public class TrapButton : NetworkBehaviour
     [SerializeField] private DungeonBlindField blindField;
     [SerializeField] private SnowFallDown snowFallDown;
 
+    [Tooltip("Island - Yolun A tarafındaki zehir bölgesini tetikler.")]
+    [SerializeField] private IslandPoisonZone islandPoisonZoneA;
+
+    [Tooltip("Island - Yolun B tarafındaki zehir bölgesini tetikler.")]
+    [SerializeField] private IslandPoisonZone islandPoisonZoneB;
+
 
     [Header("Interaction")]
     [Tooltip("How close (meters) the trapper must be to interact with this button. Used " +
@@ -83,7 +89,7 @@ public class TrapButton : NetworkBehaviour
 
     private void TriggerBoundTrap()
     {
-        Debug.Log($"[TrapButton] {name}: TriggerBoundTrap. slowField={slowField!=null}, minefield={minefield!=null}, blindField={blindField!=null}, snowFallDown={snowFallDown!=null}", this);
+        Debug.Log($"[TrapButton] {name}: TriggerBoundTrap. slowField={slowField!=null}, minefield={minefield!=null}, blindField={blindField!=null}, snowFallDown={snowFallDown!=null}, islandPoisonZoneA={islandPoisonZoneA!=null}, islandPoisonZoneB={islandPoisonZoneB!=null}", this);
 
       
         if (slowField != null)
@@ -97,9 +103,14 @@ public class TrapButton : NetworkBehaviour
         }
         if (snowFallDown != null)
             snowFallDown.Activate();
+        if (islandPoisonZoneA != null)
+            islandPoisonZoneA.ActivateZoneA();
+        if (islandPoisonZoneB != null)
+            islandPoisonZoneB.ActivateZoneB();
 
-        if (slowField == null && minefield == null && blindField == null && snowFallDown == null)
-            Debug.LogWarning($"[TrapButton] {name}: HİÇBİR slot dolu değil! Inspector'da Slow Field, Minefield veya Blind Field'a trap sürükle.", this);
+        if (slowField == null && minefield == null && blindField == null && snowFallDown == null
+            && islandPoisonZoneA == null && islandPoisonZoneB == null)
+            Debug.LogWarning($"[TrapButton] {name}: HİÇBİR slot dolu değil! Inspector'da ilgili trap slotuna obje sürükle.", this);
     }
 
     private void OnPressedCountChanged()
