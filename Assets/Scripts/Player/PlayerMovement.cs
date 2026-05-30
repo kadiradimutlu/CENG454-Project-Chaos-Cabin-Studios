@@ -1,11 +1,13 @@
 using System.Collections;
 using Fusion;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
+[RequireComponent(typeof(AudioSource))]
 public class PlayerMovement : NetworkBehaviour
 {
     private bool isMovementAllowed = true;
@@ -39,6 +41,30 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] private float obstacleSkin = 0.04f;
     [SerializeField] private bool slideAlongObstacles = true;
 
+    [Header("SFX Routing / Nereden Alıyor")]
+    [SerializeField] private bool enableMovementSfx = true;
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioMixerGroup sfxMixerGroup;
+    [TextArea(2, 3)]
+    [SerializeField] private string sfxRouteInfo =
+        "Sesler PlayerMovement üzerindeki SFX Source'tan çalar. Output: SFX Mixer Group.";
+
+    [Header("Movement SFX")]
+    [SerializeField] private AudioClip[] footstepClips;
+    [SerializeField] private AudioClip jumpClip;
+    [SerializeField] private AudioClip landingClip;
+    [SerializeField] private bool useAnimationFootstepEvents = false;
+    [Range(0f, 1f)] [SerializeField] private float footstepVolume = 0.75f;
+    [Range(0f, 1f)] [SerializeField] private float jumpVolume = 0.9f;
+    [Range(0f, 1f)] [SerializeField] private float landingVolume = 0.9f;
+    [SerializeField] private float footstepInterval = 0.42f;
+    [SerializeField] private float sprintFootstepIntervalMultiplier = 0.72f;
+    [SerializeField] private float crouchFootstepIntervalMultiplier = 1.35f;
+    [SerializeField] private float footstepMoveThreshold = 0.08f;
+    [SerializeField] private float jumpSfxVelocityThreshold = 0.2f;
+    [SerializeField] private float landingMinFallSpeed = 2.5f;
+    [Range(0f, 1f)] [SerializeField] private float sfxSpatialBlend = 1f;
+
     [Header("Snow Zone Multiplier")]
     [SerializeField] private float iceAcceleration = 4.5f;
     [SerializeField] private float iceDeceleration = 1.25f;
@@ -62,6 +88,11 @@ public class PlayerMovement : NetworkBehaviour
     private CapsuleCollider capsule;
     private PlayerHealth playerHealth;
 
+    private bool sfxStateInitialized;
+    private bool sfxWasGrounded;
+    private float sfxPreviousVerticalVelocity;
+    private float footstepTimer;
+
     [Networked] private float VerticalVelocity { get; set; }
     [Networked] private float JumpGroundIgnoreTimer { get; set; }
     [Networked] private NetworkButtons PreviousButtons { get; set; }
@@ -79,6 +110,8 @@ public class PlayerMovement : NetworkBehaviour
         capsule = GetComponent<CapsuleCollider>();
         playerHealth = GetComponent<PlayerHealth>();
         SetupCollider(false);
+        SetupSfxSource();
+        ResetSfxState();
     }
 
     public override void Spawned()
@@ -112,6 +145,8 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         SetupCollider(false);
+        SetupSfxSource();
+        ResetSfxState();
 
         if (ignorePlayerToPlayerCollision)
             StartCoroutine(RefreshPlayerCollisionIgnores());
@@ -280,6 +315,159 @@ public class PlayerMovement : NetworkBehaviour
             PullAnimationStateFromNetwork();
             ApplyCrouchCollider(CurrentCrouching);
         }
+
+        UpdateMovementSfx(Time.deltaTime);
+    }
+
+    private void SetupSfxSource()
+    {
+        if (sfxSource == null)
+            sfxSource = GetComponent<AudioSource>();
+
+        if (sfxSource == null)
+            sfxSource = gameObject.AddComponent<AudioSource>();
+
+        sfxSource.playOnAwake = false;
+        sfxSource.loop = false;
+        sfxSource.spatialBlend = sfxSpatialBlend;
+        sfxSource.outputAudioMixerGroup = sfxMixerGroup;
+    }
+
+    private void ResetSfxState()
+    {
+        sfxStateInitialized = false;
+        sfxWasGrounded = CurrentGrounded;
+        sfxPreviousVerticalVelocity = CurrentVerticalVelocity;
+        footstepTimer = 0f;
+    }
+
+    private void UpdateMovementSfx(float deltaTime)
+    {
+        if (!enableMovementSfx)
+            return;
+
+        if (sfxSource == null)
+            SetupSfxSource();
+
+        if (sfxSource == null)
+            return;
+
+        if (!sfxStateInitialized)
+        {
+            sfxWasGrounded = CurrentGrounded;
+            sfxPreviousVerticalVelocity = CurrentVerticalVelocity;
+            sfxStateInitialized = true;
+            return;
+        }
+
+        bool jumped =
+            sfxWasGrounded &&
+            !CurrentGrounded &&
+            CurrentVerticalVelocity > jumpSfxVelocityThreshold;
+
+        if (jumped)
+        {
+            PlaySfx(jumpClip, jumpVolume);
+            footstepTimer = GetFootstepInterval();
+        }
+
+        bool landed =
+            !sfxWasGrounded &&
+            CurrentGrounded &&
+            sfxPreviousVerticalVelocity <= -Mathf.Abs(landingMinFallSpeed);
+
+        if (landed)
+        {
+            PlaySfx(landingClip, landingVolume);
+            footstepTimer = Mathf.Max(0.05f, GetFootstepInterval() * 0.5f);
+        }
+
+        UpdateFootstepSfx(deltaTime);
+
+        sfxWasGrounded = CurrentGrounded;
+        sfxPreviousVerticalVelocity = CurrentVerticalVelocity;
+    }
+
+    private void UpdateFootstepSfx(float deltaTime)
+    {
+        if (useAnimationFootstepEvents)
+            return;
+
+        bool shouldStep =
+            CurrentGrounded &&
+            CurrentSpeed01 > footstepMoveThreshold &&
+            isMovementAllowed;
+
+        if (!shouldStep)
+        {
+            footstepTimer = 0f;
+            return;
+        }
+
+        footstepTimer -= deltaTime;
+
+        if (footstepTimer > 0f)
+            return;
+
+        PlayRandomFootstepSfx();
+        footstepTimer = GetFootstepInterval();
+    }
+
+    public void PlayFootstepSfxFromAnimation()
+    {
+        if (!enableMovementSfx)
+            return;
+
+        if (!CurrentGrounded || CurrentSpeed01 <= footstepMoveThreshold)
+            return;
+
+        PlayRandomFootstepSfx();
+        footstepTimer = GetFootstepInterval();
+    }
+
+    private float GetFootstepInterval()
+    {
+        float interval = Mathf.Max(0.05f, footstepInterval);
+
+        if (CurrentSprinting)
+            interval *= sprintFootstepIntervalMultiplier;
+        else if (CurrentCrouching)
+            interval *= crouchFootstepIntervalMultiplier;
+
+        return Mathf.Max(0.05f, interval);
+    }
+
+    private void PlayRandomFootstepSfx()
+    {
+        if (footstepClips == null || footstepClips.Length == 0)
+            return;
+
+        for (int i = 0; i < footstepClips.Length; i++)
+        {
+            AudioClip clip = footstepClips[UnityEngine.Random.Range(0, footstepClips.Length)];
+
+            if (clip == null)
+                continue;
+
+            PlaySfx(clip, footstepVolume);
+            return;
+        }
+    }
+
+    private void PlaySfx(AudioClip clip, float volume)
+    {
+        if (!enableMovementSfx || clip == null)
+            return;
+
+        if (sfxSource == null)
+            SetupSfxSource();
+
+        if (sfxSource == null)
+            return;
+
+        sfxSource.spatialBlend = sfxSpatialBlend;
+        sfxSource.outputAudioMixerGroup = sfxMixerGroup;
+        sfxSource.PlayOneShot(clip, Mathf.Clamp01(volume));
     }
 
 
@@ -659,6 +847,7 @@ public class PlayerMovement : NetworkBehaviour
         NetSprinting = false;
 
         SetupCollider(false);
+        ResetSfxState();
     }
 
     public void SetMovementAllowed(bool value)
@@ -709,6 +898,21 @@ public class PlayerMovement : NetworkBehaviour
         iceAcceleration = Mathf.Max(0f, iceAcceleration);
         iceDeceleration = Mathf.Max(0f, iceDeceleration);
         iceTopSpeedMultiplier = Mathf.Clamp(iceTopSpeedMultiplier, 0.2f, 2f);
+
+        footstepInterval = Mathf.Max(0.05f, footstepInterval);
+        sprintFootstepIntervalMultiplier = Mathf.Clamp(sprintFootstepIntervalMultiplier, 0.25f, 2f);
+        crouchFootstepIntervalMultiplier = Mathf.Clamp(crouchFootstepIntervalMultiplier, 0.25f, 3f);
+        footstepMoveThreshold = Mathf.Max(0f, footstepMoveThreshold);
+        jumpSfxVelocityThreshold = Mathf.Max(0f, jumpSfxVelocityThreshold);
+        landingMinFallSpeed = Mathf.Max(0f, landingMinFallSpeed);
+
+        if (sfxSource != null)
+        {
+            sfxSource.playOnAwake = false;
+            sfxSource.loop = false;
+            sfxSource.spatialBlend = sfxSpatialBlend;
+            sfxSource.outputAudioMixerGroup = sfxMixerGroup;
+        }
     }
 }
 

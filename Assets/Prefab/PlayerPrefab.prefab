@@ -28,6 +28,7 @@ GameObject:
   - component: {fileID: 8309354680070012958}
   - component: {fileID: 485313402626223404}
   - component: {fileID: 2820043749555365989}
+  - component: {fileID: 8272836205064494611}
   m_Layer: 0
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -233,6 +234,30 @@ MonoBehaviour:
     m_Bits: 4294967295
   obstacleSkin: 0.04
   slideAlongObstacles: 1
+  enableMovementSfx: 1
+  sfxSource: {fileID: 0}
+  sfxMixerGroup: {fileID: 2182846121578117188, guid: bb632aa4fb89b3e49a7c5f6b149ca60e, type: 2}
+  sfxRouteInfo: "Sesler PlayerMovement \xFCzerindeki SFX Source'tan \xE7alar. Output:
+    SFX Mixer Group."
+  footstepClips:
+  - {fileID: 8300000, guid: 8d032f5f18c14bf4d9141bcd9dd99449, type: 3}
+  - {fileID: 8300000, guid: 8d032f5f18c14bf4d9141bcd9dd99449, type: 3}
+  jumpClip: {fileID: 8300000, guid: f27ab190ed3c528418ab5ae2ddfd2a9c, type: 3}
+  landingClip: {fileID: 8300000, guid: c68b9b6c8f3d66a40853ada98dc1055f, type: 3}
+  useAnimationFootstepEvents: 0
+  footstepVolume: 1
+  jumpVolume: 0.9
+  landingVolume: 1
+  footstepInterval: 0.42
+  sprintFootstepIntervalMultiplier: 0.72
+  crouchFootstepIntervalMultiplier: 1.35
+  footstepMoveThreshold: 0.08
+  jumpSfxVelocityThreshold: 0.2
+  landingMinFallSpeed: 2.5
+  sfxSpatialBlend: 1
+  iceAcceleration: 4.5
+  iceDeceleration: 1.25
+  iceTopSpeedMultiplier: 1.05
   _NetMoveInput: {x: 0, y: 0}
   _NetSpeed01: 0
   _NetGrounded:
@@ -466,6 +491,103 @@ MonoBehaviour:
   interactKey: 102
   scanInterval: 0.25
   requireTrapperRole: 1
+--- !u!82 &8272836205064494611
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3600554267242463573}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &5535873060997195435
 GameObject:
   m_ObjectHideFlags: 0
