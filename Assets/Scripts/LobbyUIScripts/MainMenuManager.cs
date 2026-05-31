@@ -1252,6 +1252,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (playerSpawnManagerObject != null)
         {
             playerSpawnManagerObject.SendMessage("TryStartGameplaySpawn", SendMessageOptions.DontRequireReceiver);
+            playerSpawnManagerObject.SendMessage("TryStartTrapSpawn", SendMessageOptions.DontRequireReceiver);
         }
 
         Debug.Log("GameWorld opened. Gameplay has started.");

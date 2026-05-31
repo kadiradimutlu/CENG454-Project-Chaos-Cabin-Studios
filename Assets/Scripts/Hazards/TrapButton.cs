@@ -45,7 +45,7 @@ public class TrapButton : NetworkBehaviour
 
     public override void Spawned()
     {
-        Debug.Log($"[TrapButton] {name}: SPAWNED çağrıldı. Object null mu={Object==null}, HasStateAuthority={(Object!=null && Object.HasStateAuthority)}, HasInputAuthority={(Object!=null && Object.HasInputAuthority)}", this);
+        Debug.Log($"[TrapButton] {name}: SPAWNED. Id={Object.Id}, HasState={Object.HasStateAuthority}, HasInput={Object.HasInputAuthority}", this);
     }
 
     /// <summary>True if the given world position is within this button's interact range.</summary>

@@ -152,7 +152,7 @@ public class NetworkRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
             GameMode = mode,
             SessionName = roomName,
             SceneManager = _sceneManager,
-            Scene = sceneRef,
+            Scene = (mode == GameMode.Host) ? sceneRef : default,
             PlayerCount = 4
         });
  
