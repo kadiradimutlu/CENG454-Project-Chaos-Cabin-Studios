@@ -638,12 +638,15 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void SetGameplayView(bool gameplayActive)
     {
+        CameraFollowRig.SetGameplayCursorActive(gameplayActive);
+
         if (gameWorld != null)
             gameWorld.SetActive(gameplayActive);
 
         if (!gameplayActive)
         {
             EnableMenuCameraForMenu();
+            CameraFollowRig.ForceUnlockCursor();
         }
     }
 
