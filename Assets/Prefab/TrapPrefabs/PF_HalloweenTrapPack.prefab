@@ -413,6 +413,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4170994500903310769}
+  - component: {fileID: 8844159810085891977}
+  - component: {fileID: 6447316097273726437}
   m_Layer: 0
   m_Name: HalloweenPoisonZone
   m_TagString: Untagged
@@ -437,6 +439,44 @@ Transform:
   - {fileID: 4907644200377484774}
   m_Father: {fileID: 4507171284743123402}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8844159810085891977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1467473421976130255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcec495fcbd1ee5459967b23de8fe0dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IslandPoisonZone
+  poisonZoneA: {fileID: 3048008246921575541}
+  poisonZoneB: {fileID: 7718893550868476749}
+  zoneType: 2
+  duration: 5
+  cooldown: 8
+  activationVisualsA: {fileID: 0}
+  activationVisualsB: {fileID: 0}
+--- !u!114 &6447316097273726437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1467473421976130255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 763629038
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 8844159810085891977}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &1583057064977415413
 GameObject:
   m_ObjectHideFlags: 0
@@ -1126,7 +1166,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6177500242459404838
 Transform:
   m_ObjectHideFlags: 0
@@ -1223,6 +1263,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7517449306433601695}
+  - component: {fileID: 2239311423010329272}
   m_Layer: 0
   m_Name: PF_HalloweenTrapPack
   m_TagString: Untagged
@@ -1246,8 +1287,31 @@ Transform:
   - {fileID: 7329851179880126272}
   - {fileID: 4507171284743123402}
   - {fileID: 2374538517306981645}
+  - {fileID: 9024784326569176872}
+  - {fileID: 7639142594944542941}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2239311423010329272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3511947004560104765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 3010844524
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects:
+  - {fileID: 6447316097273726437}
+  - {fileID: 6393508838008618367}
+  - {fileID: 5730716559849061002}
+  NetworkedBehaviours: []
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &3521979086427767299
 GameObject:
   m_ObjectHideFlags: 0
@@ -2714,7 +2778,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4907644200377484774
 Transform:
   m_ObjectHideFlags: 0
@@ -12148,6 +12212,87 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4313711711926712427, guid: 59563be75f5d14e41b034c34448f56de, type: 3}
   m_PrefabInstance: {fileID: 7885481401447750004}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7927008189216472615
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7517449306433601695}
+    m_Modifications:
+    - target: {fileID: 1334119217286228755, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_Name
+      value: HalloweenZoneAButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 23.309998
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 8.908997
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -512.91797
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3942951617574126424, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: SortKey
+      value: 836535785
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750712707655749520, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: islandPoisonZoneA
+      value: 
+      objectReference: {fileID: 8844159810085891977}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+--- !u!114 &6393508838008618367 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3942951617574126424, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+  m_PrefabInstance: {fileID: 7927008189216472615}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+--- !u!4 &9024784326569176872 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+  m_PrefabInstance: {fileID: 7927008189216472615}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8059305105410201728
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13313,6 +13458,87 @@ MonoBehaviour:
 Transform:
   m_CorrespondingSourceObject: {fileID: 2717049170346273337, guid: f8fd3c4e772792f458f0324c05ae93f4, type: 3}
   m_PrefabInstance: {fileID: 8667032164344845426}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8736901647995681234
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7517449306433601695}
+    m_Modifications:
+    - target: {fileID: 1334119217286228755, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_Name
+      value: HalloweenZoneBButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 22.972046
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 8.986023
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -516.76
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3942951617574126424, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: SortKey
+      value: 61131044
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750712707655749520, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: islandPoisonZoneB
+      value: 
+      objectReference: {fileID: 8844159810085891977}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+--- !u!114 &5730716559849061002 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3942951617574126424, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+  m_PrefabInstance: {fileID: 8736901647995681234}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+--- !u!4 &7639142594944542941 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+  m_PrefabInstance: {fileID: 8736901647995681234}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8775988667641415012
 PrefabInstance:
