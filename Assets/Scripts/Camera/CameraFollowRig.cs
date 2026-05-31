@@ -5,6 +5,25 @@ public class CameraFollowRig : MonoBehaviour
 {
     public static CameraFollowRig LocalRig { get; private set; }
 
+    private static bool gameplayCursorActive;
+
+    public static void SetGameplayCursorActive(bool isActive)
+    {
+        gameplayCursorActive = isActive;
+
+        if (!gameplayCursorActive)
+            ForceUnlockCursor();
+    }
+
+    public static void ForceUnlockCursor()
+    {
+        if (Cursor.lockState != CursorLockMode.None)
+            Cursor.lockState = CursorLockMode.None;
+
+        if (!Cursor.visible)
+            Cursor.visible = true;
+    }
+
     [Header("Follow Target")]
     [SerializeField] private Transform target;
 
@@ -74,8 +93,10 @@ public class CameraFollowRig : MonoBehaviour
         LocalRig = this;
         SetYawFromTarget();
 
-        if (lockCursorOnTarget)
+        if (lockCursorOnTarget && gameplayCursorActive)
             LockCursor();
+        else
+            ForceUnlockCursor();
 
         if (snapInstantly)
         {
@@ -113,6 +134,12 @@ public class CameraFollowRig : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (!gameplayCursorActive)
+        {
+            ForceUnlockCursor();
+            return;
+        }
+
         if (!hasTarget || target == null)
             return;
 
@@ -151,17 +178,21 @@ public class CameraFollowRig : MonoBehaviour
 
     private void HandleCursorState()
     {
+        if (!gameplayCursorActive)
+        {
+            ForceUnlockCursor();
+            return;
+        }
+
         if (PauseMenuManager.IsPaused)
         {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            ForceUnlockCursor();
             return;
         }
 
         if (unlockCursorWithEscape && IsEscapePressed())
         {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            ForceUnlockCursor();
         }
 
         if (relockCursorWithLeftClick && IsLeftMousePressed())
@@ -170,7 +201,7 @@ public class CameraFollowRig : MonoBehaviour
 
     private void HandleMouseLook()
     {
-        if (PauseMenuManager.IsPaused)
+        if (!gameplayCursorActive || PauseMenuManager.IsPaused)
             return;
 
         if (Cursor.lockState != CursorLockMode.Locked)

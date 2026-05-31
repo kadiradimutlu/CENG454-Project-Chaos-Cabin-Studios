@@ -11,6 +11,9 @@ public class SettingsManager : MonoBehaviour
     public const float MinMouseSensitivity = 0.2f;
     public const float MaxMouseSensitivity = 3f;
 
+    private const float MinMixerVolume = -80f;
+    private const float MaxMixerVolume = 0f;
+
     private const string MasterVolumeKey = "MasterVolume";
     private const string MusicVolumeKey = "MusicVolume";
     private const string SfxVolumeKey = "SFXVolume";
@@ -72,9 +75,27 @@ public class SettingsManager : MonoBehaviour
     private void OnEnable()
     {
         _isInitializing = true;
+        InitializeAudioSliders();
         InitializeResolutions();
         LoadSettings();
         _isInitializing = false;
+    }
+
+    private void InitializeAudioSliders()
+    {
+        SetupVolumeSlider(masterVolumeSlider);
+        SetupVolumeSlider(musicVolumeSlider);
+        SetupVolumeSlider(sfxVolumeSlider);
+    }
+
+    private void SetupVolumeSlider(Slider slider)
+    {
+        if (slider == null)
+            return;
+
+        slider.minValue = 0f;
+        slider.maxValue = 1f;
+        slider.wholeNumbers = false;
     }
 
     private void InitializeResolutions()
@@ -111,11 +132,7 @@ public class SettingsManager : MonoBehaviour
         if (_isInitializing)
             return;
 
-        if (audioMixer != null)
-            audioMixer.SetFloat("MasterVolume", volume);
-
-        PlayerPrefs.SetFloat(MasterVolumeKey, volume);
-        PlayerPrefs.Save();
+        ApplyVolume(MasterVolumeKey, "MasterVolume", volume, true);
     }
 
     public void SetMusicVolume(float volume)
@@ -123,11 +140,7 @@ public class SettingsManager : MonoBehaviour
         if (_isInitializing)
             return;
 
-        if (audioMixer != null)
-            audioMixer.SetFloat("MusicVolume", volume);
-
-        PlayerPrefs.SetFloat(MusicVolumeKey, volume);
-        PlayerPrefs.Save();
+        ApplyVolume(MusicVolumeKey, "MusicVolume", volume, true);
     }
 
     public void SetSFXVolume(float volume)
@@ -135,11 +148,7 @@ public class SettingsManager : MonoBehaviour
         if (_isInitializing)
             return;
 
-        if (audioMixer != null)
-            audioMixer.SetFloat("SFXVolume", volume);
-
-        PlayerPrefs.SetFloat(SfxVolumeKey, volume);
-        PlayerPrefs.Save();
+        ApplyVolume(SfxVolumeKey, "SFXVolume", volume, true);
     }
 
     public void SetQuality(int qualityIndex)
@@ -147,9 +156,15 @@ public class SettingsManager : MonoBehaviour
         if (_isInitializing)
             return;
 
-        QualitySettings.SetQualityLevel(qualityIndex);
-        PlayerPrefs.SetInt(QualityLevelKey, qualityIndex);
+        int maxQualityIndex = Mathf.Max(0, QualitySettings.names.Length - 1);
+        int safeQualityIndex = Mathf.Clamp(qualityIndex, 0, maxQualityIndex);
+
+        QualitySettings.SetQualityLevel(safeQualityIndex, true);
+        PlayerPrefs.SetInt(QualityLevelKey, safeQualityIndex);
         PlayerPrefs.Save();
+
+        if (qualityDropdown != null && qualityDropdown.value != safeQualityIndex)
+            qualityDropdown.SetValueWithoutNotify(safeQualityIndex);
     }
 
     public void SetFullscreen(bool isFullscreen)
@@ -197,38 +212,66 @@ public class SettingsManager : MonoBehaviour
 
     private void LoadAudioSettings()
     {
-        if (PlayerPrefs.HasKey(MasterVolumeKey))
+        float masterVolume = LoadVolumeValue(MasterVolumeKey, 1f);
+        float musicVolume = LoadVolumeValue(MusicVolumeKey, 1f);
+        float sfxVolume = LoadVolumeValue(SfxVolumeKey, 1f);
+
+        if (masterVolumeSlider != null)
+            masterVolumeSlider.SetValueWithoutNotify(masterVolume);
+
+        if (musicVolumeSlider != null)
+            musicVolumeSlider.SetValueWithoutNotify(musicVolume);
+
+        if (sfxVolumeSlider != null)
+            sfxVolumeSlider.SetValueWithoutNotify(sfxVolume);
+
+        ApplyVolume(MasterVolumeKey, "MasterVolume", masterVolume, false);
+        ApplyVolume(MusicVolumeKey, "MusicVolume", musicVolume, false);
+        ApplyVolume(SfxVolumeKey, "SFXVolume", sfxVolume, false);
+    }
+
+    private float LoadVolumeValue(string key, float defaultValue)
+    {
+        if (!PlayerPrefs.HasKey(key))
+            return defaultValue;
+
+        float savedValue = PlayerPrefs.GetFloat(key, defaultValue);
+
+        if (savedValue < 0f)
+            return DbToSliderValue(savedValue);
+
+        return Mathf.Clamp01(savedValue);
+    }
+
+    private void ApplyVolume(string prefsKey, string mixerParameter, float sliderValue, bool save)
+    {
+        float normalizedValue = Mathf.Clamp01(sliderValue);
+        float mixerValue = SliderValueToDb(normalizedValue);
+
+        if (audioMixer != null)
+            audioMixer.SetFloat(mixerParameter, mixerValue);
+
+        if (save)
         {
-            float savedVolume = PlayerPrefs.GetFloat(MasterVolumeKey);
-
-            if (masterVolumeSlider != null)
-                masterVolumeSlider.SetValueWithoutNotify(savedVolume);
-
-            if (audioMixer != null)
-                audioMixer.SetFloat("MasterVolume", savedVolume);
+            PlayerPrefs.SetFloat(prefsKey, normalizedValue);
+            PlayerPrefs.Save();
         }
+    }
 
-        if (PlayerPrefs.HasKey(MusicVolumeKey))
-        {
-            float savedVolume = PlayerPrefs.GetFloat(MusicVolumeKey);
+    private float SliderValueToDb(float value)
+    {
+        if (value <= 0.0001f)
+            return MinMixerVolume;
 
-            if (musicVolumeSlider != null)
-                musicVolumeSlider.SetValueWithoutNotify(savedVolume);
+        return Mathf.Clamp(Mathf.Log10(value) * 20f, MinMixerVolume, MaxMixerVolume);
+    }
 
-            if (audioMixer != null)
-                audioMixer.SetFloat("MusicVolume", savedVolume);
-        }
+    private float DbToSliderValue(float dbValue)
+    {
+        if (dbValue <= MinMixerVolume)
+            return 0f;
 
-        if (PlayerPrefs.HasKey(SfxVolumeKey))
-        {
-            float savedVolume = PlayerPrefs.GetFloat(SfxVolumeKey);
-
-            if (sfxVolumeSlider != null)
-                sfxVolumeSlider.SetValueWithoutNotify(savedVolume);
-
-            if (audioMixer != null)
-                audioMixer.SetFloat("SFXVolume", savedVolume);
-        }
+        return Mathf.Clamp01(Mathf.Pow(10f, dbValue / 20f));
     }
 
     private void LoadGraphicsSettings()
@@ -236,11 +279,13 @@ public class SettingsManager : MonoBehaviour
         if (PlayerPrefs.HasKey(QualityLevelKey))
         {
             int savedQuality = PlayerPrefs.GetInt(QualityLevelKey);
+            int maxQualityIndex = Mathf.Max(0, QualitySettings.names.Length - 1);
+            int safeQualityIndex = Mathf.Clamp(savedQuality, 0, maxQualityIndex);
 
             if (qualityDropdown != null)
-                qualityDropdown.SetValueWithoutNotify(savedQuality);
+                qualityDropdown.SetValueWithoutNotify(safeQualityIndex);
 
-            QualitySettings.SetQualityLevel(savedQuality);
+            QualitySettings.SetQualityLevel(safeQualityIndex, true);
         }
 
         if (PlayerPrefs.HasKey(FullscreenKey))
