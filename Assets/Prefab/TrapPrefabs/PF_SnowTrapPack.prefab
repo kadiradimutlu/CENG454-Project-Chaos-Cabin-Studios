@@ -64,6 +64,81 @@ Transform:
   - {fileID: 4720061725928351078}
   m_Father: {fileID: 6848348165084904066}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &293331882098964333
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1322391926273067159}
+  - component: {fileID: 5701944677508076463}
+  - component: {fileID: 2492570873898720504}
+  m_Layer: 0
+  m_Name: IceTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1322391926273067159
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 293331882098964333}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.4885712, y: 1.6, z: 94.2}
+  m_LocalScale: {x: 10.1, y: 4, z: 206.6}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8917825541429100507}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &5701944677508076463
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 293331882098964333}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2492570873898720504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 293331882098964333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04d2e1c9d56f11841b1a9793d16c5985, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IceSurfaceTrap
+  iceVisual: {fileID: 6208877053846734449}
+  iceTrigger: {fileID: 5701944677508076463}
+  activeDuration: 25
+  affectOnlyRunners: 1
+  iceAcceleration: 2.5
+  iceDeceleration: 0.25
+  iceTopSpeedMultiplier: 1.25
+  effectRefreshDuration: 0.25
+  logEvents: 0
 --- !u!1 &425001472365911577
 GameObject:
   m_ObjectHideFlags: 0
@@ -458,6 +533,8 @@ Transform:
   - {fileID: 7503670797029680285}
   - {fileID: 1360998007906774494}
   - {fileID: 430468548843027700}
+  - {fileID: 7235170549599822458}
+  - {fileID: 8917825541429100507}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1713898426130286697
@@ -482,7 +559,9 @@ MonoBehaviour:
   - {fileID: 5595251100225959626}
   - {fileID: 3992172326366347145}
   - {fileID: 2341136452781207203}
-  NetworkedBehaviours: []
+  - {fileID: 4750253785408483373}
+  NetworkedBehaviours:
+  - {fileID: 2492570873898720504}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &1690751203974460233
 GameObject:
@@ -1588,7 +1667,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5076878221796781244
 Transform:
   m_ObjectHideFlags: 0
@@ -2413,6 +2492,39 @@ Transform:
   - {fileID: 974037247676191588}
   m_Father: {fileID: 2711353512129893519}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5972044365221837711
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8917825541429100507}
+  m_Layer: 0
+  m_Name: IceSurfaceTrap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8917825541429100507
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5972044365221837711}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -9.571426, y: -8.159, z: 322.60086}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 283125130955700357}
+  - {fileID: 1322391926273067159}
+  m_Father: {fileID: 1205187939345635490}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6174899915492271871
 GameObject:
   m_ObjectHideFlags: 0
@@ -2445,6 +2557,118 @@ Transform:
   - {fileID: 133686718096101137}
   m_Father: {fileID: 1304113749768021815}
   m_LocalEulerAnglesHint: {x: 90, y: 180, z: 0}
+--- !u!1 &6208877053846734449
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 283125130955700357}
+  - component: {fileID: 9030112400404614903}
+  - component: {fileID: 2166556786733676860}
+  - component: {fileID: 6657694046404430907}
+  m_Layer: 0
+  m_Name: IceVisual
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &283125130955700357
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6208877053846734449}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.4, y: -0.09999943, z: 94.79}
+  m_LocalScale: {x: 10.1, y: 0.2, z: 206.6}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8917825541429100507}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &9030112400404614903
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6208877053846734449}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &2166556786733676860
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6208877053846734449}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 943fd52b029cc644a975474408af416e, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &6657694046404430907
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6208877053846734449}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6222731368091049464
 GameObject:
   m_ObjectHideFlags: 0
@@ -14343,6 +14567,91 @@ MonoBehaviour:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4025932926725342513, guid: 4b1f28726fe6d6b4a85854702a07389a, type: 3}
   m_PrefabInstance: {fileID: 8580506499731832520}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8598611101928977269
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1205187939345635490}
+    m_Modifications:
+    - target: {fileID: 1334119217286228755, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_Name
+      value: IceSurfaceTrapButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.156
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 6.831
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 352.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3942951617574126424, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: SortKey
+      value: 1293243012
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750712707655749520, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: snowFallDown
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750712707655749520, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: iceSurfaceTrap
+      value: 
+      objectReference: {fileID: 2492570873898720504}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+--- !u!114 &4750253785408483373 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3942951617574126424, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+  m_PrefabInstance: {fileID: 8598611101928977269}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+--- !u!4 &7235170549599822458 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+  m_PrefabInstance: {fileID: 8598611101928977269}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8689566605371166893
 PrefabInstance:
