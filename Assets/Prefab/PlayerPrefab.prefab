@@ -216,7 +216,7 @@ MonoBehaviour:
   crouchSpeed: 2.6
   rotationSpeed: 14
   gravity: -16
-  jumpForce: 11.5
+  jumpForce: 7
   groundedGravity: -2
   groundSnapDistance: 0.35
   jumpGroundIgnoreTime: 0.22
