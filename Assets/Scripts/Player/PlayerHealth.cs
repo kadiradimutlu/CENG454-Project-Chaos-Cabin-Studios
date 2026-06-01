@@ -10,9 +10,20 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
     [Networked] public int CurrentHealth { get; private set; }
     [Networked] public NetworkBool IsEliminated { get; private set; }
 
+    [Networked] public DamageSourceType LastDamageSource { get; private set; }
+    [Networked] public int LastDamageAmount { get; private set; }
+
+    [Networked]
+    [OnChangedRender(nameof(OnDamageEventChanged))]
+    public int DamageEventId { get; private set; }
+
     public int MaxHealth => maxHealth;
 
     public event Action<PlayerHealth, int, int> HealthChanged;
+
+    // health, damageAmount, currentHealth, source
+    public event Action<PlayerHealth, int, int, DamageSourceType> DamageTaken;
+
     public event Action<PlayerHealth> Eliminated;
 
     private int lastHealth = -1;
@@ -55,6 +66,11 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
 
     public void TakeDamage(int amount)
     {
+        TakeDamage(amount, DamageSourceType.Generic);
+    }
+
+    public void TakeDamage(int amount, DamageSourceType source)
+    {
         if (!Object.HasStateAuthority)
             return;
 
@@ -66,7 +82,12 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
         if (damage == 0)
             return;
 
+        int damageAmount = Mathf.Min(damage, CurrentHealth);
         int nextHealth = Mathf.Max(0, CurrentHealth - damage);
+
+        LastDamageSource = source;
+        LastDamageAmount = damageAmount;
+        DamageEventId++;
 
         if (nextHealth == 0 && TryUseRunnerLife())
             return;
@@ -95,17 +116,34 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
 
     public void Eliminate()
     {
+        Eliminate(DamageSourceType.Generic);
+    }
+
+    public void Eliminate(DamageSourceType source)
+    {
         if (!Object.HasStateAuthority)
             return;
 
         if (IsEliminated)
             return;
 
+        LastDamageSource = source;
+        LastDamageAmount = CurrentHealth;
+        DamageEventId++;
+
         if (TryUseRunnerLife())
             return;
 
         CurrentHealth = 0;
         IsEliminated = true;
+    }
+
+    private void OnDamageEventChanged()
+    {
+        if (LastDamageAmount <= 0)
+            return;
+
+        DamageTaken?.Invoke(this, LastDamageAmount, CurrentHealth, LastDamageSource);
     }
 
     private bool TryUseRunnerLife()
