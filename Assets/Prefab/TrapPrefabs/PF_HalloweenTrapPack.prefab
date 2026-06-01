@@ -454,8 +454,8 @@ MonoBehaviour:
   poisonZoneA: {fileID: 3048008246921575541}
   poisonZoneB: {fileID: 7718893550868476749}
   zoneType: 2
-  duration: 5
-  cooldown: 8
+  duration: 10
+  cooldown: 12
   activationVisualsA: {fileID: 0}
   activationVisualsB: {fileID: 0}
 --- !u!114 &6447316097273726437
@@ -12226,15 +12226,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 23.309998
+      value: 22.55
       objectReference: {fileID: 0}
     - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.908997
+      value: 19.59
       objectReference: {fileID: 0}
     - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -512.91797
+      value: 38.78
       objectReference: {fileID: 0}
     - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
       propertyPath: m_LocalRotation.w
@@ -13473,15 +13473,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 22.972046
+      value: 22.484
       objectReference: {fileID: 0}
     - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.986023
+      value: 19.577
       objectReference: {fileID: 0}
     - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -516.76
+      value: 54.409
       objectReference: {fileID: 0}
     - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
       propertyPath: m_LocalRotation.w
