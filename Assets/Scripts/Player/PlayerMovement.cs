@@ -104,6 +104,12 @@ public class PlayerMovement : NetworkBehaviour
     [Networked] private int SlowExpiryTick { get; set; }
     [Networked] private Vector3 IceHorizontalVelocity { get; set; }
 
+    private bool temporaryIceActive;
+    private float temporaryIceAcceleration;
+    private float temporaryIceDeceleration;
+    private float temporaryIceTopSpeedMultiplier;
+    private float temporaryIceExpireTime;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -507,15 +513,29 @@ public class PlayerMovement : NetworkBehaviour
             return Vector3.zero;
         }
 
-        if (!IsRunnerOnSnow())
+        bool useIceMovement = IsRunnerOnSnow();
+
+        float activeIceAcceleration = iceAcceleration;
+        float activeIceDeceleration = iceDeceleration;
+        float activeIceTopSpeedMultiplier = iceTopSpeedMultiplier;
+
+        if (IsTemporaryIceActive())
+        {
+            useIceMovement = true;
+            activeIceAcceleration = temporaryIceAcceleration;
+            activeIceDeceleration = temporaryIceDeceleration;
+            activeIceTopSpeedMultiplier = temporaryIceTopSpeedMultiplier;
+        }
+
+        if (!useIceMovement)
         {
             IceHorizontalVelocity = Vector3.zero;
             return desiredHorizontalVelocity;
         }
 
-        Vector3 target = desiredHorizontalVelocity * Mathf.Max(0.2f, iceTopSpeedMultiplier);
-        float accelerationStep = Mathf.Max(0f, iceAcceleration) * deltaTime;
-        float decelerationStep = Mathf.Max(0f, iceDeceleration) * deltaTime;
+        Vector3 target = desiredHorizontalVelocity * Mathf.Max(0.2f, activeIceTopSpeedMultiplier);
+        float accelerationStep = Mathf.Max(0f, activeIceAcceleration) * deltaTime;
+        float decelerationStep = Mathf.Max(0f, activeIceDeceleration) * deltaTime;
 
         if (desiredHorizontalVelocity.sqrMagnitude > 0.0001f)
             IceHorizontalVelocity = Vector3.MoveTowards(IceHorizontalVelocity, target, accelerationStep);
@@ -875,7 +895,34 @@ public class PlayerMovement : NetworkBehaviour
         SlowExpiryTick = Runner.Tick + durationTicks;
     }
 
-    
+    public void ApplyTemporaryIceSurface(
+        float acceleration,
+        float deceleration,
+        float topSpeedMultiplier,
+        float refreshDuration)
+    {
+        if (!HasStateAuthority && !HasInputAuthority)
+            return;
+
+        temporaryIceActive = true;
+        temporaryIceAcceleration = Mathf.Max(0f, acceleration);
+        temporaryIceDeceleration = Mathf.Max(0f, deceleration);
+        temporaryIceTopSpeedMultiplier = Mathf.Clamp(topSpeedMultiplier, 0.2f, 3f);
+        temporaryIceExpireTime = Time.time + Mathf.Max(0.1f, refreshDuration);
+    }
+
+    private bool IsTemporaryIceActive()
+    {
+        if (!temporaryIceActive)
+            return false;
+
+        if (Time.time <= temporaryIceExpireTime)
+            return true;
+
+        temporaryIceActive = false;
+        return false;
+    }
+
     public void ClearSlow()
     {
         if (!HasStateAuthority)
