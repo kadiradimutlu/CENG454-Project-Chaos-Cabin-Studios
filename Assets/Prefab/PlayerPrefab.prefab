@@ -29,6 +29,7 @@ GameObject:
   - component: {fileID: 485313402626223404}
   - component: {fileID: 2820043749555365989}
   - component: {fileID: 8272836205064494611}
+  - component: {fileID: 6895691978234774592}
   m_Layer: 0
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -166,6 +167,7 @@ MonoBehaviour:
   - {fileID: 8309354680070012958}
   - {fileID: 485313402626223404}
   - {fileID: 2820043749555365989}
+  - {fileID: 6895691978234774592}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2796955079069592424
 MonoBehaviour:
@@ -357,6 +359,9 @@ MonoBehaviour:
   _CurrentHealth: 0
   _IsEliminated:
     _value: 0
+  _LastDamageSource: 0
+  _LastDamageAmount: 0
+  _DamageEventId: 0
 --- !u!114 &7763814639274412381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -588,6 +593,28 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &6895691978234774592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3600554267242463573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2ba1e911ffaedc4cbe1f8c08c71ac6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RunnerPoisonFeedback
+  playerHealth: {fileID: -2987654311209876543}
+  roleHandler: {fileID: 6001041684308089228}
+  poisonClip: {fileID: 8300000, guid: b840a69c87bbabe4998f6292bd06f911, type: 3}
+  sfxMixerGroup: {fileID: 2182846121578117188, guid: bb632aa4fb89b3e49a7c5f6b149ca60e, type: 2}
+  poisonVolume: 1
+  poisonColor: {r: 0, g: 1, b: 0.15, a: 0.55}
+  sideWidthPercent: 0.31
+  fadeInTime: 0.08
+  holdTime: 0.25
+  fadeOutTime: 0.45
 --- !u!1 &5535873060997195435
 GameObject:
   m_ObjectHideFlags: 0
@@ -758,6 +785,10 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  controlledCamera: {fileID: 0}
+  enableTrapperZoom: 1
+  zoomFov: 25
+  zoomSpeed: 12
 --- !u!1 &7644200788469136349
 GameObject:
   m_ObjectHideFlags: 0
@@ -1105,6 +1136,10 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  controlledCamera: {fileID: 0}
+  enableTrapperZoom: 1
+  zoomFov: 25
+  zoomSpeed: 12
 --- !u!1 &8779444187828829011
 GameObject:
   m_ObjectHideFlags: 0

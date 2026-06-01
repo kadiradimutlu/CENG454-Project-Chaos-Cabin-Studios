@@ -534,6 +534,7 @@ Transform:
   - {fileID: 1360998007906774494}
   - {fileID: 430468548843027700}
   - {fileID: 7235170549599822458}
+  - {fileID: 3071250570200738572}
   - {fileID: 8917825541429100507}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -560,6 +561,7 @@ MonoBehaviour:
   - {fileID: 3992172326366347145}
   - {fileID: 2341136452781207203}
   - {fileID: 4750253785408483373}
+  - {fileID: 1088589016845924699}
   NetworkedBehaviours:
   - {fileID: 2492570873898720504}
   ForceRemoteRenderTimeframe: 0
@@ -4025,6 +4027,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4122,6 +4125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4338,6 +4342,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4455,6 +4460,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4560,6 +4566,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4695,6 +4702,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4796,6 +4804,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4931,6 +4940,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5056,6 +5066,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5174,6 +5185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5333,6 +5345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 1
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5446,6 +5459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 2
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 1
@@ -5554,6 +5568,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 1
@@ -5667,6 +5682,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5785,6 +5801,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5893,6 +5910,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6006,6 +6024,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6103,6 +6122,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6324,6 +6344,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 2
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 1
@@ -6432,6 +6453,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6549,6 +6571,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6667,6 +6690,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6780,6 +6804,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6871,6 +6896,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7011,6 +7037,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7124,6 +7151,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7237,6 +7265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7355,6 +7384,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7475,6 +7505,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7593,6 +7624,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7701,6 +7733,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7798,6 +7831,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7916,6 +7950,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8056,6 +8091,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8186,6 +8222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8277,6 +8314,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8429,6 +8467,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8547,6 +8586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 3
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 0
   damageRepeatedly: 1
@@ -8660,6 +8700,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 1
@@ -8756,6 +8797,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8891,6 +8933,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 1
@@ -9150,6 +9193,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9275,12 +9319,98 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
   repeatInterval: 1
   damageOnCollision: 1
   nonTriggerContactPadding: 0.12
+--- !u!1001 &4153264893638801923
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1205187939345635490}
+    m_Modifications:
+    - target: {fileID: 1334119217286228755, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_Name
+      value: IceSurfaceTrapButton (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.156
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 6.831
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 476.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3942951617574126424, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: SortKey
+      value: 3831853195
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750712707655749520, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: snowFallDown
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750712707655749520, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+      propertyPath: iceSurfaceTrap
+      value: 
+      objectReference: {fileID: 2492570873898720504}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+--- !u!114 &1088589016845924699 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3942951617574126424, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+  m_PrefabInstance: {fileID: 4153264893638801923}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+--- !u!4 &3071250570200738572 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1386011876855845135, guid: 3ef86f44c64ae134ab25960ac76b9f63, type: 3}
+  m_PrefabInstance: {fileID: 4153264893638801923}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4191975996932216769
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9387,6 +9517,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9479,6 +9610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9670,6 +9802,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 1
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9783,6 +9916,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9942,6 +10076,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 1
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10055,6 +10190,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10155,6 +10291,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10290,6 +10427,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 1
@@ -10403,6 +10541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10516,6 +10655,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10634,6 +10774,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10742,6 +10883,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10860,6 +11002,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10968,6 +11111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11086,6 +11230,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11173,6 +11318,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11313,6 +11459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11409,6 +11556,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11549,6 +11697,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11667,6 +11816,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11780,6 +11930,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 2
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 1
@@ -11888,6 +12039,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 2
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 1
@@ -12006,6 +12158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -12119,6 +12272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -12232,6 +12386,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -12345,6 +12500,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -12437,6 +12593,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -12555,6 +12712,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -12712,6 +12870,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -12820,6 +12979,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -12933,6 +13093,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -13046,6 +13207,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 3
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 1
@@ -13138,6 +13300,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -13257,6 +13420,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -13380,6 +13544,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -13520,6 +13685,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -13638,6 +13804,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -13752,6 +13919,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -13802,6 +13970,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -14034,6 +14203,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -14153,6 +14323,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -14422,6 +14593,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -14557,6 +14729,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 1
@@ -14760,6 +14933,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 1
@@ -14868,6 +15042,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -14998,6 +15173,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -15170,6 +15346,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -15327,6 +15504,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -15440,6 +15618,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -15531,6 +15710,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -15676,6 +15856,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 25
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -15763,6 +15944,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -15908,6 +16090,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -16016,6 +16199,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -16135,6 +16319,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -16185,6 +16370,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0

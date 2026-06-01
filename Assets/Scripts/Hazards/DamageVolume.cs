@@ -7,6 +7,10 @@ using UnityEngine;
 public class DamageVolume : MonoBehaviour
 {
     [SerializeField] private int damage = 25;
+
+    [Header("Damage Source")]
+    [SerializeField] private DamageSourceType damageSource = DamageSourceType.Generic;
+
     [SerializeField] private bool instantElimination;
     [SerializeField] private bool damageOnEnter = true;
     [SerializeField] private bool damageRepeatedly;
@@ -18,6 +22,7 @@ public class DamageVolume : MonoBehaviour
     private readonly HashSet<PlayerHealth> overlappingPlayers = new HashSet<PlayerHealth>();
     private readonly HashSet<PlayerHealth> currentOverlapBuffer = new HashSet<PlayerHealth>();
     private readonly List<PlayerHealth> removeBuffer = new List<PlayerHealth>();
+
     private NetworkRunner runner;
     private Collider damageCollider;
     private Collider[] overlapResults = new Collider[64];
@@ -84,7 +89,6 @@ public class DamageVolume : MonoBehaviour
         if (!CanApplyDamage())
             return;
 
-       
         if (damageCollider == null || damageCollider.isTrigger || !damageOnCollision)
             return;
 
@@ -135,6 +139,7 @@ public class DamageVolume : MonoBehaviour
         }
 
         removeBuffer.Clear();
+
         foreach (PlayerHealth player in overlappingPlayers)
         {
             if (!currentOverlapBuffer.Contains(player))
@@ -149,6 +154,7 @@ public class DamageVolume : MonoBehaviour
         }
 
         overlappingPlayers.Clear();
+
         foreach (PlayerHealth player in currentOverlapBuffer)
             overlappingPlayers.Add(player);
     }
@@ -165,7 +171,6 @@ public class DamageVolume : MonoBehaviour
 
         RoleHandler roleHandler = other.GetComponentInParent<RoleHandler>();
 
-        //bunu da mı eklemediniz  https://www.youtube.com/shorts/c6aypfcOz2E
         if (roleHandler == null || roleHandler.currentRole != RoleHandler.PlayerRole.Runner)
             return;
 
@@ -173,9 +178,9 @@ public class DamageVolume : MonoBehaviour
             return;
 
         if (instantElimination)
-            playerHealth.Eliminate();
+            playerHealth.Eliminate(damageSource);
         else
-            playerHealth.TakeDamage(damage);
+            playerHealth.TakeDamage(damage, damageSource);
 
         nextDamageTimes[playerHealth] = Time.time + repeatInterval;
     }
@@ -191,7 +196,7 @@ public class DamageVolume : MonoBehaviour
     private bool CanApplyDamage()
     {
         if (runner == null)
-            runner = FindObjectOfType<NetworkRunner>();
+            runner = FindFirstObjectByType<NetworkRunner>();
 
         return runner == null || runner.IsServer;
     }
