@@ -1629,6 +1629,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -1698,10 +1699,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6892747584784621728, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 51806333166686407}
+      addedObject: {fileID: 8764952630220374594}
     - targetCorrespondingSourceObject: {fileID: 6892747584784621728, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 571135908207224119}
+      addedObject: {fileID: 1638948263613636910}
   m_SourcePrefab: {fileID: 100100000, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
 --- !u!4 &6251139353628887018 stripped
 Transform:
@@ -1713,8 +1714,8 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6892747584784621728, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
   m_PrefabInstance: {fileID: 156684647864434160}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &51806333166686407
-BoxCollider:
+--- !u!64 &8764952630220374594
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1731,10 +1732,11 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &571135908207224119
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
+--- !u!114 &1638948263613636910
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1746,13 +1748,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 15
+  damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
   repeatInterval: 1
   damageOnCollision: 1
-  nonTriggerContactPadding: 0.08
+  nonTriggerContactPadding: 0.12
 --- !u!1001 &167941355915470084
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1847,6 +1850,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -1965,6 +1969,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2065,6 +2070,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2178,6 +2184,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2296,6 +2303,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2404,6 +2412,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2517,6 +2526,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2627,6 +2637,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2735,6 +2746,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2848,6 +2860,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2966,6 +2979,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3060,7 +3074,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -3079,6 +3093,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3184,6 +3199,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3292,6 +3308,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3397,6 +3414,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3515,6 +3533,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3615,6 +3634,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3682,25 +3702,31 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 754426168301883182}
-    - targetCorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      addedObject: {fileID: 5025563301642423250}
+    - targetCorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3479870544197041503}
+      addedObject: {fileID: 3198512638495591258}
+    - targetCorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5996095385737008759}
+    - targetCorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2547994916572837117}
   m_SourcePrefab: {fileID: 100100000, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
---- !u!1 &6443535575251189986 stripped
+--- !u!1 &2720860602725909313 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+  m_CorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
   m_PrefabInstance: {fileID: 1564846342417783117}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &754426168301883182
-BoxCollider:
+--- !u!64 &5996095385737008759
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6443535575251189986}
+  m_GameObject: {fileID: 2720860602725909313}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -3712,33 +3738,82 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.4579856, y: 0.68136925, z: 0.12562789}
-  m_Center: {x: -0.0025726557, y: 0, z: 0}
---- !u!114 &3479870544197041503
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2139480152730824633, guid: 295ad512eb213964080fe19128416ea4, type: 3}
+--- !u!114 &2547994916572837117
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6443535575251189986}
+  m_GameObject: {fileID: 2720860602725909313}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
   repeatInterval: 1
   damageOnCollision: 1
-  nonTriggerContactPadding: 0.08
+  nonTriggerContactPadding: 0.12
 --- !u!4 &6866448878348639910 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5403745242328860651, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
   m_PrefabInstance: {fileID: 1564846342417783117}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8355306165755883717 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+  m_PrefabInstance: {fileID: 1564846342417783117}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &5025563301642423250
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8355306165755883717}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 156876859902641885, guid: 295ad512eb213964080fe19128416ea4, type: 3}
+--- !u!114 &3198512638495591258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8355306165755883717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
 --- !u!1001 &1664853944989594154
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3841,6 +3916,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3914,18 +3990,97 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7715043507143059586}
+      addedObject: {fileID: 8215064374563324383}
     - targetCorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8215064374563324383}
+      addedObject: {fileID: 6282276864660774392}
+    - targetCorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6852851930037659267}
+    - targetCorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9069594807515288357}
+    - targetCorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6387946003373547384}
+    - targetCorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3021710638069338502}
   m_SourcePrefab: {fileID: 100100000, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+--- !u!1 &2824148158371103222 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+  m_PrefabInstance: {fileID: 1676571549760248826}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &6387946003373547384
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2824148158371103222}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2139480152730824633, guid: 295ad512eb213964080fe19128416ea4, type: 3}
+--- !u!114 &3021710638069338502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2824148158371103222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 25
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
 --- !u!1 &6602025211681129045 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
   m_PrefabInstance: {fileID: 1676571549760248826}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &7715043507143059586
-BoxCollider:
+--- !u!114 &8215064374563324383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6602025211681129045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.08
+--- !u!64 &6282276864660774392
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3942,33 +4097,62 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.4579856, y: 0.68136925, z: 0.12562789}
-  m_Center: {x: -0.0025726557, y: 0, z: 0}
---- !u!114 &8215064374563324383
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5354982574996523744, guid: 295ad512eb213964080fe19128416ea4, type: 3}
+--- !u!4 &6753593338156571665 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5403745242328860651, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+  m_PrefabInstance: {fileID: 1676571549760248826}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8144497368031523442 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+  m_PrefabInstance: {fileID: 1676571549760248826}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &6852851930037659267
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8144497368031523442}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 156876859902641885, guid: 295ad512eb213964080fe19128416ea4, type: 3}
+--- !u!114 &9069594807515288357
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6602025211681129045}
+  m_GameObject: {fileID: 8144497368031523442}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
   repeatInterval: 1
   damageOnCollision: 1
-  nonTriggerContactPadding: 0.08
---- !u!4 &6753593338156571665 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5403745242328860651, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
-  m_PrefabInstance: {fileID: 1676571549760248826}
-  m_PrefabAsset: {fileID: 0}
+  nonTriggerContactPadding: 0.12
 --- !u!1001 &2116471684854914664
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4068,6 +4252,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4176,6 +4361,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4286,6 +4472,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4386,6 +4573,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4491,6 +4679,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4596,6 +4785,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4663,30 +4853,31 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7733729570222753899}
-    - targetCorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      addedObject: {fileID: 3902891671478416218}
+    - targetCorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 710551813070122024}
+      addedObject: {fileID: 414666377867774237}
+    - targetCorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6336820008108774100}
+    - targetCorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1885896902051710402}
   m_SourcePrefab: {fileID: 100100000, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
---- !u!4 &7577229275476584966 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5403745242328860651, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
-  m_PrefabInstance: {fileID: 2583461224406642157}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &7998734103573820482 stripped
+--- !u!1 &1418439766356277217 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+  m_CorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
   m_PrefabInstance: {fileID: 2583461224406642157}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &7733729570222753899
-BoxCollider:
+--- !u!64 &6336820008108774100
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7998734103573820482}
+  m_GameObject: {fileID: 1418439766356277217}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -4698,28 +4889,82 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.4579856, y: 0.68136925, z: 0.12562789}
-  m_Center: {x: -0.0025726557, y: 0, z: 0}
---- !u!114 &710551813070122024
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2139480152730824633, guid: 295ad512eb213964080fe19128416ea4, type: 3}
+--- !u!114 &1885896902051710402
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7998734103573820482}
+  m_GameObject: {fileID: 1418439766356277217}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
   repeatInterval: 1
   damageOnCollision: 1
-  nonTriggerContactPadding: 0.08
+  nonTriggerContactPadding: 0.12
+--- !u!1 &5015107343833351269 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+  m_PrefabInstance: {fileID: 2583461224406642157}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &3902891671478416218
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5015107343833351269}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 156876859902641885, guid: 295ad512eb213964080fe19128416ea4, type: 3}
+--- !u!114 &414666377867774237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5015107343833351269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!4 &7577229275476584966 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5403745242328860651, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+  m_PrefabInstance: {fileID: 2583461224406642157}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2779310064495711624
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4827,6 +5072,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4940,6 +5186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5045,6 +5292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5153,6 +5401,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5271,6 +5520,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5376,6 +5626,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5481,6 +5732,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5594,6 +5846,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5658,10 +5911,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5234179422906612898, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1457094611494686350}
+      addedObject: {fileID: 7879893407866987386}
     - targetCorrespondingSourceObject: {fileID: 5234179422906612898, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7879893407866987386}
+      addedObject: {fileID: 3282772154548642905}
   m_SourcePrefab: {fileID: 100100000, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
 --- !u!4 &2615528957967038688 stripped
 Transform:
@@ -5673,8 +5926,28 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5234179422906612898, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
   m_PrefabInstance: {fileID: 3327174165108875568}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &1457094611494686350
-BoxCollider:
+--- !u!114 &7879893407866987386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7390395110248816018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.08
+--- !u!64 &3282772154548642905
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5691,28 +5964,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6813691, z: 0.4844001}
-  m_Center: {x: -0.000000059604645, y: 0.6778654, z: 0}
---- !u!114 &7879893407866987386
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7390395110248816018}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.08
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5275237580509396562, guid: a156d9a24b5d97342bfd05482468f01d, type: 3}
 --- !u!1001 &3400059474516275453
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5769,25 +6024,31 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2096752918511989938}
-    - targetCorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      addedObject: {fileID: 3456895177113809825}
+    - targetCorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7312271221651541030}
+      addedObject: {fileID: 6521244690856842870}
+    - targetCorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 143248228238311786}
+    - targetCorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6547649861501947732}
   m_SourcePrefab: {fileID: 100100000, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
---- !u!1 &7202392774655568210 stripped
+--- !u!1 &2259244794193292017 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 5538154317863786927, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+  m_CorrespondingSourceObject: {fileID: 3491700627081583116, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
   m_PrefabInstance: {fileID: 3400059474516275453}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &2096752918511989938
-BoxCollider:
+--- !u!64 &143248228238311786
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7202392774655568210}
+  m_GameObject: {fileID: 2259244794193292017}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -5799,28 +6060,77 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.4579856, y: 0.68136925, z: 0.12562789}
-  m_Center: {x: -0.0025726557, y: 0, z: 0}
---- !u!114 &7312271221651541030
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2139480152730824633, guid: 295ad512eb213964080fe19128416ea4, type: 3}
+--- !u!114 &6547649861501947732
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7202392774655568210}
+  m_GameObject: {fileID: 2259244794193292017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 25
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!1 &5290605683201104245 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7368858507847870856, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
+  m_PrefabInstance: {fileID: 3400059474516275453}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &3456895177113809825
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5290605683201104245}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 156876859902641885, guid: 295ad512eb213964080fe19128416ea4, type: 3}
+--- !u!114 &6521244690856842870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5290605683201104245}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
   repeatInterval: 1
   damageOnCollision: 1
-  nonTriggerContactPadding: 0.08
+  nonTriggerContactPadding: 0.12
 --- !u!4 &7337073772555826966 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5403745242328860651, guid: 5b9145724e2d72f4998744d9071fac1e, type: 3}
@@ -5928,6 +6238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6033,6 +6344,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6151,6 +6463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6256,6 +6569,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6361,6 +6675,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6474,6 +6789,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6579,6 +6895,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6679,6 +6996,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6784,6 +7102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -6889,6 +7208,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7007,6 +7327,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7115,6 +7436,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7228,6 +7550,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7338,6 +7661,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7400,25 +7724,30 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6892747584784621728, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 1685312357018838059, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1791312764264375818}
-    - targetCorrespondingSourceObject: {fileID: 6892747584784621728, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
+      addedObject: {fileID: 4491235280081354698}
+    - targetCorrespondingSourceObject: {fileID: 1685312357018838059, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2303273731846542950}
+      addedObject: {fileID: 1615019612113191264}
   m_SourcePrefab: {fileID: 100100000, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
---- !u!1 &1494394781688501740 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6892747584784621728, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
+--- !u!4 &2303301550330466134 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6119307518225463834, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
   m_PrefabInstance: {fileID: 5411881213499110732}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &1791312764264375818
-BoxCollider:
+--- !u!1 &6663554909173338471 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1685312357018838059, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
+  m_PrefabInstance: {fileID: 5411881213499110732}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &4491235280081354698
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1494394781688501740}
+  m_GameObject: {fileID: 6663554909173338471}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -7430,33 +7759,30 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2303273731846542950
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 7756366671059464670, guid: e4a3fca120a8897479498297a7afc3c1, type: 3}
+--- !u!114 &1615019612113191264
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1494394781688501740}
+  m_GameObject: {fileID: 6663554909173338471}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 15
+  damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
   repeatInterval: 1
   damageOnCollision: 1
-  nonTriggerContactPadding: 0.08
---- !u!4 &2303301550330466134 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6119307518225463834, guid: e30edee88e2c2e145a0111aba69aaa91, type: 3}
-  m_PrefabInstance: {fileID: 5411881213499110732}
-  m_PrefabAsset: {fileID: 0}
+  nonTriggerContactPadding: 0.12
 --- !u!1001 &5435990534460352566
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7556,6 +7882,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7664,6 +7991,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 0
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -7733,18 +8061,38 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5234179422906612898, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7763369458509584282}
+      addedObject: {fileID: 4854209683725826143}
     - targetCorrespondingSourceObject: {fileID: 5234179422906612898, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4854209683725826143}
+      addedObject: {fileID: 4124956504511553542}
   m_SourcePrefab: {fileID: 100100000, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
 --- !u!1 &232661330290325499 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5234179422906612898, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
   m_PrefabInstance: {fileID: 5447418532858776409}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &7763369458509584282
-BoxCollider:
+--- !u!114 &4854209683725826143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232661330290325499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.08
+--- !u!64 &4124956504511553542
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -7761,28 +8109,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6813691, z: 0.4844001}
-  m_Center: {x: -0.000000059604645, y: 0.6778654, z: 0}
---- !u!114 &4854209683725826143
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 232661330290325499}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.08
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5275237580509396562, guid: a156d9a24b5d97342bfd05482468f01d, type: 3}
 --- !u!4 &4753928428688364169 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 747675589216082384, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
@@ -7971,6 +8301,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8076,6 +8407,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8181,6 +8513,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8291,6 +8624,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8399,6 +8733,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8521,6 +8856,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8626,6 +8962,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8734,6 +9071,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8847,6 +9185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -8960,6 +9299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9070,6 +9410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9187,6 +9528,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9287,6 +9629,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9392,6 +9735,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9497,6 +9841,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9610,6 +9955,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9723,6 +10069,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -9792,18 +10139,38 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5234179422906612898, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4768613638173560995}
+      addedObject: {fileID: 220437037256836153}
     - targetCorrespondingSourceObject: {fileID: 5234179422906612898, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 220437037256836153}
+      addedObject: {fileID: 2909485256891176941}
   m_SourcePrefab: {fileID: 100100000, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
 --- !u!1 &2513091520523797544 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5234179422906612898, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
   m_PrefabInstance: {fileID: 7657176101388548234}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &4768613638173560995
-BoxCollider:
+--- !u!114 &220437037256836153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2513091520523797544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.08
+--- !u!64 &2909485256891176941
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -9820,28 +10187,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6813691, z: 0.4844001}
-  m_Center: {x: -0.000000059604645, y: 0.6778654, z: 0}
---- !u!114 &220437037256836153
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2513091520523797544}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.08
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5275237580509396562, guid: a156d9a24b5d97342bfd05482468f01d, type: 3}
 --- !u!4 &6927530069169234266 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 747675589216082384, guid: 99954845cf71a634fba676a30fc44e90, type: 3}
@@ -9946,6 +10295,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10054,6 +10404,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10257,6 +10608,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10365,6 +10717,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10483,6 +10836,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10596,6 +10950,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10704,6 +11059,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -10901,6 +11257,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11014,6 +11371,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11119,6 +11477,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11229,6 +11588,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11334,6 +11694,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11442,6 +11803,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11552,6 +11914,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11657,6 +12020,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11762,6 +12126,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 5
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -11875,6 +12240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
