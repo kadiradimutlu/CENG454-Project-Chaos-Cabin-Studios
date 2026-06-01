@@ -52,10 +52,19 @@ public class CameraFollowRig : MonoBehaviour
     [SerializeField] private float collisionRadius = 0.25f;
     [SerializeField] private LayerMask collisionMask = ~0;
 
+    [Header("Trapper Zoom")]
+    [SerializeField] private Camera controlledCamera;
+    [SerializeField] private bool enableTrapperZoom = true;
+    [SerializeField] private float zoomFov = 25f;
+    [SerializeField] private float zoomSpeed = 12f;
+
     private bool hasTarget;
     private float yaw;
     private float pitch = 18f;
     private float mouseSensitivityMultiplier = SettingsManager.DefaultMouseSensitivity;
+    private float defaultFov = 60f;
+    private bool defaultFovCached;
+    private RoleHandler targetRoleHandler;
 
     public float CurrentYaw => yaw;
 
@@ -92,6 +101,9 @@ public class CameraFollowRig : MonoBehaviour
 
         LocalRig = this;
         SetYawFromTarget();
+        
+        CacheCamera();
+        CacheTargetRoleHandler();
 
         if (lockCursorOnTarget && gameplayCursorActive)
             LockCursor();
@@ -109,12 +121,16 @@ public class CameraFollowRig : MonoBehaviour
 
     private void OnEnable()
     {
+        CacheCamera();
+
         mouseSensitivityMultiplier = SettingsManager.MouseSensitivity;
         SettingsManager.MouseSensitivityChanged += HandleMouseSensitivityChanged;
     }
 
     private void OnDisable()
     {
+        ResetZoomToDefault();
+
         if (LocalRig == this)
             LocalRig = null;
 
@@ -136,17 +152,23 @@ public class CameraFollowRig : MonoBehaviour
     {
         if (!gameplayCursorActive)
         {
+            ResetZoomToDefault();
             ForceUnlockCursor();
             return;
         }
 
         if (!hasTarget || target == null)
+        {
+            ResetZoomToDefault();
             return;
+        }
 
         HandleCursorState();
         HandleMouseLook();
 
         float deltaTime = Mathf.Max(Time.deltaTime, 0.0001f);
+        HandleTrapperZoom(deltaTime);
+
         Vector3 desiredPosition = GetDesiredPosition();
         float distanceToTarget = Vector3.Distance(transform.position, desiredPosition);
 
@@ -261,6 +283,97 @@ public class CameraFollowRig : MonoBehaviour
 #else
         return false;
 #endif
+    }
+
+    private void HandleTrapperZoom(float deltaTime)
+    {
+        if (!enableTrapperZoom)
+            return;
+
+        if (controlledCamera == null)
+            CacheCamera();
+
+        if (controlledCamera == null)
+            return;
+
+        bool shouldZoom =
+            IsRightMouseHeld() &&
+            IsTargetTrapper() &&
+            !PauseMenuManager.IsPaused &&
+            Cursor.lockState == CursorLockMode.Locked;
+
+        float targetFov = shouldZoom ? zoomFov : defaultFov;
+        float zoomT = 1f - Mathf.Exp(-zoomSpeed * deltaTime);
+
+        controlledCamera.fieldOfView = Mathf.Lerp(
+            controlledCamera.fieldOfView,
+            targetFov,
+            zoomT
+        );
+    }
+
+    private void ResetZoomToDefault()
+    {
+        if (controlledCamera == null)
+            CacheCamera();
+
+        if (controlledCamera == null)
+            return;
+
+        controlledCamera.fieldOfView = defaultFov;
+    }
+
+    private void CacheCamera()
+    {
+        if (controlledCamera == null)
+            controlledCamera = GetComponentInChildren<Camera>(true);
+
+        if (controlledCamera == null)
+            return;
+
+        if (defaultFovCached)
+            return;
+
+        defaultFov = controlledCamera.fieldOfView;
+        defaultFovCached = true;
+    }
+
+    private void CacheTargetRoleHandler()
+    {
+        targetRoleHandler = null;
+
+        if (target == null)
+            return;
+
+        targetRoleHandler = target.GetComponentInParent<RoleHandler>();
+    }
+
+    private bool IsTargetTrapper()
+    {
+        if (targetRoleHandler == null)
+            CacheTargetRoleHandler();
+
+        if (targetRoleHandler == null)
+            return false;
+
+        if (!targetRoleHandler.TryGetRole(out RoleHandler.PlayerRole role))
+            return false;
+
+        return role == RoleHandler.PlayerRole.Trapper;
+    }
+
+    private bool IsRightMouseHeld()
+    {
+    #if ENABLE_INPUT_SYSTEM
+        if (Mouse.current != null && Mouse.current.rightButton.isPressed)
+            return true;
+    #endif
+
+    #if ENABLE_LEGACY_INPUT_MANAGER
+        return Input.GetMouseButton(1);
+    #else
+        return false;
+    #endif
     }
 
     private void LockCursor()
