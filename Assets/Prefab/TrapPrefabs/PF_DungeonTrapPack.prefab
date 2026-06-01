@@ -607,18 +607,38 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 861903026044787531}
+      addedObject: {fileID: 952677410970211653}
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 952677410970211653}
+      addedObject: {fileID: 3655095785395564445}
   m_SourcePrefab: {fileID: 100100000, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
 --- !u!1 &5766205145206057942 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
   m_PrefabInstance: {fileID: 32193857264643054}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &861903026044787531
-BoxCollider:
+--- !u!114 &952677410970211653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5766205145206057942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &3655095785395564445
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -635,28 +655,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6939314, z: 2.247566}
-  m_Center: {x: 0, y: 0, z: -0.0000044107437}
---- !u!114 &952677410970211653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5766205145206057942}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2244532701287670787, guid: 7aae06f2f01dd674d8ad940b6cc92d77, type: 3}
 --- !u!4 &8346109410719832847 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8332000634248458465, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
@@ -720,18 +722,38 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3987562476713431795}
+      addedObject: {fileID: 6957196182474543755}
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6957196182474543755}
+      addedObject: {fileID: 6638209541148395501}
   m_SourcePrefab: {fileID: 100100000, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
 --- !u!1 &5825279209404735026 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
   m_PrefabInstance: {fileID: 45108221219020298}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &3987562476713431795
-BoxCollider:
+--- !u!114 &6957196182474543755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5825279209404735026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &6638209541148395501
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -748,28 +770,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6939314, z: 2.247566}
-  m_Center: {x: 0, y: 0, z: -0.0000044107437}
---- !u!114 &6957196182474543755
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5825279209404735026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2244532701287670787, guid: 7aae06f2f01dd674d8ad940b6cc92d77, type: 3}
 --- !u!4 &8287036587766771435 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8332000634248458465, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
@@ -833,18 +837,38 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8641562730489329723}
+      addedObject: {fileID: 6873410915771377667}
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6873410915771377667}
+      addedObject: {fileID: 3489611248114047530}
   m_SourcePrefab: {fileID: 100100000, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
 --- !u!1 &6025669940267092510 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
   m_PrefabInstance: {fileID: 281677017464867366}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &8641562730489329723
-BoxCollider:
+--- !u!114 &6873410915771377667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6025669940267092510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &3489611248114047530
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -861,28 +885,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6939314, z: 2.247566}
-  m_Center: {x: 0, y: 0, z: -0.0000044107437}
---- !u!114 &6873410915771377667
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6025669940267092510}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2244532701287670787, guid: 7aae06f2f01dd674d8ad940b6cc92d77, type: 3}
 --- !u!4 &8091140797922540231 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8332000634248458465, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
@@ -995,6 +1001,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -1184,6 +1191,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -1302,6 +1310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -1369,10 +1378,10 @@ PrefabInstance:
       addedObject: {fileID: 5803212777705615689}
     - targetCorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4140492405614380538}
+      addedObject: {fileID: 5653067912515286830}
     - targetCorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5653067912515286830}
+      addedObject: {fileID: 4164412630754353390}
   m_SourcePrefab: {fileID: 100100000, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
 --- !u!1 &178293795031918344 stripped
 GameObject:
@@ -1411,8 +1420,28 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
   m_PrefabInstance: {fileID: 1060602741292112473}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &4140492405614380538
-BoxCollider:
+--- !u!114 &5653067912515286830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5565991854673231233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 15
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &4164412630754353390
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1429,28 +1458,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.0234504, y: 0.74773216, z: 0.9522121}
-  m_Center: {x: -0.000001013279, y: -0.057045862, z: -0.00017546117}
---- !u!114 &5653067912515286830
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5565991854673231233}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 15
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2602377038091957803, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
 --- !u!1001 &1476529602730734794
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1509,18 +1520,38 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2386957892125627687}
+      addedObject: {fileID: 8396885603827432503}
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8396885603827432503}
+      addedObject: {fileID: 2642020794169724615}
   m_SourcePrefab: {fileID: 100100000, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
 --- !u!1 &4902839970816931058 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
   m_PrefabInstance: {fileID: 1476529602730734794}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &2386957892125627687
-BoxCollider:
+--- !u!114 &8396885603827432503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4902839970816931058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &2642020794169724615
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1537,28 +1568,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6939314, z: 2.247566}
-  m_Center: {x: 0, y: 0, z: -0.0000044107437}
---- !u!114 &8396885603827432503
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4902839970816931058}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2244532701287670787, guid: 7aae06f2f01dd674d8ad940b6cc92d77, type: 3}
 --- !u!4 &7484025693645849643 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8332000634248458465, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
@@ -1671,6 +1684,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -1783,6 +1797,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -1855,10 +1870,10 @@ PrefabInstance:
       addedObject: {fileID: 1846055453295413309}
     - targetCorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5099194787315434889}
+      addedObject: {fileID: 2237129962895149925}
     - targetCorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2237129962895149925}
+      addedObject: {fileID: 7960522489722796115}
   m_SourcePrefab: {fileID: 100100000, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
 --- !u!1 &1195952418594273974 stripped
 GameObject:
@@ -1897,8 +1912,28 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
   m_PrefabInstance: {fileID: 2042815305777514471}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &5099194787315434889
-BoxCollider:
+--- !u!114 &2237129962895149925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6908501188663042111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 15
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &7960522489722796115
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1915,28 +1950,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.0234504, y: 0.74773216, z: 0.9522121}
-  m_Center: {x: -0.000001013279, y: -0.057045862, z: -0.00017546117}
---- !u!114 &2237129962895149925
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6908501188663042111}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 15
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2602377038091957803, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
 --- !u!1001 &2057551343713507540
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2044,6 +2061,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2111,10 +2129,10 @@ PrefabInstance:
       addedObject: {fileID: 3308575191376845243}
     - targetCorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3628562540511239409}
+      addedObject: {fileID: 2755643145415845290}
     - targetCorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2755643145415845290}
+      addedObject: {fileID: 6634811968425547828}
   m_SourcePrefab: {fileID: 100100000, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
 --- !u!4 &2812359917495054769 stripped
 Transform:
@@ -2153,8 +2171,28 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
   m_PrefabInstance: {fileID: 2345595906749601370}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &3628562540511239409
-BoxCollider:
+--- !u!114 &2755643145415845290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7136903056287723906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 15
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &6634811968425547828
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2171,28 +2209,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.0234504, y: 0.74773216, z: 0.9522121}
-  m_Center: {x: -0.000001013279, y: -0.057045862, z: -0.00017546117}
---- !u!114 &2755643145415845290
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7136903056287723906}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 15
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2602377038091957803, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
 --- !u!1001 &2423443691430652147
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2300,6 +2320,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2364,10 +2385,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6385211111052708088}
+      addedObject: {fileID: 6444775939886807848}
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6444775939886807848}
+      addedObject: {fileID: 6018809612989447773}
   m_SourcePrefab: {fileID: 100100000, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
 --- !u!4 &6439908360311045359 stripped
 Transform:
@@ -2379,8 +2400,28 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
   m_PrefabInstance: {fileID: 3097932173754043406}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &6385211111052708088
-BoxCollider:
+--- !u!114 &6444775939886807848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8829832386488372278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &6018809612989447773
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2397,28 +2438,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6939314, z: 2.247566}
-  m_Center: {x: 0, y: 0, z: -0.0000044107437}
---- !u!114 &6444775939886807848
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8829832386488372278}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2244532701287670787, guid: 7aae06f2f01dd674d8ad940b6cc92d77, type: 3}
 --- !u!1001 &3277462368398193478
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2556,6 +2579,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 15
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2620,10 +2644,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 522699422269247347}
+      addedObject: {fileID: 430287326849491088}
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 430287326849491088}
+      addedObject: {fileID: 545296309458604979}
   m_SourcePrefab: {fileID: 100100000, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
 --- !u!4 &4661695701730946763 stripped
 Transform:
@@ -2635,8 +2659,28 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
   m_PrefabInstance: {fileID: 3679614499617644074}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &522699422269247347
-BoxCollider:
+--- !u!114 &430287326849491088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7162782551141654034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &545296309458604979
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2653,28 +2697,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6939314, z: 2.247566}
-  m_Center: {x: 0, y: 0, z: -0.0000044107437}
---- !u!114 &430287326849491088
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7162782551141654034}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2244532701287670787, guid: 7aae06f2f01dd674d8ad940b6cc92d77, type: 3}
 --- !u!1001 &3984062208165381876
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2781,6 +2807,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -2850,18 +2877,38 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 565984198125387373}
+      addedObject: {fileID: 5228465637723703668}
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5228465637723703668}
+      addedObject: {fileID: 4177901518887403734}
   m_SourcePrefab: {fileID: 100100000, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
 --- !u!1 &1269867543966132749 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
   m_PrefabInstance: {fileID: 4749244743401744949}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &565984198125387373
-BoxCollider:
+--- !u!114 &5228465637723703668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1269867543966132749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &4177901518887403734
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2878,28 +2925,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6939314, z: 2.247566}
-  m_Center: {x: 0, y: 0, z: -0.0000044107437}
---- !u!114 &5228465637723703668
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1269867543966132749}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2244532701287670787, guid: 7aae06f2f01dd674d8ad940b6cc92d77, type: 3}
 --- !u!4 &3623570865245870804 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8332000634248458465, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
@@ -3010,6 +3039,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 15
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3153,6 +3183,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 15
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3293,6 +3324,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3406,6 +3438,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3519,6 +3552,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3632,6 +3666,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -3701,18 +3736,38 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4353696823852486502}
+      addedObject: {fileID: 6266826706567778987}
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6266826706567778987}
+      addedObject: {fileID: 2827550819045234446}
   m_SourcePrefab: {fileID: 100100000, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
 --- !u!1 &989337801229712209 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
   m_PrefabInstance: {fileID: 6759085411669490537}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &4353696823852486502
-BoxCollider:
+--- !u!114 &6266826706567778987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 989337801229712209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &2827550819045234446
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3729,28 +3784,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6939314, z: 2.247566}
-  m_Center: {x: 0, y: 0, z: -0.0000044107437}
---- !u!114 &6266826706567778987
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 989337801229712209}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2244532701287670787, guid: 7aae06f2f01dd674d8ad940b6cc92d77, type: 3}
 --- !u!4 &3345099408829107080 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8332000634248458465, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
@@ -3814,18 +3851,38 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3795389746248999262}
+      addedObject: {fileID: 8078933744186035024}
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8078933744186035024}
+      addedObject: {fileID: 5255211910489422421}
   m_SourcePrefab: {fileID: 100100000, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
 --- !u!1 &1056702356540774037 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
   m_PrefabInstance: {fileID: 6835870576298579629}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &3795389746248999262
-BoxCollider:
+--- !u!114 &8078933744186035024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056702356540774037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &5255211910489422421
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3842,28 +3899,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6939314, z: 2.247566}
-  m_Center: {x: 0, y: 0, z: -0.0000044107437}
---- !u!114 &8078933744186035024
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1056702356540774037}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2244532701287670787, guid: 7aae06f2f01dd674d8ad940b6cc92d77, type: 3}
 --- !u!4 &3277726061762651724 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8332000634248458465, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
@@ -3976,6 +4015,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4093,6 +4133,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4206,6 +4247,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4319,6 +4361,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4430,6 +4473,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 15
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4529,18 +4573,38 @@ PrefabInstance:
       addedObject: {fileID: 1835281128629681916}
     - targetCorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4255609456627770641}
+      addedObject: {fileID: 3883326976048469457}
     - targetCorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3883326976048469457}
+      addedObject: {fileID: 1050773129713292921}
   m_SourcePrefab: {fileID: 100100000, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
 --- !u!1 &3675851223743344307 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -4357685050095540264, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
   m_PrefabInstance: {fileID: 8107987578242615659}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &4255609456627770641
-BoxCollider:
+--- !u!114 &3883326976048469457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3675851223743344307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 15
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &1050773129713292921
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4557,28 +4621,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.0234504, y: 0.74773216, z: 0.9522121}
-  m_Center: {x: -0.000001013279, y: -0.057045862, z: -0.00017546117}
---- !u!114 &3883326976048469457
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3675851223743344307}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 15
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2602377038091957803, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
 --- !u!4 &8579325146250292864 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e45890d7480f7ab4f9c47f35a0b2bb77, type: 3}
@@ -4722,6 +4768,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4835,6 +4882,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -4899,10 +4947,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1827927866513523819}
+      addedObject: {fileID: 8412665267802550270}
     - targetCorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8412665267802550270}
+      addedObject: {fileID: 6106314307276706995}
   m_SourcePrefab: {fileID: 100100000, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
 --- !u!4 &364577999528930315 stripped
 Transform:
@@ -4914,8 +4962,28 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5798328599299489848, guid: 57853a05f8ba0c84eb241751c095b261, type: 3}
   m_PrefabInstance: {fileID: 8551785579315813610}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &1827927866513523819
-BoxCollider:
+--- !u!114 &8412665267802550270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2799486961781398738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
+  damage: 10
+  damageSource: 0
+  instantElimination: 0
+  damageOnEnter: 1
+  damageRepeatedly: 0
+  repeatInterval: 1
+  damageOnCollision: 1
+  nonTriggerContactPadding: 0.12
+--- !u!64 &6106314307276706995
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4932,28 +5000,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2475657, y: 0.6939314, z: 2.247566}
-  m_Center: {x: 0, y: 0, z: -0.0000044107437}
---- !u!114 &8412665267802550270
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2799486961781398738}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
-  instantElimination: 0
-  damageOnEnter: 1
-  damageRepeatedly: 0
-  repeatInterval: 1
-  damageOnCollision: 1
-  nonTriggerContactPadding: 0.12
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2244532701287670787, guid: 7aae06f2f01dd674d8ad940b6cc92d77, type: 3}
 --- !u!1001 &8648034831749465331
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5061,6 +5111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 10
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
@@ -5169,6 +5220,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
   damage: 1
+  damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
   damageRepeatedly: 0
