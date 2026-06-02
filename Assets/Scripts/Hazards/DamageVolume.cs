@@ -174,6 +174,11 @@ public class DamageVolume : MonoBehaviour
         if (roleHandler == null || roleHandler.currentRole != RoleHandler.PlayerRole.Runner)
             return;
 
+        RunnerLife runnerLife = playerHealth.GetComponent<RunnerLife>();
+
+        if (runnerLife != null && runnerLife.IsRespawnProtected)
+            return;
+
         if (!ignoreCooldown && !CanDamageNow(playerHealth))
             return;
 

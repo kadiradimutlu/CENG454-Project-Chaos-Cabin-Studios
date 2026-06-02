@@ -38,6 +38,10 @@ public class LobbyState : NetworkBehaviour
     [Networked] public TickTimer RoundCountdownTimer { get; set; }
     [Networked] public TickTimer SharedRoundTimer { get; set; }
 
+    [Header("Round Settings")]
+    [SerializeField] private float countdownSeconds = 3f;
+    [SerializeField] private float roundSeconds = 600f;
+
     [Header("Lobby Chat")]
     [Networked] public int ChatMessageVersion { get; set; }
 
@@ -78,6 +82,8 @@ public class LobbyState : NetworkBehaviour
 
         if (HasStateAuthority)
         {
+            GameStarted = false;
+            ResetRoundStateServer();
             EnsureValidLobbyState();
         }
     }
@@ -88,6 +94,7 @@ public class LobbyState : NetworkBehaviour
             return;
 
         CleanupInvalidPlayers();
+        UpdateRoundStateServer();
     }
 
     // ==================================================
@@ -853,6 +860,77 @@ public class LobbyState : NetworkBehaviour
     }
 
 
+    private void UpdateRoundStateServer()
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (!GameStarted)
+            return;
+
+        if (RoundStateValue == 1)
+        {
+            if (IsSharedCountdownExpired())
+                BeginRoundPlayingServer(roundSeconds);
+
+            return;
+        }
+
+        if (RoundStateValue == 2)
+        {
+            if (AreAllRunnersEliminatedServer())
+            {
+                FinishRoundServer(2);
+                return;
+            }
+
+            if (IsSharedRoundTimerExpired())
+                FinishRoundServer(2);
+        }
+    }
+
+    private bool AreAllRunnersEliminatedServer()
+    {
+        PlayerHealth[] healths = FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None);
+        bool foundRunner = false;
+
+        for (int i = 0; i < healths.Length; i++)
+        {
+            PlayerHealth health = healths[i];
+
+            if (health == null)
+                continue;
+
+            if (!IsRunnerHealthServer(health))
+                continue;
+
+            foundRunner = true;
+
+            if (!health.IsEliminated)
+                return false;
+        }
+
+        return foundRunner;
+    }
+
+    private bool IsRunnerHealthServer(PlayerHealth health)
+    {
+        NetworkObject networkObject = health.GetComponent<NetworkObject>();
+
+        if (networkObject != null && networkObject.InputAuthority != default)
+            return GetPlayerRole(networkObject.InputAuthority) == RoleHandler.PlayerRole.Runner;
+
+        RoleHandler roleHandler = health.GetComponentInChildren<RoleHandler>(true);
+
+        if (roleHandler == null)
+            return false;
+
+        if (!roleHandler.TryGetRole(out RoleHandler.PlayerRole role))
+            return false;
+
+        return role == RoleHandler.PlayerRole.Runner;
+    }
+
     // ==================================================
     // ROUND STATE
     // ==================================================
@@ -1258,6 +1336,13 @@ public class LobbyState : NetworkBehaviour
 
         ResetRoundStateServer();
         GameStarted = true;
-        Debug.Log("GameStarted has been set to TRUE.");
+        StartRoundCountdownServer(countdownSeconds);
+        Debug.Log("GameStarted has been set to TRUE and round countdown started.");
     }
+    private void OnValidate()
+    {
+        countdownSeconds = Mathf.Max(0.1f, countdownSeconds);
+        roundSeconds = Mathf.Max(1f, roundSeconds);
+    }
+
 }

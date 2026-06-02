@@ -11,8 +11,27 @@ public class RunnerLife : NetworkBehaviour
     [SerializeField] private PlayerHealth playerHealth;
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private RoleHandler roleHandler;
+    [SerializeField] private float respawnDamageGraceTime = 0.75f;
+    [SerializeField] private float respawnTransformForceTime = 0.6f;
 
     [Networked] public int RemainingDeathRights { get; private set; }
+    [Networked] private TickTimer respawnDamageGraceTimer { get; set; }
+    [Networked] private TickTimer respawnTransformForceTimer { get; set; }
+
+    public bool IsRespawnProtected
+    {
+        get
+        {
+            if (Runner == null)
+                return false;
+
+            return !respawnDamageGraceTimer.ExpiredOrNotRunning(Runner);
+        }
+    }
+
+    private Vector3 lastRespawnPosition;
+    private Quaternion lastRespawnRotation;
+    private bool hasLastRespawnPose;
 
     private Vector3 fallbackPosition;
     private Quaternion fallbackRotation;
@@ -39,9 +58,26 @@ public class RunnerLife : NetworkBehaviour
         }
     }
 
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasStateAuthority)
+            return;
+
+        if (!hasLastRespawnPose)
+            return;
+
+        if (Runner == null || respawnTransformForceTimer.ExpiredOrNotRunning(Runner))
+            return;
+
+        ApplyRespawnPose(lastRespawnPosition, lastRespawnRotation);
+    }
+
     public void ResetForNewRound(Vector3 spawnPosition, Quaternion spawnRotation)
     {
         hasCheckpoint = false;
+        hasLastRespawnPose = false;
+        respawnDamageGraceTimer = TickTimer.None;
+        respawnTransformForceTimer = TickTimer.None;
         SetFallbackRespawn(spawnPosition, spawnRotation);
 
         if (Object.HasStateAuthority)
@@ -78,13 +114,11 @@ public class RunnerLife : NetworkBehaviour
 
         position.y += respawnYOffset;
 
-        if (playerMovement == null)
-            playerMovement = GetComponent<PlayerMovement>();
+        lastRespawnPosition = position;
+        lastRespawnRotation = rotation;
+        hasLastRespawnPose = true;
 
-        if (playerMovement != null)
-            playerMovement.ResetMovementForRespawn(position, rotation);
-        else
-            transform.SetPositionAndRotation(position, rotation);
+        ApplyRespawnPose(position, rotation);
 
         if (playerHealth == null)
             playerHealth = GetComponent<PlayerHealth>();
@@ -92,7 +126,54 @@ public class RunnerLife : NetworkBehaviour
         if (playerHealth != null)
             playerHealth.ResetHealth();
 
+        PlayerDamageFeedback feedback = GetComponent<PlayerDamageFeedback>();
+
+        if (feedback != null)
+            feedback.ResetFeedback();
+
+        if (Runner != null)
+        {
+            float graceTime = Mathf.Max(respawnDamageGraceTime, respawnTransformForceTime + 0.25f);
+
+            if (graceTime > 0f)
+                respawnDamageGraceTimer = TickTimer.CreateFromSeconds(Runner, graceTime);
+
+            if (respawnTransformForceTime > 0f)
+                respawnTransformForceTimer = TickTimer.CreateFromSeconds(Runner, respawnTransformForceTime);
+        }
+
         return true;
+    }
+
+    private void ApplyRespawnPose(Vector3 position, Quaternion rotation)
+    {
+        if (playerMovement == null)
+            playerMovement = GetComponent<PlayerMovement>();
+
+        if (playerMovement != null)
+            playerMovement.ResetMovementForRespawn(position, rotation);
+
+        ForceRespawnTransform(position, rotation);
+    }
+
+    private void ForceRespawnTransform(Vector3 position, Quaternion rotation)
+    {
+        transform.SetPositionAndRotation(position, rotation);
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+
+        if (rb == null)
+            return;
+
+        rb.position = position;
+        rb.rotation = rotation;
+        rb.angularVelocity = Vector3.zero;
+
+#if UNITY_6000_0_OR_NEWER
+        rb.linearVelocity = Vector3.zero;
+#else
+        rb.velocity = Vector3.zero;
+#endif
     }
 
     private void GetRespawnPose(out Vector3 position, out Quaternion rotation)
@@ -163,5 +244,7 @@ public class RunnerLife : NetworkBehaviour
     {
         startingDeathRights = Mathf.Max(0, startingDeathRights);
         respawnYOffset = Mathf.Max(0f, respawnYOffset);
+        respawnDamageGraceTime = Mathf.Max(0f, respawnDamageGraceTime);
+        respawnTransformForceTime = Mathf.Max(0f, respawnTransformForceTime);
     }
 }
