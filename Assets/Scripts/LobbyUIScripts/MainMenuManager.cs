@@ -5,6 +5,7 @@ using Fusion;
 using Fusion.Sockets;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
@@ -20,6 +21,14 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private GameObject gameWorld;
     [SerializeField] private GameObject menuCameraObject;
     [SerializeField] private GameObject playerSpawnManagerObject;
+
+    [Header("Menu Audio")]
+    [SerializeField] private AudioSource mainMenuAudioSource;
+    [SerializeField] private AudioClip mainMenuMusicClip;
+    [SerializeField] private AudioMixerGroup mainMenuMixerGroup;
+    [SerializeField] private AudioMixer mainAudioMixer;
+    [SerializeField] private string mainMenuVolumeParameter = "MainMenuVolume";
+    [SerializeField] private bool playMainMenuMusicInLobby = true;
 
     [Header("Join Code UI")]
     [SerializeField] private TMP_InputField codeInputField;
@@ -52,6 +61,25 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private TextMeshProUGUI player3ReadyButtonText;
     [SerializeField] private TextMeshProUGUI player4ReadyButtonText;
 
+    [Header("Lobby - Role Selection Per Slot")]
+    [Tooltip("Size 4. Element 0 = Player 1 Runner button, Element 1 = Player 2 Runner button, etc.")]
+    [SerializeField] private Button[] runnerRoleButtons;
+
+    [Tooltip("Size 4. Element 0 = Player 1 Trapper button, Element 1 = Player 2 Trapper button, etc.")]
+    [SerializeField] private Button[] trapperRoleButtons;
+
+    [Tooltip("Optional. Size 4. Shows selected role text for each lobby slot.")]
+    [SerializeField] private TextMeshProUGUI[] roleInfoTexts;
+
+    [Header("Lobby - Skin Selection")]
+    [SerializeField] private Button[] previousSkinButtons;
+    [SerializeField] private Button[] nextSkinButtons;
+    [SerializeField] private TextMeshProUGUI[] skinNameTexts;
+    [SerializeField] private Image[] skinPreviewImages;
+
+    [Header("Lobby - 3D Character Preview")]
+    [SerializeField] private LobbyCharacterPreview[] characterPreviewDisplays;
+
     [Header("Lobby - Other Buttons")]
     [SerializeField] private Button startButton;
     [SerializeField] private Button leaveButton;
@@ -77,14 +105,34 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     private bool _isLeavingLobby = false;
     private bool _isStartingFusion = false;
 
+    private RoleHandler.PlayerRole _cachedHostRole = RoleHandler.PlayerRole.None;
+    private int _cachedHostSkinIndex = 0;
+
+    public LobbyState ActiveLobbyState
+    {
+        get
+        {
+            return IsLobbyStateAlive() ? _lobbyState : null;
+        }
+    }
+
     private void Awake()
     {
         EnsureRunnerHandler();
+        SetupMainMenuAudio();
+        SetupSkinSelectionButtons();
+        SetupRoleSelectionButtons();
 
         SetGameplayView(false);
         ResetCopyRoomCodeButtonText();
         OpenPanel(mainMenuPanel);
         RefreshLobbyUI();
+    }
+
+    private void OnEnable()
+    {
+        SetupSkinSelectionButtons();
+        SetupRoleSelectionButtons();
     }
 
     private void Update()
@@ -110,6 +158,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (_currentPanel == lobbyPanel && IsLobbyStateAlive())
         {
             _uiRefreshTimer += Time.deltaTime;
+
             if (_uiRefreshTimer >= UiRefreshInterval)
             {
                 _uiRefreshTimer = 0f;
@@ -140,6 +189,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         NetworkRunnerHandler found = FindObjectOfType<NetworkRunnerHandler>();
+
         if (found != null && IsSceneObject(found) && found.IsReusable())
         {
             runnerHandler = found;
@@ -189,6 +239,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         else
         {
             NetworkRunnerHandler found = FindObjectOfType<NetworkRunnerHandler>();
+
             if (found != null && IsSceneObject(found))
                 sceneObjectToDestroy = found.gameObject;
         }
@@ -207,6 +258,277 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         return _lobbyState != null;
     }
 
+    private bool IsLocalHostRunnerReady()
+    {
+        return _runner != null && _runner.IsServer;
+    }
+
+    private int GetLocalSkinCount()
+    {
+        CharacterSkinDatabase database = CharacterSkinDatabase.Instance;
+
+        if (database == null)
+            return 4;
+
+        return Mathf.Max(1, database.SkinCount);
+    }
+
+    private int NormalizeLocalSkinIndex(int skinIndex)
+    {
+        int skinCount = GetLocalSkinCount();
+
+        if (skinIndex < 0)
+            return skinCount - 1;
+
+        if (skinIndex >= skinCount)
+            return 0;
+
+        return skinIndex;
+    }
+
+    private string GetLocalSkinName(int skinIndex)
+    {
+        CharacterSkinDatabase database = CharacterSkinDatabase.Instance;
+
+        if (database == null)
+            return $"Skin {skinIndex + 1}";
+
+        return database.GetSkinName(skinIndex);
+    }
+
+    private string GetLocalRoleName(RoleHandler.PlayerRole role)
+    {
+        if (role == RoleHandler.PlayerRole.Runner)
+            return "Runner";
+
+        if (role == RoleHandler.PlayerRole.Trapper)
+            return "Trapper";
+
+        return "Choose";
+    }
+
+    private void ApplyCachedHostLoadoutToLobbyState()
+    {
+        if (!IsLocalHostRunnerReady() || !IsLobbyStateAlive())
+            return;
+
+        if (_cachedHostRole != RoleHandler.PlayerRole.None)
+            _lobbyState.SetSlotRoleServerByIndex(0, _cachedHostRole);
+
+        LobbyState.LobbySlotData[] slots = _lobbyState.GetSlots();
+
+        if (slots != null && slots.Length > 0)
+        {
+            int currentSkin = slots[0].SkinIndex;
+            int guard = 0;
+
+            while (currentSkin != _cachedHostSkinIndex && guard < GetLocalSkinCount() + 2)
+            {
+                _lobbyState.ChangeSlotSkinServerByIndex(0, 1);
+                slots = _lobbyState.GetSlots();
+                currentSkin = slots[0].SkinIndex;
+                guard++;
+            }
+        }
+    }
+
+    private bool HandleHostSlotRoleClick(int slotIndex, RoleHandler.PlayerRole role)
+    {
+        if (slotIndex != 0 || !IsLocalHostRunnerReady())
+            return false;
+
+        if (IsLobbyStateAlive() && _lobbyState.GameStarted)
+            return true;
+
+        _cachedHostRole = role;
+
+        if (IsLobbyStateAlive())
+            _lobbyState.SetSlotRoleServerByIndex(0, role);
+
+        RefreshLobbyUI();
+        return true;
+    }
+
+    private bool HandleHostSlotSkinClick(int slotIndex, int direction)
+    {
+        if (slotIndex != 0 || !IsLocalHostRunnerReady())
+            return false;
+
+        if (IsLobbyStateAlive() && _lobbyState.GameStarted)
+            return true;
+
+        direction = direction < 0 ? -1 : 1;
+        _cachedHostSkinIndex = NormalizeLocalSkinIndex(_cachedHostSkinIndex + direction);
+
+        if (IsLobbyStateAlive())
+            _lobbyState.ChangeSlotSkinServerByIndex(0, direction);
+
+        RefreshLobbyUI();
+        return true;
+    }
+
+    private bool RefreshHostOnlyLobbyFallback()
+    {
+        if (!IsLocalHostRunnerReady())
+            return false;
+
+        if (player1NameText) player1NameText.text = "Player 1 (Host)";
+        SetStatusText(player1StatusText, $"Host | {GetLocalRoleName(_cachedHostRole)}");
+
+        if (roomCodeText != null)
+        {
+            roomCodeText.text = string.IsNullOrEmpty(_currentRoomCode)
+                ? "Room Code: ------"
+                : $"Room Code: {_currentRoomCode}";
+        }
+
+        if (startButton != null)
+        {
+            startButton.gameObject.SetActive(true);
+            startButton.interactable = false;
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            bool isHostSlot = i == 0;
+
+            Button runnerButton = GetArrayItem(runnerRoleButtons, i);
+            if (runnerButton != null)
+            {
+                runnerButton.gameObject.SetActive(isHostSlot);
+                runnerButton.interactable = isHostSlot && _cachedHostRole != RoleHandler.PlayerRole.Runner;
+            }
+
+            Button trapperButton = GetArrayItem(trapperRoleButtons, i);
+            if (trapperButton != null)
+            {
+                trapperButton.gameObject.SetActive(isHostSlot);
+                trapperButton.interactable = isHostSlot && _cachedHostRole != RoleHandler.PlayerRole.Trapper;
+            }
+
+            TextMeshProUGUI roleInfoText = GetArrayItem(roleInfoTexts, i);
+            if (roleInfoText != null)
+            {
+                roleInfoText.gameObject.SetActive(isHostSlot);
+                roleInfoText.text = isHostSlot ? $"Role: {GetLocalRoleName(_cachedHostRole)}" : string.Empty;
+            }
+
+            bool showSkin = isHostSlot;
+
+            if (skinNameTexts != null && i < skinNameTexts.Length && skinNameTexts[i] != null)
+            {
+                skinNameTexts[i].gameObject.SetActive(showSkin);
+                skinNameTexts[i].text = showSkin ? GetLocalSkinName(_cachedHostSkinIndex) : string.Empty;
+            }
+
+            if (previousSkinButtons != null && i < previousSkinButtons.Length && previousSkinButtons[i] != null)
+            {
+                previousSkinButtons[i].gameObject.SetActive(showSkin);
+                previousSkinButtons[i].interactable = showSkin;
+            }
+
+            if (nextSkinButtons != null && i < nextSkinButtons.Length && nextSkinButtons[i] != null)
+            {
+                nextSkinButtons[i].gameObject.SetActive(showSkin);
+                nextSkinButtons[i].interactable = showSkin;
+            }
+
+            LobbyCharacterPreview previewDisplay = GetCharacterPreviewDisplay(i);
+            if (previewDisplay != null)
+            {
+                if (!previewDisplay.gameObject.activeSelf)
+                    previewDisplay.gameObject.SetActive(true);
+
+                if (showSkin)
+                {
+                    previewDisplay.ShowCharacter(_cachedHostSkinIndex);
+                    previewDisplay.SetPreviewVisible(true);
+                }
+                else
+                {
+                    previewDisplay.ClearPreview();
+                    previewDisplay.SetPreviewVisible(false);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private bool TryGetLocalLobbyPlayer(out PlayerRef player)
+    {
+        player = default;
+
+        if (_runner == null)
+            return false;
+
+        if (_runner.LocalPlayer != default)
+        {
+            player = _runner.LocalPlayer;
+            return true;
+        }
+
+        if (_runner.IsServer)
+        {
+            foreach (PlayerRef activePlayer in _runner.ActivePlayers)
+            {
+                if (activePlayer != default)
+                {
+                    player = activePlayer;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void EnsureLocalHostAssignedToSlotOne()
+    {
+        if (_runner == null || !_runner.IsServer || !IsLobbyStateAlive())
+            return;
+
+        if (_lobbyState.GetSlotPlayer(0) != default)
+            return;
+
+        if (TryGetLocalLobbyPlayer(out PlayerRef hostPlayer))
+            _lobbyState.AssignPlayer(hostPlayer);
+    }
+
+    private int GetLocalLobbySlotIndex()
+    {
+        if (_runner == null || !IsLobbyStateAlive())
+            return -1;
+
+        EnsureLocalHostAssignedToSlotOne();
+
+        if (TryGetLocalLobbyPlayer(out PlayerRef localPlayer))
+        {
+            int slotIndex = _lobbyState.GetPlayerSlotIndex(localPlayer);
+
+            if (slotIndex >= 0)
+                return slotIndex;
+        }
+
+        if (_runner.IsServer)
+            return 0;
+
+        return -1;
+    }
+
+    private bool IsLocalLobbyHost()
+    {
+        if (_runner == null || !IsLobbyStateAlive())
+            return false;
+
+        EnsureLocalHostAssignedToSlotOne();
+
+        if (TryGetLocalLobbyPlayer(out PlayerRef localPlayer) && _lobbyState.IsHostPlayer(localPlayer))
+            return true;
+
+        return _runner.IsServer;
+    }
+
     private void SafeClearLobbyState()
     {
         _lobbyState = null;
@@ -218,15 +540,113 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             copyRoomCodeButtonText.text = "Copy";
     }
 
+    private void SetupMainMenuAudio()
+    {
+        if (mainMenuAudioSource == null)
+            mainMenuAudioSource = GetComponent<AudioSource>();
+
+        if (mainMenuAudioSource == null)
+            mainMenuAudioSource = gameObject.AddComponent<AudioSource>();
+
+        if (mainMenuMusicClip != null)
+            mainMenuAudioSource.clip = mainMenuMusicClip;
+
+        mainMenuAudioSource.loop = true;
+        mainMenuAudioSource.playOnAwake = false;
+        mainMenuAudioSource.spatialBlend = 0f;
+
+        if (mainMenuMixerGroup != null)
+        {
+            mainMenuAudioSource.outputAudioMixerGroup = mainMenuMixerGroup;
+
+            if (mainAudioMixer == null)
+                mainAudioMixer = mainMenuMixerGroup.audioMixer;
+        }
+        else
+        {
+            Debug.LogWarning("MainMenuManager: Main Menu Mixer Group is not assigned. Main menu music will not be controlled by MainAudioMixer until you assign a mixer group.");
+        }
+    }
+
+    public void SetMainMenuMusicVolume(float normalizedVolume)
+    {
+        if (mainAudioMixer == null)
+        {
+            Debug.LogWarning("MainMenuManager: Main Audio Mixer is not assigned.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(mainMenuVolumeParameter))
+        {
+            Debug.LogWarning("MainMenuManager: Main menu volume parameter name is empty.");
+            return;
+        }
+
+        normalizedVolume = Mathf.Clamp01(normalizedVolume);
+        float volumeDb = normalizedVolume <= 0.0001f
+            ? -80f
+            : Mathf.Log10(normalizedVolume) * 20f;
+
+        bool parameterFound = mainAudioMixer.SetFloat(mainMenuVolumeParameter, volumeDb);
+
+        if (!parameterFound)
+        {
+            Debug.LogWarning($"MainMenuManager: AudioMixer parameter '{mainMenuVolumeParameter}' was not found. Expose this exact parameter name in MainAudioMixer.");
+        }
+    }
+
+    private void PlayMainMenuMusic()
+    {
+        if (mainMenuAudioSource == null)
+            return;
+
+        if (mainMenuMusicClip != null && mainMenuAudioSource.clip != mainMenuMusicClip)
+            mainMenuAudioSource.clip = mainMenuMusicClip;
+
+        if (mainMenuAudioSource.clip == null)
+            return;
+
+        if (!mainMenuAudioSource.isPlaying)
+            mainMenuAudioSource.Play();
+    }
+
+    private void StopMainMenuMusic()
+    {
+        if (mainMenuAudioSource == null)
+            return;
+
+        if (mainMenuAudioSource.isPlaying)
+            mainMenuAudioSource.Stop();
+    }
+
+    private void UpdateMainMenuMusicState()
+    {
+        bool isInGameplay = gameWorld != null && gameWorld.activeSelf;
+
+        bool isMenuPanelOpen =
+            _currentPanel == mainMenuPanel ||
+            _currentPanel == settingsPanel ||
+            _currentPanel == hostJoinPanel ||
+            _currentPanel == joinCodePanel ||
+            (playMainMenuMusicInLobby && _currentPanel == lobbyPanel);
+
+        if (!isInGameplay && isMenuPanelOpen)
+            PlayMainMenuMusic();
+        else
+            StopMainMenuMusic();
+    }
+
     private void SetGameplayView(bool gameplayActive)
     {
+        CameraFollowRig.SetGameplayCursorActive(gameplayActive);
+
         if (gameWorld != null)
             gameWorld.SetActive(gameplayActive);
 
-        // Keep the menu camera alive until the local player camera is fully ready.
         if (!gameplayActive)
         {
             EnableMenuCameraForMenu();
+            CameraFollowRig.ForceUnlockCursor();
         }
     }
 
@@ -239,6 +659,18 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (lobbyPanel) lobbyPanel.SetActive(false);
 
         _currentPanel = null;
+        UpdateMainMenuMusicState();
+    }
+
+    private void SetStatusText(TextMeshProUGUI textObject, string value)
+    {
+        if (textObject == null)
+            return;
+
+        textObject.text = value;
+
+        if (textObject.gameObject != null)
+            textObject.gameObject.SetActive(!string.IsNullOrWhiteSpace(value));
     }
 
     // ==================================================
@@ -307,7 +739,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             codeInputField.text = string.Empty;
 
         if (joinCodeInfoText != null)
-            joinCodeInfoText.text = "Join code gir";
+            joinCodeInfoText.text = "Enter Room Code";
 
         OpenPanel(joinCodePanel);
     }
@@ -329,9 +761,11 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (string.IsNullOrWhiteSpace(joinCode))
         {
-            Debug.LogWarning("Join code cannot be empty.");
+            Debug.LogWarning("Room code cannot be empty.");
+
             if (joinCodeInfoText != null)
-                joinCodeInfoText.text = "Kod boş olamaz";
+                joinCodeInfoText.text = "Room code cannot be empty.";
+
             return;
         }
 
@@ -367,16 +801,143 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void ClickReady()
     {
-        if (_isLeavingLobby || _isStartingFusion)
+        if (_isLeavingLobby)
             return;
 
         if (_runner == null || !IsLobbyStateAlive())
             return;
 
-        if (_lobbyState.IsHostPlayer(_runner.LocalPlayer))
+        if (IsLocalLobbyHost())
+            return;
+
+        int localSlotIndex = GetLocalLobbySlotIndex();
+
+        if (localSlotIndex < 0)
+            return;
+
+        if (_lobbyState.GetSlots()[localSlotIndex].Role == RoleHandler.PlayerRole.None)
             return;
 
         _lobbyState.RPC_ToggleReady();
+    }
+
+
+    public void ClickPlayer1Runner()
+    {
+        ClickSelectRoleForSlot(0, RoleHandler.PlayerRole.Runner);
+    }
+
+    public void ClickPlayer1Trapper()
+    {
+        ClickSelectRoleForSlot(0, RoleHandler.PlayerRole.Trapper);
+    }
+
+    public void ClickPlayer1PreviousSkin()
+    {
+        ClickChangeSkin(0, -1);
+    }
+
+    public void ClickPlayer1NextSkin()
+    {
+        ClickChangeSkin(0, 1);
+    }
+
+    private void SetupRoleSelectionButtons()
+    {
+        SetupRoleButtonArray(runnerRoleButtons, RoleHandler.PlayerRole.Runner);
+        SetupRoleButtonArray(trapperRoleButtons, RoleHandler.PlayerRole.Trapper);
+    }
+
+    private void SetupRoleButtonArray(Button[] buttons, RoleHandler.PlayerRole role)
+    {
+        if (buttons == null)
+            return;
+
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            int slotIndex = i;
+
+            if (buttons[i] == null)
+                continue;
+
+            buttons[i].onClick.RemoveAllListeners();
+            buttons[i].onClick.AddListener(() => ClickSelectRoleForSlot(slotIndex, role));
+        }
+    }
+
+    private void ClickSelectRoleForSlot(int slotIndex, RoleHandler.PlayerRole role)
+    {
+        if (_isLeavingLobby)
+            return;
+
+        if (HandleHostSlotRoleClick(slotIndex, role))
+            return;
+
+        if (_runner == null || !IsLobbyStateAlive())
+            return;
+
+        if (_lobbyState.GameStarted)
+            return;
+
+        int localSlotIndex = GetLocalLobbySlotIndex();
+
+        if (localSlotIndex != slotIndex)
+            return;
+
+        if (!_lobbyState.CanSlotEditLoadout(slotIndex))
+            return;
+
+        _lobbyState.RPC_SelectRole((int)role);
+        RefreshLobbyUI();
+    }
+
+    private void SetupSkinSelectionButtons()
+    {
+        SetupSkinButtonArray(previousSkinButtons, -1);
+        SetupSkinButtonArray(nextSkinButtons, 1);
+    }
+
+    private void SetupSkinButtonArray(Button[] buttons, int direction)
+    {
+        if (buttons == null)
+            return;
+
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            int slotIndex = i;
+
+            if (buttons[i] == null)
+                continue;
+
+            buttons[i].onClick.RemoveAllListeners();
+            buttons[i].onClick.AddListener(() => ClickChangeSkin(slotIndex, direction));
+        }
+    }
+
+    private void ClickChangeSkin(int slotIndex, int direction)
+    {
+        if (_isLeavingLobby)
+            return;
+
+        if (HandleHostSlotSkinClick(slotIndex, direction))
+            return;
+
+        if (_runner == null || !IsLobbyStateAlive())
+            return;
+
+        if (_lobbyState.GameStarted)
+            return;
+
+        int localSlotIndex = GetLocalLobbySlotIndex();
+
+        if (localSlotIndex != slotIndex)
+            return;
+
+        if (!_lobbyState.CanSlotEditLoadout(slotIndex))
+            return;
+
+        _lobbyState.RPC_ChangeSkin(direction);
+        RefreshLobbyUI();
     }
 
     public void ClickStartGame()
@@ -401,7 +962,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        bool isHost = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
+        bool isHost = IsLocalLobbyHost();
         bool canStart = _lobbyState.CanHostStartGame();
         int playerCount = _lobbyState.GetPlayerCount();
 
@@ -435,8 +996,10 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (string.IsNullOrWhiteSpace(codeToCopy))
         {
             Debug.LogWarning("No room code found to copy.");
+
             if (copyRoomCodeButtonText != null)
                 copyRoomCodeButtonText.text = "No Code";
+
             return;
         }
 
@@ -445,8 +1008,10 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (string.IsNullOrWhiteSpace(codeToCopy) || codeToCopy == "------")
         {
             Debug.LogWarning("There is no valid room code to copy.");
+
             if (copyRoomCodeButtonText != null)
                 copyRoomCodeButtonText.text = "No Code";
+
             return;
         }
 
@@ -513,7 +1078,6 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             ResetCopyRoomCodeButtonText();
 
             SetGameplayView(false);
-
             SafeClearLobbyState();
 
             if (runnerHandler != null)
@@ -626,13 +1190,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (mode == GameMode.Host)
         {
             SpawnLobbyStateIfNeeded();
-
-            if (_lobbyState != null &&
-                _runner.LocalPlayer != default &&
-                !_lobbyState.ContainsPlayer(_runner.LocalPlayer))
-            {
-                _lobbyState.AssignPlayer(_runner.LocalPlayer);
-            }
+            EnsureLocalHostAssignedToSlotOne();
         }
 
         TryFindLobbyState();
@@ -651,9 +1209,10 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         _lobbyState = _runner.Spawn(lobbyStatePrefab, Vector3.zero, Quaternion.identity, null);
 
-        if (_lobbyState != null && _runner.LocalPlayer != default)
+        if (_lobbyState != null)
         {
-            _lobbyState.AssignPlayer(_runner.LocalPlayer);
+            EnsureLocalHostAssignedToSlotOne();
+            ApplyCachedHostLoadoutToLobbyState();
         }
     }
 
@@ -671,6 +1230,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             return;
 
         _lobbyState = state;
+        ApplyCachedHostLoadoutToLobbyState();
         RefreshLobbyUI();
     }
 
@@ -687,10 +1247,12 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
         CloseAllPanels();
         SetGameplayView(true);
+        StopMainMenuMusic();
 
         if (playerSpawnManagerObject != null)
         {
             playerSpawnManagerObject.SendMessage("TryStartGameplaySpawn", SendMessageOptions.DontRequireReceiver);
+            playerSpawnManagerObject.SendMessage("TryStartTrapSpawn", SendMessageOptions.DontRequireReceiver);
         }
 
         Debug.Log("GameWorld opened. Gameplay has started.");
@@ -712,27 +1274,38 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             panel.SetActive(true);
 
         _currentPanel = panel;
+
+        if (panel == lobbyPanel)
+        {
+            SetupSkinSelectionButtons();
+            SetupRoleSelectionButtons();
+        }
+
+        UpdateMainMenuMusicState();
     }
 
     private void RefreshLobbyUI()
     {
-        if (player1NameText) player1NameText.text = "Player 1: Bekleniyor...";
-        if (player2NameText) player2NameText.text = "Player 2: Bekleniyor...";
-        if (player3NameText) player3NameText.text = "Player 3: Bekleniyor...";
-        if (player4NameText) player4NameText.text = "Player 4: Bekleniyor...";
+        if (player1NameText) player1NameText.text = "Player 1";
+        if (player2NameText) player2NameText.text = "Player 2";
+        if (player3NameText) player3NameText.text = "Player 3";
+        if (player4NameText) player4NameText.text = "Player 4";
 
-        if (player1StatusText) player1StatusText.text = "Bekleniyor...";
-        if (player2StatusText) player2StatusText.text = "Bekleniyor...";
-        if (player3StatusText) player3StatusText.text = "Bekleniyor...";
-        if (player4StatusText) player4StatusText.text = "Bekleniyor...";
+        SetStatusText(player1StatusText, "");
+        SetStatusText(player2StatusText, "");
+        SetStatusText(player3StatusText, "");
+        SetStatusText(player4StatusText, "");
 
         if (player2ReadyButton) player2ReadyButton.gameObject.SetActive(false);
         if (player3ReadyButton) player3ReadyButton.gameObject.SetActive(false);
         if (player4ReadyButton) player4ReadyButton.gameObject.SetActive(false);
 
-        if (player2ReadyButtonText) player2ReadyButtonText.text = "Hazır";
-        if (player3ReadyButtonText) player3ReadyButtonText.text = "Hazır";
-        if (player4ReadyButtonText) player4ReadyButtonText.text = "Hazır";
+        if (player2ReadyButtonText) player2ReadyButtonText.text = "Ready";
+        if (player3ReadyButtonText) player3ReadyButtonText.text = "Ready";
+        if (player4ReadyButtonText) player4ReadyButtonText.text = "Ready";
+
+        // Do not clear/re-enable slot UI every refresh.
+        // Clearing here causes role/skin buttons to flicker because RefreshLobbyUI runs repeatedly.
 
         if (roomCodeText != null)
         {
@@ -748,55 +1321,74 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             copyRoomCodeButton.interactable = hasRoomCode;
         }
 
-        if (_runner == null || !IsLobbyStateAlive())
+        if (_runner == null)
         {
+            ClearSkinSelectionUI();
+            ClearRoleSelectionUI();
+
             if (startButton != null)
             {
                 startButton.gameObject.SetActive(false);
                 startButton.interactable = false;
             }
+
             return;
         }
 
-        LobbyState.LobbySlotData[] slots = _lobbyState.GetSlots();
-
-        if (_runner.IsServer && _runner.LocalPlayer != default)
+        if (!IsLobbyStateAlive())
         {
-            if (!slots[0].HasPlayer)
+            if (RefreshHostOnlyLobbyFallback())
+                return;
+
+            ClearSkinSelectionUI();
+            ClearRoleSelectionUI();
+
+            if (startButton != null)
             {
-                _lobbyState.AssignPlayer(_runner.LocalPlayer);
-                slots = _lobbyState.GetSlots();
+                startButton.gameObject.SetActive(false);
+                startButton.interactable = false;
             }
+
+            return;
         }
+
+        EnsureLocalHostAssignedToSlotOne();
+        ApplyCachedHostLoadoutToLobbyState();
+        LobbyState.LobbySlotData[] slots = _lobbyState.GetSlots();
 
         if (slots.Length > 0)
         {
             if (player1NameText) player1NameText.text = slots[0].DisplayName;
-            if (player1StatusText) player1StatusText.text = slots[0].StatusText;
+            SetStatusText(player1StatusText, slots[0].StatusText);
         }
 
         if (slots.Length > 1)
         {
             if (player2NameText) player2NameText.text = slots[1].DisplayName;
-            if (player2StatusText) player2StatusText.text = slots[1].StatusText;
+            SetStatusText(player2StatusText, slots[1].StatusText);
         }
 
         if (slots.Length > 2)
         {
             if (player3NameText) player3NameText.text = slots[2].DisplayName;
-            if (player3StatusText) player3StatusText.text = slots[2].StatusText;
+            SetStatusText(player3StatusText, slots[2].StatusText);
         }
 
         if (slots.Length > 3)
         {
             if (player4NameText) player4NameText.text = slots[3].DisplayName;
-            if (player4StatusText) player4StatusText.text = slots[3].StatusText;
+            SetStatusText(player4StatusText, slots[3].StatusText);
         }
 
-        bool isHost = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
-        int localSlotIndex = _lobbyState.GetPlayerSlotIndex(_runner.LocalPlayer);
+        bool isHost = IsLocalLobbyHost();
+        int localSlotIndex = GetLocalLobbySlotIndex();
 
-        _localReady = _lobbyState.GetPlayerReady(_runner.LocalPlayer);
+        RefreshSkinSelectionUI(slots, localSlotIndex);
+        RefreshRoleSelectionUI(localSlotIndex);
+
+        _localReady = false;
+        if (TryGetLocalLobbyPlayer(out PlayerRef localLobbyPlayer))
+            _localReady = _lobbyState.GetPlayerReady(localLobbyPlayer);
 
         if (!isHost)
         {
@@ -804,34 +1396,262 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             {
                 player2ReadyButton.gameObject.SetActive(true);
                 player2ReadyButton.interactable = true;
+
                 if (player2ReadyButtonText)
-                    player2ReadyButtonText.text = _localReady ? "Hazır İptal" : "Hazır";
+                    player2ReadyButtonText.text = _localReady ? "Cancel Ready" : "Ready";
             }
             else if (localSlotIndex == 2 && player3ReadyButton != null)
             {
                 player3ReadyButton.gameObject.SetActive(true);
                 player3ReadyButton.interactable = true;
+
                 if (player3ReadyButtonText)
-                    player3ReadyButtonText.text = _localReady ? "Hazır İptal" : "Hazır";
+                    player3ReadyButtonText.text = _localReady ? "Cancel Ready" : "Ready";
             }
             else if (localSlotIndex == 3 && player4ReadyButton != null)
             {
                 player4ReadyButton.gameObject.SetActive(true);
                 player4ReadyButton.interactable = true;
+
                 if (player4ReadyButtonText)
-                    player4ReadyButtonText.text = _localReady ? "Hazır İptal" : "Hazır";
+                    player4ReadyButtonText.text = _localReady ? "Cancel Ready" : "Ready";
             }
         }
 
         if (startButton != null)
         {
-            bool isHostForStart = _lobbyState.IsHostPlayer(_runner.LocalPlayer);
+            bool isHostForStart = IsLocalLobbyHost();
             bool canStartGame = _lobbyState.CanHostStartGame();
 
             startButton.gameObject.SetActive(isHostForStart);
             startButton.interactable = isHostForStart && canStartGame;
         }
     }
+
+
+    private void RefreshRoleSelectionUI(int localSlotIndex)
+    {
+        LobbyState.LobbySlotData[] slots = IsLobbyStateAlive()
+            ? _lobbyState.GetSlots()
+            : null;
+
+        for (int i = 0; i < 4; i++)
+        {
+            bool slotExists = slots != null && i < slots.Length;
+            bool isHostEditableSlot = _runner != null && _runner.IsServer && i == 0;
+            bool slotHasPlayer = (slotExists && slots[i].HasPlayer) || isHostEditableSlot;
+            bool isLocalSlot = i == localSlotIndex;
+            bool canChooseThisSlot = _runner != null &&
+                                     IsLobbyStateAlive() &&
+                                     slotHasPlayer &&
+                                     isLocalSlot &&
+                                     _lobbyState.CanSlotEditLoadout(i);
+
+            RoleHandler.PlayerRole slotRole = slotExists
+                ? slots[i].Role
+                : RoleHandler.PlayerRole.None;
+
+            Button runnerButton = GetArrayItem(runnerRoleButtons, i);
+            if (runnerButton != null)
+            {
+                runnerButton.gameObject.SetActive(slotHasPlayer);
+                runnerButton.interactable = canChooseThisSlot && slotRole != RoleHandler.PlayerRole.Runner;
+            }
+
+            Button trapperButton = GetArrayItem(trapperRoleButtons, i);
+            if (trapperButton != null)
+            {
+                trapperButton.gameObject.SetActive(slotHasPlayer);
+                trapperButton.interactable = canChooseThisSlot && slotRole != RoleHandler.PlayerRole.Trapper;
+            }
+
+            TextMeshProUGUI roleInfoText = GetArrayItem(roleInfoTexts, i);
+            if (roleInfoText != null)
+            {
+                roleInfoText.gameObject.SetActive(slotHasPlayer);
+
+                if (slotHasPlayer)
+                {
+                    string roleName = slotRole == RoleHandler.PlayerRole.None
+                        ? "Choose"
+                        : slots[i].RoleName;
+
+                    roleInfoText.text = $"Role: {roleName}";
+                }
+                else
+                {
+                    roleInfoText.text = string.Empty;
+                }
+            }
+        }
+    }
+
+    private T GetArrayItem<T>(T[] array, int index) where T : class
+    {
+        if (array == null)
+            return null;
+
+        if (index < 0 || index >= array.Length)
+            return null;
+
+        return array[index];
+    }
+
+    private void ClearRoleSelectionUI()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            Button runnerButton = GetArrayItem(runnerRoleButtons, i);
+            if (runnerButton != null)
+            {
+                runnerButton.gameObject.SetActive(false);
+                runnerButton.interactable = false;
+            }
+
+            Button trapperButton = GetArrayItem(trapperRoleButtons, i);
+            if (trapperButton != null)
+            {
+                trapperButton.gameObject.SetActive(false);
+                trapperButton.interactable = false;
+            }
+
+            TextMeshProUGUI roleInfoText = GetArrayItem(roleInfoTexts, i);
+            if (roleInfoText != null)
+            {
+                roleInfoText.text = string.Empty;
+                roleInfoText.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    private void RefreshSkinSelectionUI(LobbyState.LobbySlotData[] slots, int localSlotIndex)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            bool hasSlot = slots != null && i < slots.Length;
+            bool isHostEditableSlot = _runner != null && _runner.IsServer && i == 0;
+            bool hasPlayer = (hasSlot && slots[i].HasPlayer) || isHostEditableSlot;
+            bool isLocalSlot = i == localSlotIndex;
+
+            string skinName = hasPlayer ? slots[i].SkinName : string.Empty;
+            int skinIndex = hasPlayer ? slots[i].SkinIndex : 0;
+
+            if (skinNameTexts != null && i < skinNameTexts.Length && skinNameTexts[i] != null)
+            {
+                skinNameTexts[i].text = hasPlayer ? skinName : string.Empty;
+                skinNameTexts[i].gameObject.SetActive(hasPlayer);
+            }
+
+            bool canChangeSkin = hasPlayer && isLocalSlot && _lobbyState.CanSlotEditLoadout(i);
+
+            if (previousSkinButtons != null && i < previousSkinButtons.Length && previousSkinButtons[i] != null)
+            {
+                previousSkinButtons[i].gameObject.SetActive(canChangeSkin);
+                previousSkinButtons[i].interactable = canChangeSkin;
+            }
+
+            if (nextSkinButtons != null && i < nextSkinButtons.Length && nextSkinButtons[i] != null)
+            {
+                nextSkinButtons[i].gameObject.SetActive(canChangeSkin);
+                nextSkinButtons[i].interactable = canChangeSkin;
+            }
+
+            LobbyCharacterPreview previewDisplay = GetCharacterPreviewDisplay(i);
+
+            if (previewDisplay != null)
+            {
+                // Keep the preview GameObject active. Only hide/show its RawImage.
+                // Deactivating the object every UI refresh can stop the RenderTexture
+                // from displaying even though the runtime model and camera exist.
+                if (!previewDisplay.gameObject.activeSelf)
+                    previewDisplay.gameObject.SetActive(true);
+
+                if (hasPlayer)
+                {
+                    previewDisplay.ShowCharacter(skinIndex);
+                    previewDisplay.SetPreviewVisible(true);
+                }
+                else
+                {
+                    previewDisplay.ClearPreview();
+                    previewDisplay.SetPreviewVisible(false);
+                }
+
+                if (skinPreviewImages != null && i < skinPreviewImages.Length && skinPreviewImages[i] != null)
+                    skinPreviewImages[i].gameObject.SetActive(false);
+
+                continue;
+            }
+
+            if (skinPreviewImages != null && i < skinPreviewImages.Length && skinPreviewImages[i] != null)
+            {
+                Image previewImage = skinPreviewImages[i];
+                previewImage.gameObject.SetActive(hasPlayer);
+
+                if (hasPlayer)
+                {
+                    CharacterSkinDatabase database = CharacterSkinDatabase.Instance;
+
+                    if (database != null)
+                    {
+                        Sprite previewSprite = database.GetPreviewSprite(skinIndex);
+                        Color previewColor = database.GetPreviewColor(skinIndex);
+                        previewColor.a = 1f;
+
+                        previewImage.enabled = true;
+                        previewImage.sprite = previewSprite;
+                        previewImage.color = previewSprite != null ? Color.white : previewColor;
+                        previewImage.canvasRenderer.SetAlpha(1f);
+                        previewImage.SetAllDirty();
+                    }
+                }
+            }
+        }
+    }
+
+    private LobbyCharacterPreview GetCharacterPreviewDisplay(int index)
+    {
+        if (characterPreviewDisplays == null)
+            return null;
+
+        if (index < 0 || index >= characterPreviewDisplays.Length)
+            return null;
+
+        return characterPreviewDisplays[index];
+    }
+
+    private void ClearSkinSelectionUI()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            if (skinNameTexts != null && i < skinNameTexts.Length && skinNameTexts[i] != null)
+            {
+                skinNameTexts[i].text = string.Empty;
+                skinNameTexts[i].gameObject.SetActive(false);
+            }
+
+            if (previousSkinButtons != null && i < previousSkinButtons.Length && previousSkinButtons[i] != null)
+                previousSkinButtons[i].gameObject.SetActive(false);
+
+            if (nextSkinButtons != null && i < nextSkinButtons.Length && nextSkinButtons[i] != null)
+                nextSkinButtons[i].gameObject.SetActive(false);
+
+            LobbyCharacterPreview previewDisplay = GetCharacterPreviewDisplay(i);
+            if (previewDisplay != null)
+            {
+                // Keep the preview component alive; only hide the RawImage.
+                // RefreshSkinSelectionUI will decide whether to show/clear each slot.
+                if (!previewDisplay.gameObject.activeSelf)
+                    previewDisplay.gameObject.SetActive(true);
+
+                previewDisplay.SetPreviewVisible(false);
+            }
+
+            if (skinPreviewImages != null && i < skinPreviewImages.Length && skinPreviewImages[i] != null)
+                skinPreviewImages[i].gameObject.SetActive(false);
+        }
+    }
+
     public void DisableMenuCameraForGameplay()
     {
         if (menuCameraObject != null && menuCameraObject.activeSelf)
@@ -849,6 +1669,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             Debug.Log("MainMenuManager: Menu camera enabled for menu.");
         }
     }
+
     private string GenerateRandomCode(int length)
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -873,14 +1694,18 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (runner.IsServer)
         {
             SpawnLobbyStateIfNeeded();
+            EnsureLocalHostAssignedToSlotOne();
 
             if (_lobbyState != null)
             {
-                bool assigned = _lobbyState.AssignPlayer(player);
+                bool assigned = _lobbyState.ContainsPlayer(player) || _lobbyState.AssignPlayer(player);
+
                 if (!assigned)
                 {
                     Debug.LogWarning($"Player could not be assigned: {player.PlayerId}");
                 }
+
+                ApplyCachedHostLoadoutToLobbyState();
             }
         }
 
@@ -964,7 +1789,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
+
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
 
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
