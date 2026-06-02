@@ -224,6 +224,29 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         return false;
     }
 
+    private void DestroyLeftoverNetworkClones()
+    {
+        NetworkObject[] objects = FindObjectsByType<NetworkObject>(FindObjectsSortMode.None);
+
+        for (int i = 0; i < objects.Length; i++)
+        {
+            NetworkObject obj = objects[i];
+
+            if (obj == null)
+                continue;
+
+            GameObject go = obj.gameObject;
+
+            if (go == null)
+                continue;
+
+            if (!go.name.Contains("(Clone)"))
+                continue;
+
+            Destroy(go);
+        }
+    }
+
     private void DestroyLiveRunnerHandlerObject()
     {
         GameObject sceneObjectToDestroy = null;
@@ -255,7 +278,16 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private bool IsLobbyStateAlive()
     {
-        return _lobbyState != null;
+        if (_lobbyState == null)
+            return false;
+
+        if (_runner == null || _runner.IsShutdown)
+            return false;
+
+        if (_lobbyState.Runner == null || _lobbyState.Runner.IsShutdown)
+            return false;
+
+        return _lobbyState.Runner == _runner;
     }
 
     private bool IsLocalHostRunnerReady()
@@ -532,6 +564,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     private void SafeClearLobbyState()
     {
         _lobbyState = null;
+        RoundManager.ResetLocalRoundState();
     }
 
     private void ResetCopyRoomCodeButtonText()
@@ -640,6 +673,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         CameraFollowRig.SetGameplayCursorActive(gameplayActive);
 
+        if (!gameplayActive)
+            ResetLocalGameplaySession();
+
         if (gameWorld != null)
             gameWorld.SetActive(gameplayActive);
 
@@ -647,6 +683,22 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             EnableMenuCameraForMenu();
             CameraFollowRig.ForceUnlockCursor();
+        }
+    }
+
+    private void ResetLocalGameplaySession()
+    {
+        RoundManager.ResetLocalRoundState();
+        RunnerCheckpoint.ClearAllProgress();
+
+        if (playerSpawnManagerObject != null)
+            playerSpawnManagerObject.SendMessage("ResetLocalGameplayState", SendMessageOptions.DontRequireReceiver);
+        else
+        {
+            PlayerSpawner spawner = FindFirstObjectByType<PlayerSpawner>(FindObjectsInactive.Include);
+
+            if (spawner != null)
+                spawner.ResetLocalGameplayState();
         }
     }
 
@@ -1086,6 +1138,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             }
 
             DestroyLiveRunnerHandlerObject();
+            DestroyLeftoverNetworkClones();
 
             _lobbyState = null;
 
@@ -1098,6 +1151,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
             SafeClearLobbyState();
             DestroyLiveRunnerHandlerObject();
+            DestroyLeftoverNetworkClones();
 
             _localReady = false;
             _gameWorldOpened = false;
@@ -1157,6 +1211,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private async Task StartFusion(GameMode mode, string sessionName)
     {
+        DestroyLeftoverNetworkClones();
+        SafeClearLobbyState();
+
         if (_isLeavingLobby)
         {
             Debug.LogWarning("A new connection cannot be started while leaving the lobby.");
@@ -1221,12 +1278,31 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (IsLobbyStateAlive())
             return;
 
-        _lobbyState = FindObjectOfType<LobbyState>();
+        LobbyState[] states = FindObjectsByType<LobbyState>(FindObjectsSortMode.None);
+
+        for (int i = 0; i < states.Length; i++)
+        {
+            LobbyState state = states[i];
+
+            if (state == null)
+                continue;
+
+            if (_runner != null && state.Runner != null && state.Runner == _runner)
+            {
+                _lobbyState = state;
+                return;
+            }
+        }
+
+        _lobbyState = null;
     }
 
     public void RegisterLobbyState(LobbyState state)
     {
         if (state == null)
+            return;
+
+        if (_runner != null && state.Runner != null && state.Runner != _runner)
             return;
 
         _lobbyState = state;

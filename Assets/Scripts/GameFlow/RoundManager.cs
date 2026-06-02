@@ -68,7 +68,12 @@ public class RoundManager : NetworkBehaviour
         localDisplayWinner = RoundWinner.None;
         localCountdownRemaining = 0f;
         localRoundRemaining = 0f;
-        localRoundDuration = 180f;
+        localRoundDuration = 600f;
+    }
+
+    public static void ResetLocalRoundState()
+    {
+        ClearLocalDisplay();
     }
 
     private void Awake()
@@ -120,11 +125,8 @@ public class RoundManager : NetworkBehaviour
 
         if (lobbyState.RoundStateValue == (int)RoundState.Playing)
         {
-            if (AreAllRunnersEliminated())
-            {
-                EndRound(RoundWinner.Trappers);
+            if (TryEndRoundIfAllRunnersEliminated())
                 return;
-            }
 
             if (lobbyState.IsSharedRoundTimerExpired())
                 EndRound(RoundWinner.Trappers);
@@ -289,6 +291,23 @@ public class RoundManager : NetworkBehaviour
         return (RoundWinner)value;
     }
 
+    public bool TryEndRoundIfAllRunnersEliminated()
+    {
+        CacheLobbyState();
+
+        if (!HasRoundAuthority())
+            return false;
+
+        if (lobbyState == null || lobbyState.RoundStateValue != (int)RoundState.Playing)
+            return false;
+
+        if (!AreAllRunnersEliminated())
+            return false;
+
+        EndRound(RoundWinner.Trappers);
+        return true;
+    }
+
     private bool AreAllRunnersEliminated()
     {
         if (lobbyState == null || lobbyState.RoundStateValue != (int)RoundState.Playing)
@@ -353,10 +372,44 @@ public class RoundManager : NetworkBehaviour
 
     private void CacheLobbyState()
     {
-        if (lobbyState != null)
+        if (IsLobbyStateUsable(lobbyState))
             return;
 
-        lobbyState = FindFirstObjectByType<LobbyState>();
+        LobbyState[] states = FindObjectsByType<LobbyState>(FindObjectsSortMode.None);
+        LobbyState fallbackState = null;
+
+        for (int i = 0; i < states.Length; i++)
+        {
+            LobbyState state = states[i];
+
+            if (!IsLobbyStateUsable(state))
+                continue;
+
+            if (state.HasStateAuthority)
+            {
+                lobbyState = state;
+                return;
+            }
+
+            if (fallbackState == null)
+                fallbackState = state;
+        }
+
+        lobbyState = fallbackState;
+    }
+
+    private bool IsLobbyStateUsable(LobbyState state)
+    {
+        if (state == null)
+            return false;
+
+        if (!state.isActiveAndEnabled)
+            return false;
+
+        if (state.Runner == null || state.Runner.IsShutdown)
+            return false;
+
+        return true;
     }
 
     private void PublishLocalDisplay()

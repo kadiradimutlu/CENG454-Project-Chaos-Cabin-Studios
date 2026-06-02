@@ -62,20 +62,42 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     private bool TryCacheRunner()
     {
-        if (_runner != null)
+        if (_runner != null && !_runner.IsShutdown)
             return true;
 
-        _runner = FindObjectOfType<NetworkRunner>();
-        return _runner != null;
+        _runner = FindFirstObjectByType<NetworkRunner>();
+        return _runner != null && !_runner.IsShutdown;
     }
 
     private bool TryCacheLobbyState()
     {
-        if (_lobbyState != null)
+        if (_lobbyState != null && IsLobbyStateUsable(_lobbyState))
             return true;
 
-        _lobbyState = FindObjectOfType<LobbyState>();
-        return _lobbyState != null;
+        LobbyState[] states = FindObjectsByType<LobbyState>(FindObjectsSortMode.None);
+
+        for (int i = 0; i < states.Length; i++)
+        {
+            if (IsLobbyStateUsable(states[i]))
+            {
+                _lobbyState = states[i];
+                return true;
+            }
+        }
+
+        _lobbyState = null;
+        return false;
+    }
+
+    private bool IsLobbyStateUsable(LobbyState state)
+    {
+        if (state == null)
+            return false;
+
+        if (_runner == null || _runner.IsShutdown)
+            return false;
+
+        return state.Runner == _runner;
     }
 
     private void TryRegisterCallbacks()
@@ -88,6 +110,19 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         _runner.AddCallbacks(this);
         _callbacksRegistered = true;
+    }
+
+    public void ResetLocalGameplayState()
+    {
+        if (_runner != null && _callbacksRegistered)
+            _runner.RemoveCallbacks(this);
+
+        _runner = null;
+        _lobbyState = null;
+        _callbacksRegistered = false;
+        _gameplaySpawnStarted = false;
+        _spawnedPlayers.Clear();
+        RunnerCheckpoint.ClearAllProgress();
     }
 
     public void TryStartGameplaySpawn()
@@ -623,12 +658,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
-        _runner = null;
-        _lobbyState = null;
-        _callbacksRegistered = false;
-        _gameplaySpawnStarted = false;
-        RunnerCheckpoint.ClearAllProgress();
-        _spawnedPlayers.Clear();
+        ResetLocalGameplayState();
     }
 
     public void OnConnectedToServer(NetworkRunner runner)
@@ -640,12 +670,7 @@ public class PlayerSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
-        _runner = null;
-        _lobbyState = null;
-        _callbacksRegistered = false;
-        _gameplaySpawnStarted = false;
-        RunnerCheckpoint.ClearAllProgress();
-        _spawnedPlayers.Clear();
+        ResetLocalGameplayState();
     }
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }

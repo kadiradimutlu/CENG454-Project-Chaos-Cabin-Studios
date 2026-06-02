@@ -19,6 +19,8 @@ public class PlayerDamageFeedback : NetworkBehaviour
 
     private int lastHealth = -1;
     private Coroutine flashRoutine;
+    private List<MaterialColorState> baseColorStates;
+    private List<MaterialColorState> activeFlashStates;
 
     private void Awake()
     {
@@ -31,6 +33,7 @@ public class PlayerDamageFeedback : NetworkBehaviour
 
     public override void Spawned()
     {
+        CacheBaseColors();
         Bind();
     }
 
@@ -42,6 +45,7 @@ public class PlayerDamageFeedback : NetworkBehaviour
 
     private void OnDisable()
     {
+        ResetFeedback();
         Unbind();
     }
 
@@ -71,6 +75,9 @@ public class PlayerDamageFeedback : NetworkBehaviour
 
     private void OnHealthChanged(PlayerHealth health, int currentHealth, int maxHealth)
     {
+        if (currentHealth >= maxHealth)
+            ResetFeedback();
+
         if (lastHealth >= 0 && currentHealth < lastHealth && currentHealth > 0)
             PlayDamageFeedback();
 
@@ -102,23 +109,51 @@ public class PlayerDamageFeedback : NetworkBehaviour
         audioSource.PlayOneShot(clip);
     }
 
-    private void StartFlash(Color color, float duration)
+    public void ResetFeedback()
     {
         if (flashRoutine != null)
             StopCoroutine(flashRoutine);
 
-        flashRoutine = StartCoroutine(Flash(color, duration));
+        flashRoutine = null;
+
+        if (baseColorStates == null || baseColorStates.Count == 0)
+            CacheBaseColors();
+
+        if (baseColorStates != null)
+            RestoreColor(baseColorStates);
+        else if (activeFlashStates != null)
+            RestoreColor(activeFlashStates);
+
+        activeFlashStates = null;
     }
 
-    private IEnumerator Flash(Color color, float duration)
+    private void StartFlash(Color color, float duration)
     {
-        List<MaterialColorState> states = CollectMaterialStates();
+        ResetFeedback();
 
-        ApplyColor(states, color);
+        if (baseColorStates == null || baseColorStates.Count == 0)
+            CacheBaseColors();
+
+        activeFlashStates = baseColorStates;
+        ApplyColor(activeFlashStates, color);
+
+        flashRoutine = StartCoroutine(Flash(duration));
+    }
+
+    private IEnumerator Flash(float duration)
+    {
         yield return new WaitForSeconds(Mathf.Max(0.01f, duration));
-        RestoreColor(states);
 
+        if (baseColorStates != null)
+            RestoreColor(baseColorStates);
+
+        activeFlashStates = null;
         flashRoutine = null;
+    }
+
+    private void CacheBaseColors()
+    {
+        baseColorStates = CollectMaterialStates();
     }
 
     private List<MaterialColorState> CollectMaterialStates()
