@@ -3092,13 +3092,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 10
+  damage: 5
   damageSource: 0
   instantElimination: 0
   damageOnEnter: 1
-  damageRepeatedly: 0
+  damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.08
 --- !u!1001 &922731448401602180
 PrefabInstance:
