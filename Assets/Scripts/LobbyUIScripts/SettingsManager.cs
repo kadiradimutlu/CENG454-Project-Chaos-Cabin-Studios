@@ -41,6 +41,32 @@ public class SettingsManager : MonoBehaviour
 
     public static event Action<float> MouseSensitivityChanged;
 
+    public static void ApplySavedAudioSettings(AudioMixer targetMixer)
+    {
+        if (targetMixer == null)
+            return;
+
+        ApplySavedVolumeToMixer(targetMixer, MasterVolumeKey, "MasterVolume", 1f);
+        ApplySavedVolumeToMixer(targetMixer, MusicVolumeKey, "MusicVolume", 1f);
+        ApplySavedVolumeToMixer(targetMixer, SfxVolumeKey, "SFXVolume", 1f);
+    }
+
+    private static void ApplySavedVolumeToMixer(AudioMixer targetMixer, string prefsKey, string mixerParameter, float defaultValue)
+    {
+        float volume = LoadVolumeValue(prefsKey, defaultValue);
+        float mixerValue = SliderValueToDb(volume);
+        targetMixer.SetFloat(mixerParameter, mixerValue);
+    }
+
+    private static void ApplyMainMenuMusicVolume(float volume)
+    {
+        MainMenuManager mainMenuManager = FindFirstObjectByType<MainMenuManager>(FindObjectsInactive.Include);
+
+        if (mainMenuManager != null)
+            mainMenuManager.SetMainMenuMusicVolume(volume);
+    }
+
+
     [Header("Audio Settings")]
     [SerializeField] private AudioMixer audioMixer;
     [SerializeField] private Slider masterVolumeSlider;
@@ -70,6 +96,12 @@ public class SettingsManager : MonoBehaviour
             MaxMouseSensitivity);
 
         mouseSensitivityLoaded = true;
+    }
+
+
+    private void Awake()
+    {
+        ApplySavedAudioSettings(audioMixer);
     }
 
     private void OnEnable()
@@ -141,6 +173,7 @@ public class SettingsManager : MonoBehaviour
             return;
 
         ApplyVolume(MusicVolumeKey, "MusicVolume", volume, true);
+        ApplyMainMenuMusicVolume(volume);
     }
 
     public void SetSFXVolume(float volume)
@@ -228,9 +261,10 @@ public class SettingsManager : MonoBehaviour
         ApplyVolume(MasterVolumeKey, "MasterVolume", masterVolume, false);
         ApplyVolume(MusicVolumeKey, "MusicVolume", musicVolume, false);
         ApplyVolume(SfxVolumeKey, "SFXVolume", sfxVolume, false);
+        ApplyMainMenuMusicVolume(musicVolume);
     }
 
-    private float LoadVolumeValue(string key, float defaultValue)
+    private static float LoadVolumeValue(string key, float defaultValue)
     {
         if (!PlayerPrefs.HasKey(key))
             return defaultValue;
@@ -258,7 +292,7 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
-    private float SliderValueToDb(float value)
+    private static float SliderValueToDb(float value)
     {
         if (value <= 0.0001f)
             return MinMixerVolume;
@@ -266,7 +300,7 @@ public class SettingsManager : MonoBehaviour
         return Mathf.Clamp(Mathf.Log10(value) * 20f, MinMixerVolume, MaxMixerVolume);
     }
 
-    private float DbToSliderValue(float dbValue)
+    private static float DbToSliderValue(float dbValue)
     {
         if (dbValue <= MinMixerVolume)
             return 0f;

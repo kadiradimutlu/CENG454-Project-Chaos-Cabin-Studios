@@ -10,6 +10,9 @@ using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 {
+    private const string MusicVolumePrefsKey = "MusicVolume";
+    private const float MutedVolumeDb = -80f;
+
     [Header("Panels")]
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject settingsPanel;
@@ -599,33 +602,52 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             Debug.LogWarning("MainMenuManager: Main Menu Mixer Group is not assigned. Main menu music will not be controlled by MainAudioMixer until you assign a mixer group.");
         }
+
+        SettingsManager.ApplySavedAudioSettings(mainAudioMixer);
+        ApplySavedMainMenuMusicVolume();
+    }
+
+    private float LoadSavedMainMenuMusicVolume()
+    {
+        if (!PlayerPrefs.HasKey(MusicVolumePrefsKey))
+            return 1f;
+
+        float savedValue = PlayerPrefs.GetFloat(MusicVolumePrefsKey, 1f);
+
+        if (savedValue < 0f)
+        {
+            if (savedValue <= MutedVolumeDb)
+                return 0f;
+
+            return Mathf.Clamp01(Mathf.Pow(10f, savedValue / 20f));
+        }
+
+        return Mathf.Clamp01(savedValue);
+    }
+
+    private void ApplySavedMainMenuMusicVolume()
+    {
+        SetMainMenuMusicVolume(LoadSavedMainMenuMusicVolume());
     }
 
     public void SetMainMenuMusicVolume(float normalizedVolume)
     {
+        normalizedVolume = Mathf.Clamp01(normalizedVolume);
+
+        if (mainMenuAudioSource != null)
+            mainMenuAudioSource.volume = normalizedVolume;
+
         if (mainAudioMixer == null)
-        {
-            Debug.LogWarning("MainMenuManager: Main Audio Mixer is not assigned.");
             return;
-        }
 
         if (string.IsNullOrWhiteSpace(mainMenuVolumeParameter))
-        {
-            Debug.LogWarning("MainMenuManager: Main menu volume parameter name is empty.");
             return;
-        }
 
-        normalizedVolume = Mathf.Clamp01(normalizedVolume);
         float volumeDb = normalizedVolume <= 0.0001f
-            ? -80f
+            ? MutedVolumeDb
             : Mathf.Log10(normalizedVolume) * 20f;
 
-        bool parameterFound = mainAudioMixer.SetFloat(mainMenuVolumeParameter, volumeDb);
-
-        if (!parameterFound)
-        {
-            Debug.LogWarning($"MainMenuManager: AudioMixer parameter '{mainMenuVolumeParameter}' was not found. Expose this exact parameter name in MainAudioMixer.");
-        }
+        mainAudioMixer.SetFloat(mainMenuVolumeParameter, volumeDb);
     }
 
     private void PlayMainMenuMusic()
