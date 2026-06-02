@@ -5351,7 +5351,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!1001 &1864270543488837489
 PrefabInstance:
@@ -9464,7 +9464,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -9488,7 +9488,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!1001 &5849764456669350272
 PrefabInstance:
@@ -12496,7 +12496,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!1001 &8175350412762474030
 PrefabInstance:
@@ -13555,7 +13555,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!4 &6769928414807375435 stripped
 Transform:
