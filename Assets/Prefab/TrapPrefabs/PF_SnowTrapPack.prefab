@@ -5451,7 +5451,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -5475,7 +5475,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!1001 &1050941676749046258
 PrefabInstance:
@@ -5560,7 +5560,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -5584,7 +5584,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!4 &8252240474384245824 stripped
 Transform:
@@ -6341,7 +6341,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -6365,7 +6365,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!1001 &1707966195163300411
 PrefabInstance:
@@ -8703,7 +8703,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -8727,7 +8727,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!1001 &3834172155503586826
 PrefabInstance:
@@ -8936,7 +8936,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -8960,7 +8960,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!4 &5380766938114827978 stripped
 Transform:
@@ -10435,7 +10435,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -10459,7 +10459,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!4 &7320192530651664593 stripped
 Transform:
@@ -11946,7 +11946,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -11970,7 +11970,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!1001 &5751470503466882339
 PrefabInstance:
@@ -12055,7 +12055,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -12079,7 +12079,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!4 &8651326209818660882 stripped
 Transform:
@@ -14765,7 +14765,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -14789,7 +14789,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!4 &4668800809586228217 stripped
 Transform:
@@ -14969,7 +14969,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -14993,7 +14993,7 @@ MonoBehaviour:
   damageOnEnter: 1
   damageRepeatedly: 1
   repeatInterval: 1
-  damageOnCollision: 1
+  damageOnCollision: 0
   nonTriggerContactPadding: 0.12
 --- !u!1001 &8712786401157863383
 PrefabInstance:

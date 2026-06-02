@@ -10,6 +10,9 @@ using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 {
+    private const string MusicVolumePrefsKey = "MusicVolume";
+    private const float MutedVolumeDb = -80f;
+
     [Header("Panels")]
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject settingsPanel;
@@ -224,6 +227,29 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         return false;
     }
 
+    private void DestroyLeftoverNetworkClones()
+    {
+        NetworkObject[] objects = FindObjectsByType<NetworkObject>(FindObjectsSortMode.None);
+
+        for (int i = 0; i < objects.Length; i++)
+        {
+            NetworkObject obj = objects[i];
+
+            if (obj == null)
+                continue;
+
+            GameObject go = obj.gameObject;
+
+            if (go == null)
+                continue;
+
+            if (!go.name.Contains("(Clone)"))
+                continue;
+
+            Destroy(go);
+        }
+    }
+
     private void DestroyLiveRunnerHandlerObject()
     {
         GameObject sceneObjectToDestroy = null;
@@ -255,7 +281,16 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private bool IsLobbyStateAlive()
     {
-        return _lobbyState != null;
+        if (_lobbyState == null)
+            return false;
+
+        if (_runner == null || _runner.IsShutdown)
+            return false;
+
+        if (_lobbyState.Runner == null || _lobbyState.Runner.IsShutdown)
+            return false;
+
+        return _lobbyState.Runner == _runner;
     }
 
     private bool IsLocalHostRunnerReady()
@@ -532,6 +567,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     private void SafeClearLobbyState()
     {
         _lobbyState = null;
+        RoundManager.ResetLocalRoundState();
     }
 
     private void ResetCopyRoomCodeButtonText()
@@ -566,33 +602,52 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             Debug.LogWarning("MainMenuManager: Main Menu Mixer Group is not assigned. Main menu music will not be controlled by MainAudioMixer until you assign a mixer group.");
         }
+
+        SettingsManager.ApplySavedAudioSettings(mainAudioMixer);
+        ApplySavedMainMenuMusicVolume();
+    }
+
+    private float LoadSavedMainMenuMusicVolume()
+    {
+        if (!PlayerPrefs.HasKey(MusicVolumePrefsKey))
+            return 1f;
+
+        float savedValue = PlayerPrefs.GetFloat(MusicVolumePrefsKey, 1f);
+
+        if (savedValue < 0f)
+        {
+            if (savedValue <= MutedVolumeDb)
+                return 0f;
+
+            return Mathf.Clamp01(Mathf.Pow(10f, savedValue / 20f));
+        }
+
+        return Mathf.Clamp01(savedValue);
+    }
+
+    private void ApplySavedMainMenuMusicVolume()
+    {
+        SetMainMenuMusicVolume(LoadSavedMainMenuMusicVolume());
     }
 
     public void SetMainMenuMusicVolume(float normalizedVolume)
     {
+        normalizedVolume = Mathf.Clamp01(normalizedVolume);
+
+        if (mainMenuAudioSource != null)
+            mainMenuAudioSource.volume = normalizedVolume;
+
         if (mainAudioMixer == null)
-        {
-            Debug.LogWarning("MainMenuManager: Main Audio Mixer is not assigned.");
             return;
-        }
 
         if (string.IsNullOrWhiteSpace(mainMenuVolumeParameter))
-        {
-            Debug.LogWarning("MainMenuManager: Main menu volume parameter name is empty.");
             return;
-        }
 
-        normalizedVolume = Mathf.Clamp01(normalizedVolume);
         float volumeDb = normalizedVolume <= 0.0001f
-            ? -80f
+            ? MutedVolumeDb
             : Mathf.Log10(normalizedVolume) * 20f;
 
-        bool parameterFound = mainAudioMixer.SetFloat(mainMenuVolumeParameter, volumeDb);
-
-        if (!parameterFound)
-        {
-            Debug.LogWarning($"MainMenuManager: AudioMixer parameter '{mainMenuVolumeParameter}' was not found. Expose this exact parameter name in MainAudioMixer.");
-        }
+        mainAudioMixer.SetFloat(mainMenuVolumeParameter, volumeDb);
     }
 
     private void PlayMainMenuMusic()
@@ -640,6 +695,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         CameraFollowRig.SetGameplayCursorActive(gameplayActive);
 
+        if (!gameplayActive)
+            ResetLocalGameplaySession();
+
         if (gameWorld != null)
             gameWorld.SetActive(gameplayActive);
 
@@ -647,6 +705,22 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             EnableMenuCameraForMenu();
             CameraFollowRig.ForceUnlockCursor();
+        }
+    }
+
+    private void ResetLocalGameplaySession()
+    {
+        RoundManager.ResetLocalRoundState();
+        RunnerCheckpoint.ClearAllProgress();
+
+        if (playerSpawnManagerObject != null)
+            playerSpawnManagerObject.SendMessage("ResetLocalGameplayState", SendMessageOptions.DontRequireReceiver);
+        else
+        {
+            PlayerSpawner spawner = FindFirstObjectByType<PlayerSpawner>(FindObjectsInactive.Include);
+
+            if (spawner != null)
+                spawner.ResetLocalGameplayState();
         }
     }
 
@@ -1086,6 +1160,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
             }
 
             DestroyLiveRunnerHandlerObject();
+            DestroyLeftoverNetworkClones();
 
             _lobbyState = null;
 
@@ -1098,6 +1173,7 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
             SafeClearLobbyState();
             DestroyLiveRunnerHandlerObject();
+            DestroyLeftoverNetworkClones();
 
             _localReady = false;
             _gameWorldOpened = false;
@@ -1157,6 +1233,9 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private async Task StartFusion(GameMode mode, string sessionName)
     {
+        DestroyLeftoverNetworkClones();
+        SafeClearLobbyState();
+
         if (_isLeavingLobby)
         {
             Debug.LogWarning("A new connection cannot be started while leaving the lobby.");
@@ -1221,12 +1300,31 @@ public class MainMenuManager : MonoBehaviour, INetworkRunnerCallbacks
         if (IsLobbyStateAlive())
             return;
 
-        _lobbyState = FindObjectOfType<LobbyState>();
+        LobbyState[] states = FindObjectsByType<LobbyState>(FindObjectsSortMode.None);
+
+        for (int i = 0; i < states.Length; i++)
+        {
+            LobbyState state = states[i];
+
+            if (state == null)
+                continue;
+
+            if (_runner != null && state.Runner != null && state.Runner == _runner)
+            {
+                _lobbyState = state;
+                return;
+            }
+        }
+
+        _lobbyState = null;
     }
 
     public void RegisterLobbyState(LobbyState state)
     {
         if (state == null)
+            return;
+
+        if (_runner != null && state.Runner != null && state.Runner != _runner)
             return;
 
         _lobbyState = state;

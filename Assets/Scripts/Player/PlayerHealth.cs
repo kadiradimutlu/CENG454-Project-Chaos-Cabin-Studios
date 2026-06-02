@@ -95,7 +95,10 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
         CurrentHealth = nextHealth;
 
         if (CurrentHealth == 0)
+        {
             IsEliminated = true;
+            NotifyRoundManagerIfRunnerEliminated();
+        }
     }
 
     public void Heal(int amount)
@@ -136,6 +139,29 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
 
         CurrentHealth = 0;
         IsEliminated = true;
+        NotifyRoundManagerIfRunnerEliminated();
+    }
+
+    private void NotifyRoundManagerIfRunnerEliminated()
+    {
+        if (!Object.HasStateAuthority)
+            return;
+
+        RoleHandler localRoleHandler = GetComponentInChildren<RoleHandler>(true);
+
+        if (localRoleHandler == null)
+            return;
+
+        if (!localRoleHandler.TryGetRole(out RoleHandler.PlayerRole role))
+            return;
+
+        if (role != RoleHandler.PlayerRole.Runner)
+            return;
+
+        RoundManager roundManager = FindFirstObjectByType<RoundManager>();
+
+        if (roundManager != null)
+            roundManager.TryEndRoundIfAllRunnersEliminated();
     }
 
     private void OnDamageEventChanged()

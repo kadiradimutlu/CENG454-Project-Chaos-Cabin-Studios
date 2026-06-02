@@ -374,7 +374,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a7c3b815f4d4dc4a8b70826bc42e211, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RunnerLife
-  startingDeathRights: 2
+  startingDeathRights: 3
   respawnYOffset: 1.2
   playerHealth: {fileID: -2987654311209876543}
   playerMovement: {fileID: -6558359621573049810}
