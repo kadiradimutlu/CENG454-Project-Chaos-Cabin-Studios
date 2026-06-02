@@ -454,8 +454,8 @@ MonoBehaviour:
   poisonZoneA: {fileID: 3048008246921575541}
   poisonZoneB: {fileID: 7718893550868476749}
   zoneType: 2
-  duration: 10
-  cooldown: 12
+  duration: 30
+  cooldown: 15
   activationVisualsA: {fileID: 0}
   activationVisualsB: {fileID: 0}
 --- !u!114 &6447316097273726437
@@ -1215,7 +1215,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 2
+  damage: 5
   damageSource: 1
   instantElimination: 0
   damageOnEnter: 0
@@ -2828,7 +2828,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53e0ea0fd9b34b2aa231a764e244c77b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageVolume
-  damage: 2
+  damage: 5
   damageSource: 1
   instantElimination: 0
   damageOnEnter: 0
